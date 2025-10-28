@@ -1,0 +1,139 @@
+/* Admin-specific styling */
+.navbar-dark .navbar-brand {
+    color: #ffc107 !important;
+}
+
+.navbar-dark .nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.navbar-dark .nav-link:hover {
+    color: #ffc107 !important;
+}
+
+.navbar-dark .nav-link.text-warning {
+    color: #ffc107 !important;
+}
+
+.navbar-dark .dropdown-menu {
+    background-color: #343a40;
+    border: 1px solid #495057;
+}
+
+.navbar-dark .dropdown-item {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.navbar-dark .dropdown-item:hover {
+    background-color: #495057;
+    color: #ffc107;
+}
+
+.navbar-dark .dropdown-divider {
+    border-color: #495057;
+}
+
+/* Admin dashboard specific */
+.admin-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+}
+
+.admin-stats-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.admin-quick-action {
+    transition: all 0.2s ease-in-out;
+}
+
+.admin-quick-action:hover {
+    transform: scale(1.05);
+}
+
+/* User-specific styling */
+.user-welcome {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.user-feature-card {
+    border-left: 4px solid #007bff;
+    transition: all 0.2s ease-in-out;
+}
+
+.user-feature-card:hover {
+    border-left-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Enhanced cards */
+.card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+}
+
+/* Badge enhancements */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.75em;
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Search bar enhancement */
+.search-input {
+    border-radius: 25px;
+    border: 2px solid #e9ecef;
+    transition: all 0.2s ease-in-out;
+}
+
+.search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.btn-search {
+    border-radius: 25px;
+    font-weight: 600;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .admin-stats-icon {
+        font-size: 2rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn {
+        font-size: 0.9rem;
+    }
+}

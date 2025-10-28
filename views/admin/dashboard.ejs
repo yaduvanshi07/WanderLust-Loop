@@ -1,0 +1,188 @@
+<% layout('layouts/boilerplate') %>
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="text-primary mb-0">
+          <i class="fa-solid fa-tachometer-alt me-2"></i>
+          Admin Dashboard
+        </h2>
+        <div class="text-muted">
+          <i class="fa-solid fa-user-shield me-1"></i>
+          Welcome, <%= currUser.username %>!
+        </div>
+      </div>
+      <hr class="my-3">
+    </div>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="text-primary mb-2">
+            <i class="fa-solid fa-eye fa-2x"></i>
+          </div>
+          <h4 class="card-title text-primary"><%= overview.totalViews %></h4>
+          <p class="card-text text-muted">Total Views</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="text-success mb-2">
+            <i class="fa-solid fa-calendar-check fa-2x"></i>
+          </div>
+          <h4 class="card-title text-success"><%= overview.totalBookings %></h4>
+          <p class="card-text text-muted">Total Bookings</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="text-warning mb-2">
+            <i class="fa-solid fa-rupee-sign fa-2x"></i>
+          </div>
+          <h4 class="card-title text-warning">₹<%= overview.totalRevenue %></h4>
+          <p class="card-text text-muted">Total Revenue</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="text-info mb-2">
+            <i class="fa-solid fa-star fa-2x"></i>
+          </div>
+          <h4 class="card-title text-info"><%= (overview.averageRating||0).toFixed(2) %></h4>
+          <p class="card-text text-muted">Average Rating</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fa-solid fa-bolt me-2"></i>Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <a href="/coupons" class="btn btn-outline-primary w-100">
+                <i class="fa-solid fa-ticket-alt me-2"></i>Manage Coupons
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="/analytics/dashboard" class="btn btn-outline-success w-100">
+                <i class="fa-solid fa-chart-line me-2"></i>View Analytics
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="/listings/new" class="btn btn-outline-warning w-100">
+                <i class="fa-solid fa-plus me-2"></i>Add Listing
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="/bookings" class="btn btn-outline-info w-100">
+                <i class="fa-solid fa-list me-2"></i>View Bookings
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="/admin/ml/dashboard" class="btn btn-outline-danger w-100">
+                <i class="fa-solid fa-brain me-2"></i>ML Performance
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <form method="POST" action="/admin/trigger-performance-check" class="d-inline">
+                <button type="submit" class="btn btn-outline-warning w-100">
+                  <i class="fa-solid fa-chart-line me-2"></i>Check Performance
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fa-solid fa-ticket-alt me-2"></i>Recent Coupons</h5>
+        </div>
+        <div class="card-body">
+          <% if (recentCoupons.length > 0) { %>
+            <div class="list-group list-group-flush">
+              <% recentCoupons.forEach(c => { %>
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                  <div>
+                    <strong><%= c.code %></strong>
+                    <br>
+                    <small class="text-muted"><%= c.discountType %> - <%= c.amount %></small>
+                  </div>
+                  <span class="badge <%= c.isActive ? 'bg-success' : 'bg-secondary' %>">
+                    <%= c.isActive ? 'Active' : 'Inactive' %>
+                  </span>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-muted text-center">No coupons created yet.</p>
+          <% } %>
+          <div class="mt-3">
+            <a class="btn btn-success btn-sm w-100" href="/coupons">
+              <i class="fa-solid fa-cog me-1"></i>Manage All Coupons
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fa-solid fa-chart-bar me-2"></i>Top Listings</h5>
+        </div>
+        <div class="card-body">
+          <% if (topListings.length > 0) { %>
+            <div class="list-group list-group-flush">
+              <% topListings.forEach(a => { %>
+                <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                  <div>
+                    <strong><%= a.listing?.title || 'Unknown' %></strong>
+                    <br>
+                    <small class="text-muted">₹<%= a.listing?.price || 0 %> per night</small>
+                  </div>
+                  <div class="text-end">
+                    <div class="small text-muted">
+                      <i class="fa-solid fa-eye me-1"></i><%= a.viewsCount %>
+                    </div>
+                    <div class="small text-muted">
+                      <i class="fa-solid fa-calendar-check me-1"></i><%= a.bookingsCount %>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-muted text-center">No listings with analytics yet.</p>
+          <% } %>
+          <div class="mt-3">
+            <a class="btn btn-info btn-sm w-100" href="/analytics/dashboard">
+              <i class="fa-solid fa-chart-line me-1"></i>View Full Analytics
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,106 @@
+
+<style>
+  .btn-search{
+    background-color:#fe242d ;
+    color:#fff;
+    padding:0 1rem 0 1rem;
+    border-radius: 25rem;
+  }
+  .btn-search:hover{
+    background-color:#fe242d ;
+    color:#fff;
+  }
+  .btn-search i{
+    display:inline;
+    margin-right: 0.5rem;
+  }
+
+  .search-input{
+    border-radius: 25px;
+    width:300px;
+    /* padding:0.5rem, 3rem, 0.5rem, 3rem; */
+  }
+</style>
+
+<!-- Add to your header or navigation part -->
+
+
+
+<nav class="navbar navbar-expand-md border-bottom sticky-top <%= currUser && currUser.role === 'admin' ? 'navbar-dark bg-dark' : 'bg-light' %>">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="<%= currUser && currUser.role === 'admin' ? '/admin' : '/listings' %>">
+        <i class="fa-regular fa-compass"></i>
+        <% if (currUser && currUser.role === 'admin') { %>
+          <span class="ms-2 text-warning">Admin Panel</span>
+        <% } else { %>
+          <span class="ms-2">WanderLust</span>
+        <% } %>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+        
+          <a class="nav-link" href="/listings">Explore</a>
+          <% if (currUser && currUser.role === 'admin') { %>
+            <a class="nav-link text-warning" href="/admin">Dashboard</a>
+          <% } %>
+          
+        </div>
+        <div >
+        
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/bookings">View All Bookings</a>
+          </li>
+        </ul>
+        </div>
+
+
+        <div class="navbar-nav ms-auto">
+
+        <form action="/listings" method="GET" class="d-flex" role="search">
+          <input class="form-control me-2 search-input" type="search" placeholder="Search" aria-label="Search"  name="q" value="<%= searchQuery %>">
+          <button class="btn btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
+        </form>
+      </div>
+      <div class="navbar-nav ms-auto">
+        <% if (currUser && currUser.role === 'admin') { %>
+          <a class="nav-link" href="/coupons">Coupons</a>
+        <% } %>
+        <% if (currUser) { %>
+          <a class="nav-link" href="/analytics/dashboard">Analytics</a>
+        <% } %>
+        <a class="nav-link" href="/listings/new">Airbnb your home</a>
+
+        <% if (typeof currUser === "undefined" || !currUser) { %>
+          <a class="nav-link" href="/signup"><b>Sign up</b></a>
+          <a class="nav-link" href="/login"><b>Log in</b></a>
+        <% } else { %>
+          <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-user"></i> <%= currUser.username %>
+              <% if (currUser.role === 'admin') { %>
+                <span class="badge bg-warning text-dark ms-1">Admin</span>
+              <% } %>
+            </a>
+            <ul class="dropdown-menu">
+              <% if (currUser.role === 'admin') { %>
+                <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><hr class="dropdown-divider"></li>
+              <% } %>
+              <li><a class="dropdown-item" href="/bookings"><i class="fa-solid fa-calendar-check"></i> My Bookings</a></li>
+              <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line"></i> Performance</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+          </div>
+        <% } %>
+      </div>
+
+
+        
+      </div>
+    </div>
+  </nav>

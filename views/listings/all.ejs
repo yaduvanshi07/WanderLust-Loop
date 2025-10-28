@@ -1,0 +1,113 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-dark">All Bookings</h2>
+
+    <% if (bookings.length === 0) { %>
+        <div class="alert alert-warning text-center">No bookings found.</div>
+    <% } else { %>
+        <div class="row">
+            <% bookings.forEach(booking => { %>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-lg border-0 rounded-3">
+                        <div class="card-body">
+                            
+                            <% if (booking.listing) { %>
+                                <h5 class="card-title font-weight-bold text-primary mb-3"><%= booking.listing.title %></h5>
+                            <% } else { %>
+                                <h5 class="card-title text-danger mb-3">Listing not available</h5>
+                            <% } %>
+
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-calendar-day"></i> <strong>Check-in:</strong> <%= booking.checkin.toDateString() %></li>
+                                <li><i class="fas fa-calendar-times"></i> <strong>Check-out:</strong> <%= booking.checkout.toDateString() %></li>
+                                <li><i class="fas fa-users"></i> <strong>Guests:</strong> <%= booking.guests %></li>
+                                <li><i class="fas fa-tag"></i> <strong>Total:</strong> ₹<%= booking.total.toFixed(2) %></li>
+                            </ul>
+
+                            <% if (booking.listing) { %>
+                                <a href="/listings/<%= booking.listing._id %>" class="btn btn-primary btn-sm mt-3">View Listing</a>
+                            <% } else { %>
+                                <button class="btn btn-secondary btn-sm mt-3" disabled>Listing Removed</button>
+                            <% } %>
+
+                            <br>
+                            <small class="text-muted d-block mt-2">Booked on <%= booking.bookedAt.toDateString() %></small>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .container {
+        max-width: 1200px;
+    }
+
+    h2 {
+        font-size: 2rem;
+        color: #343a40;
+        font-weight: 600;
+    }
+
+    .alert-warning {
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .card {
+        border-radius: 15px;
+        background-color: #f8f9fa;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    i {
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .btn-sm {
+        padding: 5px 10px;
+        font-size: 0.9rem;
+    }
+
+    small.text-muted {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 15px;
+        }
+        .btn-sm {
+            font-size: 0.8rem;
+        }
+    }
+</style>

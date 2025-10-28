@@ -1,0 +1,725 @@
+<!-- Airbnb-style Booking Widget -->
+<div class="booking-widget-container">
+  <div class="booking-widget">
+    <div class="price-section">
+      <div class="price-row">
+        <span class="price-amount">₹<%= listing.price.toLocaleString("en-IN") %></span>
+        <span class="price-period">per night</span>
+      </div>
+      <div class="rating-section">
+        <div class="stars">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <span class="rating-text">4.8 · 24 reviews</span>
+      </div>
+    </div>
+
+    <form id="booking-form" class="booking-form" action="/bookings/<%= listing._id %>" method="POST">
+      <!-- Date Selection -->
+      <div class="date-section">
+        <div class="date-input-group">
+          <div class="date-input-container">
+            <label for="checkin" class="date-label">CHECK-IN</label>
+            <input type="date" id="checkin" name="checkin" class="date-input" required>
+          </div>
+          <div class="date-input-container">
+            <label for="checkout" class="date-label">CHECKOUT</label>
+            <input type="date" id="checkout" name="checkout" class="date-input" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guest Selection -->
+      <div class="guest-section">
+        <button type="button" class="guest-selector" id="guest-selector">
+          <div class="guest-info">
+            <span class="guest-label">GUESTS</span>
+            <span class="guest-count" id="guest-count">1 guest</span>
+          </div>
+          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        
+        <!-- Guest Dropdown -->
+        <div class="guest-dropdown" id="guest-dropdown" style="display: none;">
+          <div class="guest-option">
+            <div class="guest-option-info">
+              <span class="guest-option-label">Adults</span>
+              <span class="guest-option-desc">Ages 13 or above</span>
+            </div>
+            <div class="guest-option-controls">
+              <button type="button" class="guest-btn" id="adults-minus">-</button>
+              <span class="guest-count-display" id="adults-count">1</span>
+              <button type="button" class="guest-btn" id="adults-plus">+</button>
+            </div>
+          </div>
+          
+          <div class="guest-option">
+            <div class="guest-option-info">
+              <span class="guest-option-label">Children</span>
+              <span class="guest-option-desc">Ages 2-12</span>
+            </div>
+            <div class="guest-option-controls">
+              <button type="button" class="guest-btn" id="children-minus">-</button>
+              <span class="guest-count-display" id="children-count">0</span>
+              <button type="button" class="guest-btn" id="children-plus">+</button>
+            </div>
+          </div>
+          
+          <div class="guest-option">
+            <div class="guest-option-info">
+              <span class="guest-option-label">Infants</span>
+              <span class="guest-option-desc">Under 2</span>
+            </div>
+            <div class="guest-option-controls">
+              <button type="button" class="guest-btn" id="infants-minus">-</button>
+              <span class="guest-count-display" id="infants-count">0</span>
+              <button type="button" class="guest-btn" id="infants-plus">+</button>
+            </div>
+          </div>
+          
+          <div class="guest-option">
+            <div class="guest-option-info">
+              <span class="guest-option-label">Pets</span>
+              <span class="guest-option-desc">Bringing a service animal?</span>
+            </div>
+            <div class="guest-option-controls">
+              <button type="button" class="guest-btn" id="pets-minus">-</button>
+              <span class="guest-count-display" id="pets-count">0</span>
+              <button type="button" class="guest-btn" id="pets-plus">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden inputs for guest counts -->
+      <input type="hidden" name="guests[adults]" id="adults-input" value="1">
+      <input type="hidden" name="guests[children]" id="children-input" value="0">
+      <input type="hidden" name="guests[infants]" id="infants-input" value="0">
+      <input type="hidden" name="guests[pets]" id="pets-input" value="0">
+
+      <!-- Special Requests -->
+      <div class="special-requests">
+        <textarea 
+          name="specialRequests" 
+          placeholder="Tell the host about your trip..." 
+          class="special-requests-input"
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <!-- Booking Button -->
+      <button type="submit" class="booking-button" id="booking-button">
+        <span id="booking-button-text">Reserve</span>
+      </button>
+
+      <!-- Pricing Breakdown -->
+      <div class="pricing-breakdown" id="pricing-breakdown" style="display: none;">
+        <div class="pricing-line">
+          <span>₹<%= listing.price.toLocaleString("en-IN") %> × <span id="nights-display">1</span> nights</span>
+          <span id="base-price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+        </div>
+        <div class="pricing-line">
+          <span>Cleaning fee</span>
+          <span id="cleaning-fee">₹500</span>
+        </div>
+        <div class="pricing-line">
+          <span>Service fee</span>
+          <span id="service-fee">₹200</span>
+        </div>
+        <div class="pricing-line">
+          <span>Taxes</span>
+          <span id="taxes">₹0</span>
+        </div>
+        <div class="pricing-line total-line">
+          <span>Total (INR)</span>
+          <span id="total-price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+        </div>
+      </div>
+
+      <!-- Coupon Section -->
+      <div class="coupon-section">
+        <button type="button" class="coupon-toggle" id="coupon-toggle">
+          <i class="fa-solid fa-tag"></i>
+          <span>Add a coupon</span>
+        </button>
+        <div class="coupon-input-container" id="coupon-input-container" style="display: none;">
+          <input type="text" name="couponCode" id="couponCode" placeholder="Enter coupon code" class="coupon-input">
+          <button type="button" class="coupon-apply-btn" id="coupon-apply-btn">Apply</button>
+        </div>
+        <div class="coupon-feedback" id="coupon-feedback"></div>
+      </div>
+    </form>
+
+    <!-- Host Information -->
+    <div class="host-info">
+      <div class="host-avatar">
+        <i class="fa-solid fa-user"></i>
+      </div>
+      <div class="host-details">
+        <div class="host-name">Hosted by <%= listing.owner.username %></div>
+        <div class="host-response-time">Responds within an hour</div>
+      </div>
+    </div>
+
+    <!-- Safety Information -->
+    <div class="safety-info">
+      <div class="safety-item">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Free cancellation before 3:00 PM on Mar 27</span>
+      </div>
+      <div class="safety-item">
+        <i class="fa-solid fa-lock"></i>
+        <span>Your payment information is always secure</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.booking-widget-container {
+  position: sticky;
+  top: 20px;
+}
+
+.booking-widget {
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 24px;
+  background: white;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.price-section {
+  margin-bottom: 24px;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.price-amount {
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
+}
+
+.price-period {
+  font-size: 16px;
+  color: #717171;
+  margin-left: 4px;
+}
+
+.rating-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stars {
+  color: #ff385c;
+  font-size: 12px;
+}
+
+.rating-text {
+  font-size: 14px;
+  color: #222;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.booking-form {
+  margin-bottom: 24px;
+}
+
+.date-section {
+  margin-bottom: 16px;
+}
+
+.date-input-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.date-input-container {
+  position: relative;
+}
+
+.date-input-container:first-child {
+  border-right: 1px solid #b0b0b0;
+}
+
+.date-label {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #222;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
+.date-input {
+  width: 100%;
+  padding: 24px 12px 8px;
+  border: none;
+  font-size: 14px;
+  background: transparent;
+}
+
+.date-input:focus {
+  outline: none;
+}
+
+.guest-section {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.guest-selector {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.guest-selector:hover {
+  border-color: #222;
+}
+
+.guest-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.guest-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #222;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.guest-count {
+  font-size: 14px;
+  color: #222;
+}
+
+.guest-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  padding: 16px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.guest-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.guest-option:last-child {
+  border-bottom: none;
+}
+
+.guest-option-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.guest-option-label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #222;
+}
+
+.guest-option-desc {
+  font-size: 14px;
+  color: #717171;
+}
+
+.guest-option-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.guest-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #b0b0b0;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: #222;
+  transition: all 0.2s;
+}
+
+.guest-btn:hover:not(:disabled) {
+  border-color: #222;
+}
+
+.guest-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guest-count-display {
+  font-size: 16px;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+}
+
+.special-requests {
+  margin-bottom: 16px;
+}
+
+.special-requests-input {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.special-requests-input:focus {
+  outline: none;
+  border-color: #222;
+}
+
+.booking-button {
+  width: 100%;
+  padding: 16px;
+  background: #ff385c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 16px;
+}
+
+.booking-button:hover {
+  background: #e31c5f;
+}
+
+.booking-button:disabled {
+  background: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.pricing-breakdown {
+  border-top: 1px solid #ebebeb;
+  padding-top: 16px;
+  margin-bottom: 16px;
+}
+
+.pricing-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.pricing-line:last-child {
+  margin-bottom: 0;
+}
+
+.total-line {
+  font-weight: 600;
+  font-size: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #ebebeb;
+}
+
+.coupon-section {
+  margin-bottom: 16px;
+}
+
+.coupon-toggle {
+  background: none;
+  border: none;
+  color: #222;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.coupon-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #b0b0b0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.coupon-apply-btn {
+  padding: 12px 16px;
+  background: #222;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.coupon-feedback {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.coupon-feedback.success {
+  color: #008a05;
+}
+
+.coupon-feedback.error {
+  color: #c13515;
+}
+
+.host-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #ebebeb;
+  margin-bottom: 16px;
+}
+
+.host-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #717171;
+}
+
+.host-details {
+  flex: 1;
+}
+
+.host-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+}
+
+.host-response-time {
+  font-size: 12px;
+  color: #717171;
+}
+
+.safety-info {
+  border-top: 1px solid #ebebeb;
+  padding-top: 16px;
+}
+
+.safety-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #717171;
+}
+
+.safety-item:last-child {
+  margin-bottom: 0;
+}
+
+.safety-item i {
+  color: #222;
+}
+
+@media (max-width: 768px) {
+  .booking-widget-container {
+    position: static;
+    margin-top: 24px;
+  }
+  
+  .date-input-group {
+    grid-template-columns: 1fr;
+  }
+  
+  .date-input-container:first-child {
+    border-right: none;
+    border-bottom: 1px solid #b0b0b0;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const guestSelector = document.getElementById('guest-selector');
+  const guestDropdown = document.getElementById('guest-dropdown');
+  const bookingForm = document.getElementById('booking-form');
+  const checkinInput = document.getElementById('checkin');
+  const checkoutInput = document.getElementById('checkout');
+  const pricingBreakdown = document.getElementById('pricing-breakdown');
+  const couponToggle = document.getElementById('coupon-toggle');
+  const couponContainer = document.getElementById('coupon-input-container');
+  
+  // Guest counts
+  let adults = 1, children = 0, infants = 0, pets = 0;
+  
+  // Toggle guest dropdown
+  guestSelector.addEventListener('click', function(e) {
+    e.stopPropagation();
+    guestDropdown.style.display = guestDropdown.style.display === 'none' ? 'block' : 'none';
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    guestDropdown.style.display = 'none';
+  });
+  
+  // Guest count controls
+  function updateGuestCounts() {
+    document.getElementById('adults-count').textContent = adults;
+    document.getElementById('children-count').textContent = children;
+    document.getElementById('infants-count').textContent = infants;
+    document.getElementById('pets-count').textContent = pets;
+    
+    const total = adults + children + infants;
+    document.getElementById('guest-count').textContent = 
+      total === 1 ? '1 guest' : `${total} guests`;
+    
+    // Update hidden inputs
+    document.getElementById('adults-input').value = adults;
+    document.getElementById('children-input').value = children;
+    document.getElementById('infants-input').value = infants;
+    document.getElementById('pets-input').value = pets;
+  }
+  
+  // Adults controls
+  document.getElementById('adults-plus').addEventListener('click', function() {
+    if (adults < 16) adults++;
+    updateGuestCounts();
+  });
+  
+  document.getElementById('adults-minus').addEventListener('click', function() {
+    if (adults > 1) adults--;
+    updateGuestCounts();
+  });
+  
+  // Children controls
+  document.getElementById('children-plus').addEventListener('click', function() {
+    if (children < 5) children++;
+    updateGuestCounts();
+  });
+  
+  document.getElementById('children-minus').addEventListener('click', function() {
+    if (children > 0) children--;
+    updateGuestCounts();
+  });
+  
+  // Infants controls
+  document.getElementById('infants-plus').addEventListener('click', function() {
+    if (infants < 5) infants++;
+    updateGuestCounts();
+  });
+  
+  document.getElementById('infants-minus').addEventListener('click', function() {
+    if (infants > 0) infants--;
+    updateGuestCounts();
+  });
+  
+  // Pets controls
+  document.getElementById('pets-plus').addEventListener('click', function() {
+    if (pets < 2) pets++;
+    updateGuestCounts();
+  });
+  
+  document.getElementById('pets-minus').addEventListener('click', function() {
+    if (pets > 0) pets--;
+    updateGuestCounts();
+  });
+  
+  // Date change handler
+  function updatePricing() {
+    const checkin = new Date(checkinInput.value);
+    const checkout = new Date(checkoutInput.value);
+    
+    if (checkin && checkout && checkout > checkin) {
+      const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+      const basePrice = <%= listing.price %> * nights;
+      const cleaningFee = 500;
+      const serviceFee = 200;
+      const taxes = Math.round(basePrice * 0.18);
+      const total = basePrice + cleaningFee + serviceFee + taxes;
+      
+      document.getElementById('nights-display').textContent = nights;
+      document.getElementById('base-price').textContent = `₹${basePrice.toLocaleString('en-IN')}`;
+      document.getElementById('cleaning-fee').textContent = `₹${cleaningFee}`;
+      document.getElementById('service-fee').textContent = `₹${serviceFee}`;
+      document.getElementById('taxes').textContent = `₹${taxes.toLocaleString('en-IN')}`;
+      document.getElementById('total-price').textContent = `₹${total.toLocaleString('en-IN')}`;
+      
+      pricingBreakdown.style.display = 'block';
+    } else {
+      pricingBreakdown.style.display = 'none';
+    }
+  }
+  
+  checkinInput.addEventListener('change', updatePricing);
+  checkoutInput.addEventListener('change', updatePricing);
+  
+  // Coupon toggle
+  couponToggle.addEventListener('click', function() {
+    couponContainer.style.display = couponContainer.style.display === 'none' ? 'flex' : 'none';
+  });
+  
+  // Set minimum date to today
+  const today = new Date().toISOString().split('T')[0];
+  checkinInput.min = today;
+  checkoutInput.min = today;
+  
+  // Initialize
+  updateGuestCounts();
+});
+</script>

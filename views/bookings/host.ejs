@@ -1,0 +1,457 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="host-bookings-header">
+        <h1 class="host-bookings-title">Host Bookings</h1>
+        <p class="host-bookings-subtitle">Manage reservations for your listings</p>
+      </div>
+
+      <% if (bookings && bookings.length > 0) { %>
+        <div class="bookings-table-container">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Listing</th>
+                <th>Dates</th>
+                <th>Guests</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% bookings.forEach(booking => { %>
+                <tr>
+                  <td>
+                    <div class="guest-info">
+                      <div class="guest-avatar">
+                        <i class="fa-solid fa-user"></i>
+                      </div>
+                      <div class="guest-details">
+                        <div class="guest-name"><%= booking.guest.username %></div>
+                        <div class="booking-ref">#WB<%= booking._id.toString().slice(-8).toUpperCase() %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="listing-info">
+                      <div class="listing-title"><%= booking.listing.title %></div>
+                      <div class="listing-location">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <%= booking.listing.location %>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="date-info">
+                      <div class="checkin-date">
+                        <strong>Check-in:</strong><br>
+                        <%= new Date(booking.checkin).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                      </div>
+                      <div class="checkout-date">
+                        <strong>Check-out:</strong><br>
+                        <%= new Date(booking.checkout).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="guests-info">
+                      <div class="guest-count">
+                        <i class="fa-solid fa-users"></i>
+                        <%= booking.guests.adults %> <%= booking.guests.adults === 1 ? 'adult' : 'adults' %>
+                      </div>
+                      <% if (booking.guests.children > 0) { %>
+                        <div class="guest-count">
+                          <i class="fa-solid fa-child"></i>
+                          <%= booking.guests.children %> <%= booking.guests.children === 1 ? 'child' : 'children' %>
+                        </div>
+                      <% } %>
+                      <% if (booking.guests.infants > 0) { %>
+                        <div class="guest-count">
+                          <i class="fa-solid fa-baby"></i>
+                          <%= booking.guests.infants %> <%= booking.guests.infants === 1 ? 'infant' : 'infants' %>
+                        </div>
+                      <% } %>
+                      <% if (booking.guests.pets > 0) { %>
+                        <div class="guest-count">
+                          <i class="fa-solid fa-paw"></i>
+                          <%= booking.guests.pets %> <%= booking.guests.pets === 1 ? 'pet' : 'pets' %>
+                        </div>
+                      <% } %>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="pricing-info">
+                      <div class="total-amount">₹<%= booking.pricing.total.toLocaleString('en-IN') %></div>
+                      <div class="nights-count">
+                        <%= Math.ceil((new Date(booking.checkout) - new Date(booking.checkin)) / (1000 * 60 * 60 * 24)) %> 
+                        <%= Math.ceil((new Date(booking.checkout) - new Date(booking.checkin)) / (1000 * 60 * 60 * 24)) === 1 ? 'night' : 'nights' %>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge status-<%= booking.status %>">
+                      <%= booking.status.charAt(0).toUpperCase() + booking.status.slice(1) %>
+                    </span>
+                    <% if (booking.status === 'cancelled' && booking.cancelledAt) { %>
+                      <div class="cancelled-date">
+                        <small class="text-muted">
+                          Cancelled: <%= new Date(booking.cancelledAt).toLocaleDateString() %>
+                        </small>
+                      </div>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-primary" title="View Listing">
+                        <i class="fa-solid fa-eye"></i>
+                      </a>
+                      
+                      <% if (booking.status === 'confirmed' && new Date(booking.checkin) > new Date()) { %>
+                        <button class="btn btn-sm btn-outline-danger" onclick="cancelHostBooking('<%= booking._id %>')" title="Cancel Booking">
+                          <i class="fa-solid fa-times"></i>
+                        </button>
+                      <% } %>
+                      
+                      <% if (booking.specialRequests) { %>
+                        <button class="btn btn-sm btn-outline-info" onclick="showSpecialRequests('<%= booking.specialRequests %>')" title="Special Requests">
+                          <i class="fa-solid fa-comment"></i>
+                        </button>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="no-bookings">
+          <div class="no-bookings-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <h3>No bookings yet</h3>
+          <p>You haven't received any bookings for your listings.</p>
+          <a href="/listings/new" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Create New Listing
+          </a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Special Requests Modal -->
+<div class="modal fade" id="specialRequestsModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Special Requests</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="specialRequestsText"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Booking Modal -->
+<div class="modal fade" id="cancelHostModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cancel Booking</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to cancel this booking as a host?</p>
+        <div class="alert alert-warning">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <strong>Warning:</strong> Cancelling a booking may affect your host rating and could result in penalties.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+        <button type="button" class="btn btn-danger" id="confirmHostCancel">Cancel Booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.host-bookings-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.host-bookings-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.host-bookings-subtitle {
+  font-size: 18px;
+  color: #717171;
+  margin: 0;
+}
+
+.bookings-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.table {
+  margin: 0;
+}
+
+.table thead th {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+  padding: 16px 12px;
+}
+
+.table tbody td {
+  padding: 16px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.guest-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guest-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #717171;
+  font-size: 16px;
+}
+
+.guest-details {
+  flex: 1;
+}
+
+.guest-name {
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 2px;
+}
+
+.booking-ref {
+  font-size: 12px;
+  color: #717171;
+}
+
+.listing-info {
+  max-width: 200px;
+}
+
+.listing-title {
+  font-weight: 500;
+  color: #222;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.listing-location {
+  font-size: 12px;
+  color: #717171;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.date-info {
+  font-size: 14px;
+}
+
+.checkin-date,
+.checkout-date {
+  margin-bottom: 4px;
+}
+
+.guests-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guest-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #717171;
+}
+
+.guest-count i {
+  font-size: 12px;
+  width: 14px;
+}
+
+.pricing-info {
+  text-align: right;
+}
+
+.total-amount {
+  font-weight: 600;
+  color: #222;
+  font-size: 16px;
+}
+
+.nights-count {
+  font-size: 12px;
+  color: #717171;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.cancelled-date {
+  margin-top: 4px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.no-bookings-icon {
+  font-size: 64px;
+  color: #717171;
+  margin-bottom: 24px;
+}
+
+.no-bookings h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.no-bookings p {
+  color: #717171;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .bookings-table-container {
+    overflow-x: auto;
+  }
+  
+  .table {
+    min-width: 800px;
+  }
+  
+  .guest-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+let bookingToCancel = null;
+
+function showSpecialRequests(requests) {
+  document.getElementById('specialRequestsText').textContent = requests;
+  const modal = new bootstrap.Modal(document.getElementById('specialRequestsModal'));
+  modal.show();
+}
+
+function cancelHostBooking(bookingId) {
+  bookingToCancel = bookingId;
+  const modal = new bootstrap.Modal(document.getElementById('cancelHostModal'));
+  modal.show();
+}
+
+document.getElementById('confirmHostCancel').addEventListener('click', function() {
+  if (bookingToCancel) {
+    // Create a form to submit the cancellation
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/bookings/${bookingToCancel}/host-cancel`;
+    
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'PATCH';
+    
+    form.appendChild(methodInput);
+    document.body.appendChild(form);
+    form.submit();
+  }
+});
+
+// Reset bookingToCancel when modal is hidden
+document.getElementById('cancelHostModal').addEventListener('hidden.bs.modal', function() {
+  bookingToCancel = null;
+});
+</script>

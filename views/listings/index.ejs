@@ -1,0 +1,436 @@
+<% layout("/layouts/boilerplate")%>
+
+<style>
+    #filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter {
+        text-align: center;
+        margin-top: 1.5rem;
+        margin-left: 2rem;
+        opacity: 0.6;
+    }
+
+    .filter:hover {
+        opacity: 1;
+        cursor: pointer;
+    }
+
+    .tax-info {
+        display: none;
+        margin-top: 0.5rem;
+    }
+
+    .tax-toggle {
+        border: 1px solid black;
+        border-radius: 1rem;
+        height: 3rem;
+        padding: 1rem;
+        margin-left: 9rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .card {
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        z-index: 1;
+        opacity: 0.6;
+    }
+
+    .card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+        opacity: 1;
+        cursor: pointer;
+    }
+
+    .listing-container {
+        margin-bottom: 5rem; /* space below for footer */
+    }
+
+    .old-price {
+        color: red;
+    }
+
+    .new-price {
+        font-weight: bold;
+        color: green;
+    }
+
+    .cut-price {
+        text-decoration: line-through;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    .personalized-alert {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+</style>
+
+
+
+<div id="filters" class="position-relative">
+    <div class="alert alert-info border-0 d-flex align-items-center gap-3 mt-3 personalized-alert shadow-sm" role="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+        <i class="fa-solid fa-sparkles fa-2x"></i>
+        <div class="flex-grow-1">
+            <span class="badge bg-white text-primary me-2">AI-Powered</span>
+            <strong>Search results may be reordered for you using machine learning.</strong>
+            <span id="info-trigger" class="ms-2 text-white" style="cursor: help; border-bottom: 1px dotted white;">ℹ️ How it works?</span>
+        </div>
+    </div>
+    <!-- <div class="filter"><div><i class="fa-solid fa-fire"></i></div><p>Trending</p></div>
+    <div class="filter"><div><i class="fa-solid fa-bed"></i></div><p>Rooms</p></div>
+    <div class="filter"><div><i class="fa-solid fa-mountain-city"></i></div><p>Iconic Cities</p></div>
+    <div class="filter"><div><i class="fa-solid fa-mountain-sun"></i></div><p>Mountains</p></div>
+    <div class="filter"><div><i class="fa-brands fa-fort-awesome"></i></div><p>Castles</p></div>
+    <div class="filter"><div><i class="fa-solid fa-person-swimming"></i></div><p>Amazing pools</p></div>
+    <div class="filter"><div><i class="fa-solid fa-tents"></i></div><p>Camps</p></div>
+    <div class="filter"><div><i class="fa-solid fa-cow"></i></div><p>Farms</p></div>
+    <div class="filter"><div><i class="fa-solid fa-snowflake"></i></div><p>Arctic</p></div> -->
+
+    <div class="tax-toggle mb-3 mt-4 d-flex align-items-center gap-3">
+        <div class="form-check-reverse form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+        </div>
+        
+        <button class="btn btn-gradient border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#whatIfModal" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 25px; padding: 10px 25px;">
+            <i class="fa-solid fa-calculator me-2"></i> What If Explorer
+            <span class="badge bg-light text-primary ms-2">Beta</span>
+        </button>
+    </div>
+</div>
+
+<!-- What-If Modal -->
+<div class="modal fade" id="whatIfModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h5 class="modal-title"><i class="fa-solid fa-sliders me-2"></i> What If Explorer</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4">Explore how changing your search criteria could unlock more options and savings!</p>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <i class="fa-solid fa-wallet text-primary fa-2x mb-2"></i>
+                                <label class="form-label fw-bold">Your Max Nightly Budget</label>
+                                <input type="number" class="form-control mt-2" id="whatif-maxbudget" placeholder="₹3000" min="0">
+                                <small class="text-muted">Current max you want to spend per night</small>
+                                <hr>
+                                <label class="form-label fw-bold">Increase Budget By</label>
+                                <input type="number" class="form-control mt-2" id="whatif-budget" placeholder="₹5000" min="0">
+                                <small class="text-muted">Try: ₹1000 - ₹10000</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <i class="fa-solid fa-calendar-days text-success fa-2x mb-2"></i>
+                                <label class="form-label fw-bold">Extend Stay</label>
+                                <input type="number" class="form-control mt-2" id="whatif-stay" placeholder="1 day" min="1">
+                                <small class="text-muted">Additional nights</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body text-center">
+                                <i class="fa-solid fa-calendar-check text-info fa-2x mb-2"></i>
+                                <label class="form-label fw-bold">Flexible Dates</label>
+                                <div class="form-check form-switch mt-3">
+                                    <input class="form-check-input" type="checkbox" id="whatif-flexible" style="width: 50px; height: 25px;">
+                                    <label class="form-check-label" for="whatif-flexible">Enable flexibility</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary w-100 btn-lg" onclick="runWhatIf()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                    <i class="fa-solid fa-rocket me-2"></i> Explore Scenarios
+                </button>
+                
+                <div id="whatif-results" class="mt-4"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<% if (allListings.length === 0) { %>
+    <h4>No listings found for "<%= searchQuery %>"</h4>
+<% } else { %>
+    <div class="container mt-4 listing-container">
+        <div id="listing-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <% allListings.forEach(listing => { 
+                let priceWithGST = listing.price * 1.18;
+            %>
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm rounded-4" data-listing-id="<%= listing._id %>">
+                        <a href="/listings/<%= listing._id %>" data-listing-id="<%= listing._id %>">
+                            <div class="position-relative">
+                                <img src="<%= listing.image?.url || '/images/default.jpg' %>" class="card-img-top rounded-top-4" style="height: 250px; object-fit: cover;" alt="<%= listing.title %>">
+                                <% if (listing.performanceBadge) { %>
+                                    <span class="position-absolute top-0 start-0 m-2 badge <%= listing.performanceBadge.class %>">
+                                        <%= listing.performanceBadge.text %>
+                                    </span>
+                                <% } %>
+                                <% if (listing.rankingScore) { %>
+                                    <div class="position-absolute top-0 end-0 m-2">
+                                        <span class="badge bg-dark" title="Performance Score: <%= listing.rankingScore %>/100">
+                                            <i class="fa-solid fa-chart-line"></i> <%= listing.rankingScore %>
+                                        </span>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-1"><%= listing.title %></h5>
+                            <p class="mb-1 text-muted"><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
+                            <p class="mb-2 text-muted">
+                                <strong>Price:</strong> 
+                                <span class="old-price" id="old-price-<%= listing._id %>">₹<%= listing.price %>/night</span>
+                                <span class="tax-info new-price" id="new-price-<%= listing._id %>">₹<%= priceWithGST.toFixed(2) %>/night</span>
+                            </p>
+                            <% if (listing.performanceStatus && listing.performanceStatus !== 'average') { %>
+                                <div class="performance-indicator mt-2">
+                                    <small class="text-muted">
+                                        <i class="fa-solid fa-<%= listing.performanceStatus === 'excellent' ? 'star' : (listing.performanceStatus === 'good' ? 'thumbs-up' : 'exclamation-triangle') %>"></i>
+                                        Performance: <%= listing.performanceStatus.charAt(0).toUpperCase() + listing.performanceStatus.slice(1) %>
+                                    </small>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+<% } %>
+
+<script>
+    // Initialize tooltip and cleanup on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        // Remove duplicate alerts
+        const alerts = document.querySelectorAll('.personalized-alert');
+        for (let i = 1; i < alerts.length; i++) {
+            alerts[i].remove();
+        }
+        
+        // Initialize Bootstrap tooltip
+        const infoTrigger = document.getElementById('info-trigger');
+        if (infoTrigger && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            new bootstrap.Tooltip(infoTrigger, {
+                html: true,
+                placement: 'bottom',
+                title: '<strong>How Machine Learning Works</strong><br><br>We use a Multi-Armed Bandit algorithm that learns which listings you\'ll likely engage with based on patterns from similar users.<br><br>💡 Rankings adjust in real-time as you browse!<br>🔒 Your data stays anonymous and secure.',
+                trigger: 'hover',
+                animation: true
+            });
+        }
+    });
+
+    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+
+    taxSwitch.addEventListener("click", () => {
+        let allOldPrices = document.getElementsByClassName("old-price");
+        let allNewPrices = document.getElementsByClassName("tax-info");
+
+        for (let i = 0; i < allOldPrices.length; i++) {
+            let oldPrice = allOldPrices[i];
+            let newPrice = allNewPrices[i];
+
+            // Toggle the line-through for old price and show the new price with GST
+            if (taxSwitch.checked) {
+                oldPrice.classList.add("cut-price");
+                newPrice.style.display = "inline";
+            } else {
+                oldPrice.classList.remove("cut-price");
+                newPrice.style.display = "none";
+            }
+        }
+    });
+</script>
+<script>
+    // Client-side re-ranking using bandit API with explanations
+    (async function applyPersonalizedRanking(){
+        try {
+            const grid = document.getElementById('listing-grid');
+            if (!grid) return;
+            const cards = Array.from(grid.querySelectorAll('.card[data-listing-id]'));
+            const listingIds = cards.map(c => c.getAttribute('data-listing-id'));
+            if (listingIds.length === 0) return;
+
+            const query = '<%= searchQuery %>';
+            const resp = await fetch('/api/search/rank', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ listingIds, searchFilters: {}, query })
+            });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            if (!data || !Array.isArray(data.ranked)) return;
+
+            // Build map from id to column node for stable re-insertion
+            const colById = new Map();
+            cards.forEach(card => {
+                const id = card.getAttribute('data-listing-id');
+                colById.set(id, card.closest('.col'));
+            });
+
+            // Reorder DOM and add explanation badges
+            const fragment = document.createDocumentFragment();
+            data.ranked.forEach((item, idx) => {
+                const id = (item && item._id) ? item._id : String(item);
+                const col = colById.get(String(id));
+                if (col) {
+                    const explanation = data.explanations && data.explanations[String(id)];
+                    if (explanation && idx < 3) {
+                        const card = col.querySelector('.card');
+                        if (card) {
+                            const explEl = document.createElement('div');
+                            explEl.className = 'position-absolute top-0 end-0 m-2';
+                            explEl.innerHTML = `
+                                <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-html="true" 
+                                    title="<strong>Why recommended:</strong><br>
+                                    ${(explanation.factors || []).map(f => '• ' + f.message).join('<br>')}<br>
+                                    <em>Confidence: ${explanation.confidence}</em>">
+                                    <i class="fa-solid fa-sparkles"></i> Recommended
+                                </button>`;
+                            card.appendChild(explEl);
+                            if (window.bootstrap) new bootstrap.Tooltip(explEl);
+                        }
+                    }
+                    fragment.appendChild(col);
+                }
+            });
+            grid.appendChild(fragment);
+        } catch (_) {}
+    })();
+
+    // What-If Functions
+    function toggleWhatIf() {
+        const modalEl = document.getElementById('whatIfModal');
+        if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        } else {
+            console.error('Bootstrap Modal not available');
+            alert('Please wait for the page to fully load');
+        }
+    }
+
+    async function runWhatIf() {
+        const maxBudget = document.getElementById('whatif-maxbudget').value;
+        const budget = document.getElementById('whatif-budget').value;
+        const stay = document.getElementById('whatif-stay').value;
+        const flexible = document.getElementById('whatif-flexible').checked;
+        const resultsDiv = document.getElementById('whatif-results');
+        
+        resultsDiv.innerHTML = '<div class="spinner-border text-primary"></div><p class="text-center mt-2">Analyzing scenarios...</p>';
+        
+        try {
+            const resp = await fetch('/api/search/whatif', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    baseResults: [],
+                    proposedChanges: {
+                        maxBudget: maxBudget ? parseFloat(maxBudget) : null,
+                        budgetIncrease: budget ? parseFloat(budget) : null,
+                        extendStay: stay ? parseInt(stay) : null,
+                        flexibleDates: flexible
+                    }
+                })
+            });
+            const data = await resp.json();
+            if (data.success && data.suggestions) {
+                // Fetch listings with their prices to filter by scenario
+                const grid = document.getElementById('listing-grid');
+                const cards = Array.from(grid.querySelectorAll('.card[data-listing-id]'));
+                const allListings = cards.map(c => {
+                    const cardBody = c.querySelector('.card-body');
+                    const title = cardBody ? cardBody.querySelector('h5')?.textContent || 'Listing' : 'Listing';
+                    // Try to extract price from the price span
+                    const priceText = c.querySelector('.old-price')?.textContent || '';
+                    const priceMatch = priceText.match(/₹?([\d,]+)/);
+                    const price = priceMatch ? parseInt(priceMatch[1].replace(/,/g, '')) : 0;
+                    return { title, price };
+                });
+                
+                resultsDiv.innerHTML = data.suggestions.map((s, idx) => {
+                    // Filter listings based on the scenario
+                    let applicableListings = [];
+                    
+                    if (s.type === 'budget' && (maxBudget || budget)) {
+                        const newBudgetMax = (maxBudget ? parseFloat(maxBudget) : 0) + (budget ? parseFloat(budget) : 0);
+                        applicableListings = allListings.filter(l => l.price <= newBudgetMax && l.price > 0);
+                    } else if (s.type === 'duration') {
+                        // For duration, show listings that would benefit from longer stays (mid-range)
+                        applicableListings = allListings.filter(l => l.price >= 2000 && l.price <= 5000);
+                    } else if (s.type === 'flexibility') {
+                        // For flexibility, show all affordable listings
+                        applicableListings = allListings.filter(l => l.price <= 3000);
+                    } else {
+                        // Default: show a few sample listings
+                        applicableListings = allListings.slice(0, 3);
+                    }
+                    
+                    return `
+                        <div class="alert alert-${s.impact === 'positive' ? 'success' : 'info'} border-0 shadow-sm fade-in mb-3" role="alert" style="border-left: 4px solid ${s.impact === 'positive' ? '#28a745' : '#17a2b8'}; animation-delay: ${idx * 0.1}s;">
+                            <div class="d-flex align-items-start">
+                                <i class="fa-solid fa-${s.type === 'budget' ? 'wallet' : (s.type === 'duration' ? 'calendar-days' : 'sliders')} fa-2x me-3"></i>
+                                <div class="flex-grow-1">
+                                    <strong>${s.message}</strong>
+                                    ${s.examples && s.examples.length ? `
+                                      <div class="mt-2 small text-muted">
+                                        Examples under new budget: 
+                                        ${s.examples.map(e => `${e.title} (₹${e.price})`).join(', ')}
+                                      </div>` : ''}
+                                    ${applicableListings.length > 0 ? `
+                                    <div class="mt-3">
+                                        <div class="fw-bold mb-2"><i class="fa-solid fa-list me-1"></i> Applicable listings (${applicableListings.length}):</div>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${applicableListings.slice(0, 8).map(listing => `
+                                                <span class="badge bg-light text-dark p-2">
+                                                    <i class="fa-solid fa-building me-1"></i>
+                                                    ${listing.title}
+                                                </span>
+                                            `).join('')}
+                                            ${applicableListings.length > 8 ? `<span class="badge bg-secondary p-2">+${applicableListings.length - 8} more</span>` : ''}
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                <span class="badge bg-${s.impact === 'positive' ? 'success' : 'info'} ms-2">${s.impact === 'positive' ? 'Great Deal!' : 'Consider This'}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                resultsDiv.innerHTML = '<div class="alert alert-warning border-0 shadow-sm">No suggestions available at this time.</div>';
+            }
+        } catch(e) {
+            resultsDiv.innerHTML = '<div class="alert alert-danger">Failed to fetch suggestions.</div>';
+        }
+    }
+</script>

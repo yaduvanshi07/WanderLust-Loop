@@ -1,0 +1,65 @@
+<% layout('layouts/boilerplate') %>
+<div class="container mt-4">
+  <h2>
+    Analytics Dashboard 
+    <% if (isAdmin) { %>
+      <span class="badge bg-warning text-dark">Admin View - All Listings</span>
+    <% } else { %>
+      <span class="badge bg-info text-dark">Your Listings Only</span>
+    <% } %>
+  </h2>
+  <div class="row mb-4">
+    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Total Views</div><div><%= overview.totalViews %></div></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Bookings</div><div><%= overview.totalBookings %></div></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Revenue</div><div>₹<%= overview.totalRevenue %></div></div></div>
+    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Avg Rating</div><div><%= (overview.averageRating||0).toFixed(2) %></div></div></div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <canvas id="viewsChart" height="140"></canvas>
+    </div>
+    <div class="col-md-6">
+      <canvas id="revenueChart" height="140"></canvas>
+    </div>
+  </div>
+
+  <h4>Top Listings</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Listing</th>
+        <th>Views</th>
+        <th>Bookings</th>
+        <th>Revenue</th>
+        <th>Avg Rating</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% (perListing||[]).forEach(a => { %>
+        <tr>
+          <td><a href="/listings/<%= a.listing?._id %>"><%= a.listing?.title || 'Unknown' %></a></td>
+          <td><%= a.viewsCount %></td>
+          <td><%= a.bookingsCount %></td>
+          <td>₹<%= a.revenue %></td>
+          <td><%= (a.averageRating||0).toFixed(2) %> (<%= a.reviewsCount %>)</td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  (function(){
+    const labels =  JSON.stringify((perListing||[]).map(a => a.listing?.title || 'Unknown')) ;
+    const views =JSON.stringify((perListing||[]).map(a => a.viewsCount || 0));
+    const revenue = JSON.stringify((perListing||[]).map(a => a.revenue || 0));
+    const bookings =JSON.stringify((perListing||[]).map(a => a.bookingsCount || 0)) ;
+    const ctx1 = document.getElementById('viewsChart');
+    const ctx2 = document.getElementById('revenueChart');
+    if (ctx1) new Chart(ctx1, { type: 'bar', data: { labels, datasets: [{ label: 'Views', data: views, backgroundColor: 'rgba(54, 162, 235, 0.5)' }, { label: 'Bookings', data: bookings, backgroundColor: 'rgba(255, 206, 86, 0.5)' }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' }}}});
+    if (ctx2) new Chart(ctx2, { type: 'line', data: { labels, datasets: [{ label: 'Revenue', data: revenue, borderColor: 'rgba(75, 192, 192, 1)', fill: false }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' }}}});
+  })();
+</script>
+
+

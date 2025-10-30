@@ -59,7 +59,7 @@
                 </div>
 
                 <div class="booking-pricing">
-                  <div class="price-amount">₹<%= booking.pricing.total.toLocaleString('en-IN') %></div>
+                  <div class="price-amount">₹<%= booking.pricing && booking.pricing.total ? booking.pricing.total.toLocaleString('en-IN') : 'N/A' %></div>
                   <div class="price-details">
                     <%= Math.ceil((new Date(booking.checkout) - new Date(booking.checkin)) / (1000 * 60 * 60 * 24)) %> 
                     <%= Math.ceil((new Date(booking.checkout) - new Date(booking.checkin)) / (1000 * 60 * 60 * 24)) === 1 ? 'night' : 'nights' %>
@@ -146,7 +146,7 @@
                 </div>
 
                 <div class="booking-pricing">
-                  <div class="price-amount">₹<%= booking.pricing.total.toLocaleString('en-IN') %></div>
+                  <div class="price-amount">₹<%= booking.pricing && booking.pricing.total ? booking.pricing.total.toLocaleString('en-IN') : 'N/A' %></div>
                   <div class="price-details">
                     <%= Math.ceil((new Date(booking.checkout) - new Date(booking.checkin)) / (1000 * 60 * 60 * 24)) %> 
                     <%= Math.ceil((new Date(booking.checkout) - new Date(booking.checkin)) / (1000 * 60 * 60 * 24)) === 1 ? 'night' : 'nights' %>

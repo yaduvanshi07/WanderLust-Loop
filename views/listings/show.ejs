@@ -96,6 +96,50 @@ form p {
   </div>
 </div>
 
+<!-- Similar Listings -->
+<% if (recommendations && recommendations.length > 0) { %>
+<div class="container-fluid mt-5">
+  <h3 class="mb-3">Similar places you may like</h3>
+  <div class="row g-4">
+    <% recommendations.forEach(sim => { %>
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+        <div class="card h-100 shadow-sm similar-card">
+          <a href="/listings/<%= sim._id %>" class="text-decoration-none text-dark">
+            <div class="ratio ratio-4x3">
+              <img src="<%= (sim.image && sim.image.url) ? sim.image.url : 'https://via.placeholder.com/600x400?text=Listing' %>" class="card-img-top object-fit-cover" alt="<%= sim.title %>">
+            </div>
+            <div class="card-body">
+              <h5 class="card-title text-truncate mb-1"><%= sim.title %></h5>
+              <p class="card-text text-muted mb-2 text-truncate"><i class="fa-solid fa-location-dot me-1"></i><%= sim.location %>, <%= sim.country %></p>
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="fw-semibold">₹<%= sim.price %><span class="text-muted fw-normal">/night</span></span>
+                <span class="badge bg-light text-dark">Similar</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<style>
+.similar-card .card-img-top {
+  object-fit: cover;
+}
+.similar-card .card-body {
+  padding: 12px 14px;
+}
+.similar-card .card-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+@media (max-width: 576px) {
+  .similar-card .card-title { font-size: 15px; }
+}
+</style>
+<% } %>
+
 <style>
 .listing-title {
   font-size: 26px;

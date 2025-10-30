@@ -17,6 +17,10 @@ const reviewSchema = new Schema({
         ref: "User",
         required: true
     },
+    listing: {
+        type: Schema.Types.ObjectId,
+        ref: "Listing"
+    },
     status: {
         type: String,
         enum: ["approved", "pending", "rejected"],

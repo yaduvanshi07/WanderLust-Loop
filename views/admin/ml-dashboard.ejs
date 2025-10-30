@@ -144,7 +144,7 @@
   async function initializeCTRChart() {
     try {
       // Fetch real CTR data from bandit service
-      const banditResponse = await fetch('http://127.0.0.1:8001/stats/ctr');
+      const banditResponse = await fetch('/admin/ml/bandit-ctr');
       const banditData = await banditResponse.json();
       
       // Generate realistic time-based data

@@ -9,10 +9,10 @@
     <% } %>
   </h2>
   <div class="row mb-4">
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Total Views</div><div><%= overview.totalViews %></div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Bookings</div><div><%= overview.totalBookings %></div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Revenue</div><div>₹<%= overview.totalRevenue %></div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Avg Rating</div><div><%= (overview.averageRating||0).toFixed(2) %></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Total Views</div><div class="fs-4 fw-bold"><%= overview.totalViews %></div></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Bookings</div><div class="fs-4 fw-bold"><%= overview.totalBookings %></div></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Revenue</div><div class="fs-4 fw-bold">₹<%= overview.totalRevenue %></div></div></div></div>
+    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Avg Rating</div><div class="fs-4 fw-bold"><%= (overview.averageRating||0).toFixed(2) %></div></div></div></div>
   </div>
 
   <div class="row mb-4">
@@ -24,8 +24,8 @@
     </div>
   </div>
 
-  <h4>Top Listings</h4>
-  <table class="table table-striped">
+  <h4 class="mt-2 mb-2">Top Listings</h4>
+  <table class="table table-hover align-middle">
     <thead>
       <tr>
         <th>Listing</th>
@@ -38,7 +38,14 @@
     <tbody>
       <% (perListing||[]).forEach(a => { %>
         <tr>
-          <td><a href="/listings/<%= a.listing?._id %>"><%= a.listing?.title || 'Unknown' %></a></td>
+          <td>
+            <a class="text-decoration-none" href="/listings/<%= a.listing?._id %>"><%= a.listing?.title || 'Unknown' %></a>
+            <% if (a.listing && a.listing.rankingScore) { %>
+              <span class="badge <%= a.listing.rankingScore >= 80 ? 'bg-success' : (a.listing.rankingScore >= 60 ? 'bg-primary' : (a.listing.rankingScore <= 30 ? 'bg-warning text-dark' : 'bg-secondary')) %> ms-2">
+                Score <%= a.listing.rankingScore %>
+              </span>
+            <% } %>
+          </td>
           <td><%= a.viewsCount %></td>
           <td><%= a.bookingsCount %></td>
           <td>₹<%= a.revenue %></td>
@@ -51,10 +58,10 @@
 
 <script>
   (function(){
-    const labels =  JSON.stringify((perListing||[]).map(a => a.listing?.title || 'Unknown')) ;
-    const views =JSON.stringify((perListing||[]).map(a => a.viewsCount || 0));
-    const revenue = JSON.stringify((perListing||[]).map(a => a.revenue || 0));
-    const bookings =JSON.stringify((perListing||[]).map(a => a.bookingsCount || 0)) ;
+    const labels = (perListing||[]).map(a => a.listing?.title || 'Unknown');
+    const views = (perListing||[]).map(a => a.viewsCount || 0);
+    const revenue = (perListing||[]).map(a => a.revenue || 0);
+    const bookings = (perListing||[]).map(a => a.bookingsCount || 0);
     const ctx1 = document.getElementById('viewsChart');
     const ctx2 = document.getElementById('revenueChart');
     if (ctx1) new Chart(ctx1, { type: 'bar', data: { labels, datasets: [{ label: 'Views', data: views, backgroundColor: 'rgba(54, 162, 235, 0.5)' }, { label: 'Bookings', data: bookings, backgroundColor: 'rgba(255, 206, 86, 0.5)' }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' }}}});

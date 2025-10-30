@@ -797,7 +797,8 @@ app.post("/listings/:id/reviews", isLoggedIn, validateReview, wrapAsync(async (r
     const newReview = new Review({
         comment: req.body.review.comment,
         rating: req.body.review.rating,
-        author: req.user._id
+        author: req.user._id,
+        listing: listing._id
     });
 
     // If too many reviews already, send to admin moderation
@@ -1105,6 +1106,17 @@ app.get('/admin/ml/analytics', isAdmin, wrapAsync(async (req, res) => {
         });
     } catch(e) {
         return res.status(500).json({ success: false, error: e.message });
+    }
+}));
+
+// Proxy Bandit CTR stats to avoid browser CORS issues
+app.get('/admin/ml/bandit-ctr', isAdmin, wrapAsync(async (req, res) => {
+    try {
+        const BANDIT_URL = process.env.BANDIT_SERVICE_URL || 'http://127.0.0.1:8001';
+        const resp = await axios.get(`${BANDIT_URL}/stats/ctr`, { timeout: 3000 });
+        return res.json(resp.data || {});
+    } catch (e) {
+        return res.status(200).json({ success: false, error: 'bandit_unavailable' });
     }
 }));
 

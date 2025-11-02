@@ -524,5 +524,192 @@ router.post("/inbox/:conversationId/message", isLoggedIn, wrapAsync(async (req, 
     res.redirect(`/buddy/inbox/${conversationId}`);
 }));
 
+// Location Tracking Routes
+// Update user location
+router.post("/location/update", isLoggedIn, wrapAsync(async (req, res) => {
+    const { latitude, longitude, visibility, travelStatus, city, country } = req.body;
+
+    if (!latitude || !longitude) {
+        return res.status(400).json({ error: "Latitude and longitude are required" });
+    }
+
+    // Update location with proper GeoJSON structure
+    const user = await User.findById(req.user._id);
+    user.location = {
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)], // GeoJSON format: [lon, lat]
+        visibility: visibility || user.location?.visibility || 'exact',
+        travelStatus: travelStatus || user.location?.travelStatus || 'in-transit',
+        lastUpdated: new Date(),
+        city: city || user.location?.city,
+        country: country || user.location?.country,
+        sharingEnabled: true
+    };
+    
+    await user.save();
+
+    // Emit location update via WebSocket (handled in app.js)
+    if (req.app.get('io')) {
+        req.app.get('io').emit('location:update', {
+            userId: req.user._id.toString(),
+            location: {
+                coordinates: [parseFloat(longitude), parseFloat(latitude)],
+                visibility: visibility || 'exact',
+                travelStatus: travelStatus || 'in-transit'
+            }
+        });
+    }
+
+    res.json({ success: true, message: "Location updated" });
+}));
+
+// Get nearby travelers
+router.get("/location/nearby", isLoggedIn, wrapAsync(async (req, res) => {
+    const { radius = 50, maxResults = 50 } = req.query; // radius in km
+    const user = await User.findById(req.user._id);
+
+    if (!user || !user.location?.coordinates || !user.location.sharingEnabled) {
+        return res.status(400).json({ error: "Your location is not shared. Enable location sharing first." });
+    }
+
+    const [lon, lat] = user.location.coordinates;
+
+    // MongoDB geospatial query to find users within radius
+    const nearbyUsers = await User.find({
+        _id: { $ne: req.user._id },
+        "location": {
+            $near: {
+                $geometry: {
+                    type: "Point",
+                    coordinates: [lon, lat]
+                },
+                $maxDistance: radius * 1000 // Convert km to meters
+            }
+        },
+        "location.sharingEnabled": true,
+        "location.visibility": { $ne: 'hidden' },
+        "travelBuddyProfile.isActive": true
+    })
+    .select("username email travelBuddyProfile location")
+    .limit(parseInt(maxResults));
+
+    // Calculate compatibility scores for nearby users
+    const { calculateCompatibilityScore } = require("../utils/buddyMatchingEngine");
+    
+    // Calculate distance and apply privacy filters
+    const results = await Promise.all(nearbyUsers.map(async (nearbyUser) => {
+        const [userLon, userLat] = nearbyUser.location.coordinates;
+        const distance = calculateHaversineDistance(lat, lon, userLat, userLon);
+
+        let coordinates = nearbyUser.location.coordinates;
+        // Apply privacy filter
+        if (nearbyUser.location.visibility === 'city') {
+            // Return approximate city center (you might want to use geocoding API)
+            coordinates = [lon + (Math.random() * 0.1 - 0.05), lat + (Math.random() * 0.1 - 0.05)];
+        } else if (nearbyUser.location.visibility === 'country') {
+            // Return approximate country center
+            coordinates = [lon + (Math.random() * 1 - 0.5), lat + (Math.random() * 1 - 0.5)];
+        }
+
+        // Calculate compatibility score
+        let compatibilityScore = null;
+        try {
+            const compatibility = await calculateCompatibilityScore(req.user._id, nearbyUser._id);
+            if (compatibility) {
+                compatibilityScore = compatibility.score;
+            }
+        } catch (error) {
+            console.error('Error calculating compatibility:', error);
+        }
+
+        return {
+            user: {
+                _id: nearbyUser._id,
+                username: nearbyUser.username,
+                profilePicture: nearbyUser.travelBuddyProfile?.profilePicture,
+                age: nearbyUser.travelBuddyProfile?.age
+            },
+            location: {
+                coordinates: coordinates,
+                travelStatus: nearbyUser.location.travelStatus,
+                city: nearbyUser.location.city,
+                country: nearbyUser.location.country,
+                visibility: nearbyUser.location.visibility
+            },
+            distance: Math.round(distance * 10) / 10, // Round to 1 decimal
+            compatibilityScore: compatibilityScore
+        };
+    }));
+
+    res.json({ success: true, users: results, count: results.length });
+}));
+
+// Helper function for Haversine distance calculation
+function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+// Update location privacy settings
+router.post("/location/privacy", isLoggedIn, wrapAsync(async (req, res) => {
+    const { visibility, sharingEnabled } = req.body;
+
+    const updateData = {};
+    if (visibility) {
+        updateData["location.visibility"] = visibility;
+    }
+    if (typeof sharingEnabled !== 'undefined') {
+        updateData["location.sharingEnabled"] = sharingEnabled === true || sharingEnabled === 'true';
+    }
+
+    await User.findByIdAndUpdate(req.user._id, updateData);
+
+    res.json({ success: true, message: "Privacy settings updated" });
+}));
+
+// Add travel route
+router.post("/location/route", isLoggedIn, wrapAsync(async (req, res) => {
+    const { destination, latitude, longitude, arrivalDate, departureDate } = req.body;
+
+    if (!destination || !latitude || !longitude) {
+        return res.status(400).json({ error: "Destination, latitude, and longitude are required" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user.travelRoutes) {
+        user.travelRoutes = [];
+    }
+
+    user.travelRoutes.push({
+        destination,
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)],
+        arrivalDate: arrivalDate ? new Date(arrivalDate) : undefined,
+        departureDate: departureDate ? new Date(departureDate) : undefined,
+        status: 'planned'
+    });
+
+    await user.save();
+
+    res.json({ success: true, message: "Travel route added" });
+}));
+
+// Map View - Interactive map showing nearby travelers
+router.get("/map", isLoggedIn, wrapAsync(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    
+    res.render("buddy/map", {
+        user,
+        title: "Find Nearby Travelers"
+    });
+}));
+
 module.exports = router;
 

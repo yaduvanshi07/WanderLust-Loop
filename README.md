@@ -43,6 +43,8 @@ QuickStay is a full-stack vacation rental booking platform built with Node.js, E
   - Personality trait matching
   - Destination preferences
   - Travel style alignment
+  - **Geographic Proximity (25% weight)**: Real-time location-based matching
+  - **Route Overlap Scoring**: Multi-city travel itinerary matching
 - **Find Matches**: Discover compatible travel partners with compatibility scores
 - **Listings**: Create/browse travel partner posts with destination, dates, bio, and preferences
 - **Communities**: Join interest-based micro-communities (foodies, adventure lovers, nomads, etc.)
@@ -51,12 +53,26 @@ QuickStay is a full-stack vacation rental booking platform built with Node.js, E
 - **Ice Breakers**: AI-suggested conversation starters based on shared interests
 - **Modern UI**: Highly interactive interface with glassmorphism design, animations, and gradient themes
 
-#### 4. **Admin Features**
+#### 4. **Real-Time Location Tracking & Interactive Map**
+- **Browser Geolocation**: User permission-based location tracking
+- **Privacy Controls**: Multiple visibility levels (exact, city, country, hidden)
+- **Travel Status Tracking**: Real-time status updates (at-home, in-transit, at-destination, planning)
+- **Interactive Map View**: Leaflet.js integration with color-coded compatibility markers
+- **Marker Clustering**: Automatic clustering when multiple users are nearby
+- **Radius Filter**: Adjustable search radius (5km-500km)
+- **WebSocket Integration**: Real-time location updates via Socket.IO
+- **Geospatial Queries**: MongoDB 2dsphere indexes for efficient location-based searches
+- **Multi-City Routes**: Track and match users with overlapping travel itineraries
+- **Distance-Based Scoring**: Proximity boosts compatibility scores (<10km = +10%, <50km = +5%)
+- **Admin Map View**: Admins can view all users' locations regardless of privacy settings
+
+#### 5. **Admin Features**
 - **Admin Dashboard**: Platform-wide overview
 - **ML Performance Dashboard**: Track ML algorithm effectiveness
 - **Coupon Management**: Create, enable, disable, and delete coupons
 - **User Management**: Role-based access control
 - **Analytics Dashboard**: Comprehensive analytics for all users
+- **User Location Map**: View all users' live locations with travel status and privacy settings
 
 ##  Architecture
 
@@ -64,16 +80,19 @@ QuickStay is a full-stack vacation rental booking platform built with Node.js, E
 
 **Backend:**
 - Node.js & Express.js
-- MongoDB with Mongoose ODM
+- MongoDB with Mongoose ODM (GeoJSON support)
 - Passport.js for authentication
 - Cloudinary for image storage
 - Axios for HTTP requests
+- Socket.IO for real-time WebSocket communication
 
 **Frontend:**
 - EJS templating engine
 - Bootstrap CSS framework
 - Custom JavaScript for interactivity
 - Chart.js for analytics visualization
+- Leaflet.js for interactive maps
+- Browser Geolocation API
 
 **ML Services:**
 - FastAPI (Python) for ML services
@@ -92,8 +111,8 @@ QuickStay/
 │
 ├── models/                         # Database models
 │   ├── listing.js                  # Property listings with ML fields
-│   ├── user.js                     # User authentication (with travelBuddyProfile)
-│   ├── booking.js                  # Booking management
+│   ├── user.js                     # User authentication (with travelBuddyProfile, location tracking)
+│   ├── booking.js                  # Booking management (with route locations)
 │   ├── review.js                   # Reviews with sentiment
 │   ├── coupon.js                   # Coupon system
 │   ├── analytics.js                # Analytics tracking
@@ -143,6 +162,7 @@ QuickStay/
 ├── public/                         # Static assets
 │   ├── css/                        # Stylesheets
 │   └── js/                         # Client-side scripts
+│       └── map.js                  # Interactive map functionality
 │
 └── ml-services/                    # Python ML services
     ├── bandit_service/
@@ -254,12 +274,19 @@ The application will run on `http://localhost:8080`
 - `GET /buddy/inbox` - Messages inbox
 - `GET /buddy/inbox/:id` - Chat conversation
 - `POST /buddy/inbox/:id/message` - Send message
+- `GET /buddy/map` - Interactive map showing nearby travelers
+- `POST /buddy/location/update` - Update user location (real-time)
+- `GET /buddy/location/nearby` - Get nearby travelers within radius
+- `POST /buddy/location/privacy` - Update location privacy settings
+- `POST /buddy/location/route` - Add travel route for multi-city trips
 
 ### Admin
 - `GET /admin` - Admin dashboard
 - `GET /admin/ml/dashboard` - ML performance dashboard
 - `GET /admin/ml/analytics` - ML analytics API
 - `POST /admin/ml/backfill-listing-fields` - Initialize ML fields
+- `GET /admin/map` - Admin map view (all users' locations)
+- `GET /admin/api/users/locations` - Get all users with locations (API)
 - `GET /coupons` - Coupon management
 - `POST /coupons` - Create coupon
 - `POST /coupons/:id/toggle` - Toggle coupon status
@@ -436,7 +463,6 @@ A sophisticated decision-support tool that enables hosts to test hypothetical ch
 - No payment integration
 
 ### Future Enhancements
-- Real-time WebSocket updates
 - A/B testing framework
 - Scheduled model retraining
 - Computer vision for image quality
@@ -444,6 +470,7 @@ A sophisticated decision-support tool that enables hosts to test hypothetical ch
 - Fraud detection
 - Email/SMS notifications
 - Payment gateway integration
+- Push notifications for location-based matches
 
 ## 🎯 Project Highlights
 
@@ -457,15 +484,19 @@ A sophisticated decision-support tool that enables hosts to test hypothetical ch
 6. **Explainable AI**: Recommendations come with explanations
 7. **Automated Notifications**: Hosts receive alerts for underperforming listings
 8. **Travel Buddy Finder**: AI-powered social compatibility matching system connecting like-minded travelers
-9. **Modern Interactive UI**: Glassmorphism design with smooth animations and gradient themes
-10. **Comprehensive Analytics**: Analytics dashboard accessible to both users and admins
+9. **Real-Time Location Tracking**: Geolocation-based matching with interactive map visualization
+10. **Modern Interactive UI**: Glassmorphism design with smooth animations and gradient themes
+11. **Comprehensive Analytics**: Analytics dashboard accessible to both users and admins
 
 ### Key Technical Achievements
 
 - ✅ Full-stack web application with Express.js
-- ✅ MongoDB database with complex relationships
+- ✅ MongoDB database with complex relationships and geospatial queries
 - ✅ Machine learning integration (Python FastAPI services)
 - ✅ Real-time analytics and performance tracking
+- ✅ Real-time location tracking with WebSocket (Socket.IO)
+- ✅ Interactive map visualization with Leaflet.js
+- ✅ Geospatial database queries with MongoDB 2dsphere indexes
 - ✅ Predictive analytics for decision support
 - ✅ Role-based authentication and authorization
 - ✅ Image upload with Cloudinary

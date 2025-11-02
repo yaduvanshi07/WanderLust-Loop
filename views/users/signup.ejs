@@ -1,35 +1,359 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <h1 class="col-6 offset-3">Signup for WanderLust</h1>
-<div class="col-6 offset-3">
-    <form action="/signup" method="POST" class="needs-validation" novalidate>
+<style>
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+  }
 
-        <div class="mb-3">
-            <label for="username" class="form-label">username:</label>
-            <input name="username" id="username" type="text" class="form-control" required>
-            <div class="valid-feedback"> Looks good!</div>
-        </div>
+  .auth-container {
+    max-width: 450px;
+    width: 100%;
+    margin: 0 auto;
+  }
 
-        <div class="mb-3">
-            <label for="email" class="form-label">Email:</label>
-            <input name="email" id="email" type="text" class="form-control" required>
-           
-        </div>
-        
-        <div class="mb-3">
-            <label for="password" class="form-label">Password:</label>
-            <input name="password" id="password" type="password" class="form-control" required>
-            
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Account Type</label>
-            <select class="form-select" name="role">
-                <option value="user" selected>User</option>
-            </select>
-            <div class="form-text">Admin accounts are managed separately.</div>
-        </div>
-        <button class="btn btn-success">Signup</button>
-    </form> 
-</div>
+  .auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeInUp 0.6s ease-out;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-header h1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-header p {
+    color: #6c757d;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .auth-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-icon i {
+    font-size: 2.5rem;
+    color: white;
+  }
+
+  .form-floating {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-floating label {
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .form-control:valid {
+    border-color: #28a745;
+  }
+
+  .password-strength {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .password-strength-indicator {
+    height: 4px;
+    border-radius: 2px;
+    background: #e9ecef;
+    margin-top: 0.5rem;
+    overflow: hidden;
+  }
+
+  .password-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+  }
+
+  .strength-weak { background: #dc3545; }
+  .strength-medium { background: #ffc107; }
+  .strength-strong { background: #28a745; }
+
+  .btn-signup {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-signup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    color: white;
+  }
+
+  .btn-signup:active {
+    transform: translateY(0);
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-footer p {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  .auth-footer a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  .form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+  }
+
+  .terms-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .terms-text a {
+    color: #667eea;
+    text-decoration: none;
+  }
+</style>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <i class="fa-solid fa-compass"></i>
+      </div>
+      <h1>Join WanderLust</h1>
+      <p>Start your adventure today</p>
     </div>
+
+    <form action="/signup" method="POST" class="needs-validation" novalidate>
+      <div class="form-floating">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="username" 
+          name="username" 
+          placeholder="Username" 
+          required
+          autocomplete="username"
+          pattern="[a-zA-Z0-9_]{3,20}"
+        >
+        <label for="username">
+          <i class="fa-solid fa-user me-2"></i>Username
+        </label>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">
+          Username must be 3-20 characters and contain only letters, numbers, or underscores.
+        </div>
+      </div>
+
+      <div class="form-floating">
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          name="email" 
+          placeholder="Email" 
+          required
+          autocomplete="email"
+        >
+        <label for="email">
+          <i class="fa-solid fa-envelope me-2"></i>Email Address
+        </label>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+      </div>
+
+      <div class="form-floating">
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          placeholder="Password" 
+          required
+          autocomplete="new-password"
+          minlength="6"
+        >
+        <label for="password">
+          <i class="fa-solid fa-lock me-2"></i>Password
+        </label>
+        <div class="password-strength">
+          <div class="password-strength-indicator">
+            <div class="password-strength-bar" id="strengthBar"></div>
+          </div>
+        </div>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+      </div>
+
+      <button type="submit" class="btn btn-signup">
+        <i class="fa-solid fa-user-plus me-2"></i>Create Account
+      </button>
+    </form>
+
+    <div class="terms-text">
+      By signing up, you agree to our 
+      <a href="#">Terms of Service</a> 
+      and 
+      <a href="#">Privacy Policy</a>
+    </div>
+
+    <div class="auth-footer">
+      <p>Already have an account?</p>
+      <a href="/login">
+        <i class="fa-solid fa-sign-in-alt me-1"></i>Login Here
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Form validation
+  (function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+
+  // Password strength indicator
+  const passwordInput = document.getElementById('password');
+  const strengthBar = document.getElementById('strengthBar');
+  
+  passwordInput.addEventListener('input', function() {
+    const password = this.value;
+    let strength = 0;
+    
+    if (password.length >= 6) strength += 33;
+    if (password.length >= 8) strength += 33;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength += 11;
+    if (/[0-9]/.test(password)) strength += 11;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 12;
+    
+    strength = Math.min(100, strength);
+    strengthBar.style.width = strength + '%';
+    
+    strengthBar.className = 'password-strength-bar';
+    if (strength < 40) {
+      strengthBar.classList.add('strength-weak');
+    } else if (strength < 70) {
+      strengthBar.classList.add('strength-medium');
+    } else {
+      strengthBar.classList.add('strength-strong');
+    }
+  });
+</script>

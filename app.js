@@ -158,17 +158,16 @@ app.get("/signup", (req,res)=>{
 app.post("/signup", wrapAsync(async(req,res)=>{
     try{
     let {username, email, password}=req.body;
-    const desiredRole = (req.body.role || 'user').toLowerCase();
-    const adminHint = (req.body.adminHint || '').trim() || null;
-    const role = desiredRole === 'admin' ? 'admin' : 'user';
-    const newUser= new User({email, username, role, adminHint});
+    // All new signups are regular users - admin accounts are managed separately
+    const role = 'user';
+    const newUser= new User({email, username, role});
     const registeredUser= await User.register(newUser,password);
     console.log(registeredUser);
     req.login(registeredUser, (err)=>{
         if(err){
             return next(err);
         }
-        req.flash("success", `Welcome to Wanderlust! Logged in as ${registeredUser.role}.`);
+        req.flash("success", `Welcome to Wanderlust! Your account has been created successfully.`);
         res.redirect("/listings");
     })
     
@@ -1040,6 +1039,41 @@ app.get('/admin', isAdmin, wrapAsync(async (req, res) => {
     res.render('admin/dashboard', { overview, recentCoupons, topListings });
 }));
 
+// Admin map view - view all users' locations
+app.get('/admin/map', isAdmin, wrapAsync(async (req, res) => {
+    res.render('admin/map', {
+        title: 'Admin - User Location Map'
+    });
+}));
+
+// Admin API - Get all users with locations
+app.get('/admin/api/users/locations', isAdmin, wrapAsync(async (req, res) => {
+    const users = await User.find({
+        "location.sharingEnabled": true,
+        "location.coordinates": { $exists: true, $ne: null }
+    })
+    .select("username email role location travelBuddyProfile")
+    .limit(1000); // Limit for performance
+    
+    const formattedUsers = users.map(user => ({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        location: {
+            coordinates: user.location.coordinates,
+            visibility: user.location.visibility,
+            travelStatus: user.location.travelStatus,
+            city: user.location.city,
+            country: user.location.country,
+            lastUpdated: user.location.lastUpdated
+        },
+        profilePicture: user.travelBuddyProfile?.profilePicture
+    }));
+    
+    res.json({ success: true, users: formattedUsers, count: formattedUsers.length });
+}));
+
 // Admin utility: backfill ML fields on listings
 app.post('/admin/ml/backfill-listing-fields', isAdmin, wrapAsync(async (req, res) => {
     const filter = {
@@ -1280,6 +1314,39 @@ res.status(statusCode).render("error.ejs",{err});
 const PORT = process.env.PORT || 8080;
 const server = app.listen(PORT, ()=>{
 console.log(`Server is listening to port ${PORT}`);
+});
+
+// Initialize Socket.IO for real-time location updates
+const { Server } = require("socket.io");
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+// Store Socket.IO instance in app for use in routes
+app.set('io', io);
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    // Handle location updates
+    socket.on('location:update', (data) => {
+        // Broadcast to all connected clients
+        io.emit('location:update', data);
+    });
+
+    // Handle user joining location room
+    socket.on('location:subscribe', (data) => {
+        socket.join('locations');
+        console.log('User subscribed to location updates:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
 });
 
 server.on("error", (err)=>{

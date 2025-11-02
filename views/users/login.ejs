@@ -1,30 +1,293 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <h1 class="col-6 offset-3">Login: Look at the WanderLust</h1>
-<div class="col-6 offset-3">
-    <form action="/login" method="POST" class="needs-validation" novalidate>
+<style>
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+  }
 
-        <div class="mb-3">
-            <label for="username" class="form-label">username:</label>
-            <input name="username" id="username" type="text" class="form-control" required>
-            <div class="valid-feedback"> Looks good!</div>
-        </div>
+  .auth-container {
+    max-width: 450px;
+    width: 100%;
+    margin: 0 auto;
+  }
 
-       
-        
-        <div class="mb-3">
-            <label for="password" class="form-label">Password:</label>
-            <input name="password" id="password" type="password" class="form-control" required>
-            
-        </div>
-        <div class="mb-3">
-            <label for="adminHintVerify" class="form-label">Admin Personal Hint (admins only)</label>
-            <input name="adminHintVerify" id="adminHintVerify" type="text" class="form-control" placeholder="Enter your admin hint">
-            <div class="form-text">Required if your account is admin.</div>
-        </div>
-        <button class="btn btn-success">Login</button>
-        
-    </form> 
-</div>
+  .auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeInUp 0.6s ease-out;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-header h1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-header p {
+    color: #6c757d;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .auth-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-icon i {
+    font-size: 2.5rem;
+    color: white;
+  }
+
+  .form-floating {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-floating label {
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .form-control:valid {
+    border-color: #28a745;
+  }
+
+  .admin-hint-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #ffc107;
+  }
+
+  .admin-hint-section label {
+    font-weight: 600;
+    color: #856404;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    color: white;
+  }
+
+  .btn-login:active {
+    transform: translateY(0);
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .auth-footer p {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  .auth-footer a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  .form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+  }
+</style>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <i class="fa-solid fa-compass"></i>
+      </div>
+      <h1>Welcome Back</h1>
+      <p>Login to continue your journey</p>
     </div>
+
+    <form action="/login" method="POST" class="needs-validation" novalidate>
+      <div class="form-floating">
+        <input 
+          type="text" 
+          class="form-control" 
+          id="username" 
+          name="username" 
+          placeholder="Username" 
+          required
+          autocomplete="username"
+        >
+        <label for="username">
+          <i class="fa-solid fa-user me-2"></i>Username
+        </label>
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Please enter your username.</div>
+      </div>
+
+      <div class="form-floating">
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          placeholder="Password" 
+          required
+          autocomplete="current-password"
+        >
+        <label for="password">
+          <i class="fa-solid fa-lock me-2"></i>Password
+        </label>
+        <div class="invalid-feedback">Please enter your password.</div>
+      </div>
+
+      <div class="admin-hint-section">
+        <label for="adminHintVerify">
+          <i class="fa-solid fa-shield-halved me-2"></i>Admin Personal Hint
+        </label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="adminHintVerify" 
+          name="adminHintVerify" 
+          placeholder="Enter your admin hint (admins only)"
+        >
+        <div class="form-text">
+          <i class="fa-solid fa-info-circle me-1"></i>Required only if your account is admin
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-login">
+        <i class="fa-solid fa-sign-in-alt me-2"></i>Login
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account?</p>
+      <a href="/signup">
+        <i class="fa-solid fa-user-plus me-1"></i>Sign Up Now
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Form validation
+  (function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>

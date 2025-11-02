@@ -1,0 +1,184 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4"><i class="fa-solid fa-user-circle me-2"></i>My Travel Buddy Profile</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-edit me-2"></i>Edit Profile</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/buddy/profile" enctype="multipart/form-data">
+                        <!-- Profile Picture -->
+                        <div class="mb-4 text-center">
+                            <% if (user.travelBuddyProfile?.profilePicture?.url) { %>
+                                <img src="<%= user.travelBuddyProfile.profilePicture.url %>" 
+                                     class="rounded-circle mb-3" 
+                                     style="width: 150px; height: 150px; object-fit: cover;" 
+                                     alt="Profile Picture">
+                            <% } else { %>
+                                <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 150px; height: 150px;">
+                                    <i class="fa-solid fa-user fa-3x text-white"></i>
+                                </div>
+                            <% } %>
+                            <div>
+                                <label for="profilePicture" class="btn btn-outline-primary btn-sm">
+                                    <i class="fa-solid fa-camera me-1"></i>Upload Photo
+                                </label>
+                                <input type="file" id="profilePicture" name="profilePicture" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Age</label>
+                                <input type="number" class="form-control" name="age" 
+                                       value="<%= user.travelBuddyProfile?.age || '' %>" min="18" max="99">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender">
+                                    <option value="prefer-not-to-say" <%= user.travelBuddyProfile?.gender === 'prefer-not-to-say' ? 'selected' : '' %>>Prefer not to say</option>
+                                    <option value="male" <%= user.travelBuddyProfile?.gender === 'male' ? 'selected' : '' %>>Male</option>
+                                    <option value="female" <%= user.travelBuddyProfile?.gender === 'female' ? 'selected' : '' %>>Female</option>
+                                    <option value="non-binary" <%= user.travelBuddyProfile?.gender === 'non-binary' ? 'selected' : '' %>>Non-binary</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="isActive" value="true" 
+                                       id="isActive" <%= user.travelBuddyProfile?.isActive ? 'checked' : '' %>>
+                                <label class="form-check-label" for="isActive">
+                                    Activate Travel Buddy Profile
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="mb-3">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" name="bio" rows="4" 
+                                      placeholder="Tell others about yourself..."><%= preference?.bio || '' %></textarea>
+                        </div>
+
+                        <!-- Interests -->
+                        <div class="mb-3">
+                            <label class="form-label">Travel Interests <small class="text-muted">(Select multiple)</small></label>
+                            <div class="row">
+                                <% const allInterests = ['foodie', 'adventure', 'culture', 'beach', 'mountains', 'city', 'nature', 'nightlife', 'budget', 'luxury', 'backpacking', 'wellness', 'photography', 'sports', 'music', 'art', 'history', 'wildlife', 'nomad', 'solo-travel']; %>
+                                <% allInterests.forEach(interest => { %>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="interests" 
+                                                   value="<%= interest %>" id="int_<%= interest %>"
+                                                   <%= preference?.interests?.includes(interest) ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="int_<%= interest %>">
+                                                <%= interest.charAt(0).toUpperCase() + interest.slice(1).replace(/-/g, ' ') %>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+                        <!-- Travel Style -->
+                        <div class="mb-3">
+                            <label class="form-label">Travel Style</label>
+                            <select class="form-select" name="travelStyle">
+                                <option value="flexible" <%= preference?.travelStyle === 'flexible' ? 'selected' : '' %>>Flexible</option>
+                                <option value="budget" <%= preference?.travelStyle === 'budget' ? 'selected' : '' %>>Budget</option>
+                                <option value="mid-range" <%= preference?.travelStyle === 'mid-range' ? 'selected' : '' %>>Mid-range</option>
+                                <option value="luxury" <%= preference?.travelStyle === 'luxury' ? 'selected' : '' %>>Luxury</option>
+                            </select>
+                        </div>
+
+                        <!-- Personality Traits -->
+                        <div class="mb-3">
+                            <label class="form-label">Personality Traits</label>
+                            <div class="row">
+                                <% const traits = ['introverted', 'extroverted', 'adventurous', 'laid-back', 'organized', 'spontaneous', 'early-riser', 'night-owl', 'social', 'independent']; %>
+                                <% traits.forEach(trait => { %>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="personalityTraits" 
+                                                   value="<%= trait %>" id="trait_<%= trait %>"
+                                                   <%= preference?.personalityTraits?.includes(trait) ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="trait_<%= trait %>">
+                                                <%= trait.charAt(0).toUpperCase() + trait.slice(1).replace(/-/g, ' ') %>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+                        <!-- Looking For -->
+                        <div class="mb-3">
+                            <label class="form-label">Looking For</label>
+                            <select class="form-select" name="lookingFor">
+                                <option value="travel-buddy" <%= preference?.lookingFor === 'travel-buddy' ? 'selected' : '' %>>Travel Buddy</option>
+                                <option value="roommate" <%= preference?.lookingFor === 'roommate' ? 'selected' : '' %>>Roommate</option>
+                                <option value="both" <%= preference?.lookingFor === 'both' ? 'selected' : '' %>>Both</option>
+                            </select>
+                        </div>
+
+                        <!-- Preferred Destinations -->
+                        <div class="mb-3">
+                            <label class="form-label">Preferred Destinations <small class="text-muted">(comma-separated)</small></label>
+                            <input type="text" class="form-control" name="preferredDestinations" 
+                                   value="<%= preference?.preferredDestinations?.join(', ') || '' %>"
+                                   placeholder="e.g., Goa, Manali, Kerala">
+                        </div>
+
+                        <!-- Budget Range -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Budget Range (Min ₹)</label>
+                                <input type="number" class="form-control" name="budgetMin" 
+                                       value="<%= preference?.budgetRange?.min || 0 %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Budget Range (Max ₹)</label>
+                                <input type="number" class="form-control" name="budgetMax" 
+                                       value="<%= preference?.budgetRange?.max || 50000 %>">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-save me-2"></i>Save Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('profilePicture').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.querySelector('img');
+                if (img) {
+                    img.src = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+

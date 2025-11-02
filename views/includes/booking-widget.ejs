@@ -7,14 +7,35 @@
         <span class="price-period">per night</span>
       </div>
       <div class="rating-section">
+        <% 
+          // Calculate real rating and review count from MongoDB
+          const approvedReviews = listing.reviews ? listing.reviews.filter(r => r.status === "approved" || !r.status) : [];
+          const totalReviews = approvedReviews.length;
+          const avgRating = totalReviews > 0 
+            ? (approvedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / totalReviews).toFixed(1)
+            : 0;
+          const ratingNum = parseFloat(avgRating);
+          const fullStars = Math.floor(ratingNum);
+          const hasHalfStar = ratingNum % 1 >= 0.5;
+        %>
         <div class="stars">
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
-          <i class="fa-solid fa-star"></i>
+          <% for (let i = 1; i <= 5; i++) { %>
+            <% if (i <= fullStars) { %>
+              <i class="fa-solid fa-star filled"></i>
+            <% } else if (i === fullStars + 1 && hasHalfStar) { %>
+              <i class="fa-solid fa-star-half-stroke filled"></i>
+            <% } else { %>
+              <i class="fa-regular fa-star empty"></i>
+            <% } %>
+          <% } %>
         </div>
-        <span class="rating-text">4.8 · 24 reviews</span>
+        <span class="rating-text">
+          <% if (totalReviews > 0) { %>
+            <%= avgRating %> · <%= totalReviews %> <%= totalReviews === 1 ? 'review' : 'reviews' %>
+          <% } else { %>
+            New listing
+          <% } %>
+        </span>
       </div>
     </div>
 
@@ -224,6 +245,16 @@
 .stars {
   color: #ff385c;
   font-size: 12px;
+  display: flex;
+  gap: 2px;
+}
+
+.stars .filled {
+  color: #ff385c;
+}
+
+.stars .empty {
+  color: #ddd;
 }
 
 .rating-text {

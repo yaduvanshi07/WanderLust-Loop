@@ -43,8 +43,19 @@
         <div class="navbar-nav">
         
           <a class="nav-link" href="/listings">Explore</a>
-          <% if (currUser && currUser.role === 'admin') { %>
-            <a class="nav-link text-warning" href="/admin">Dashboard</a>
+          <% if (currUser) { %>
+            <div class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="fa-solid fa-users me-1"></i>Travel Buddy Finder
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/buddy/matches"><i class="fa-solid fa-heart me-2"></i>Find Matches</a></li>
+                <li><a class="dropdown-item" href="/buddy/listings"><i class="fa-solid fa-map-marked-alt me-2"></i>Listings</a></li>
+                <li><a class="dropdown-item" href="/buddy/communities"><i class="fa-solid fa-users me-2"></i>Communities</a></li>
+                <li><a class="dropdown-item" href="/buddy/requests"><i class="fa-solid fa-envelope me-2"></i>Requests</a></li>
+                <li><a class="dropdown-item" href="/buddy/inbox"><i class="fa-solid fa-inbox me-2"></i>Inbox</a></li>
+              </ul>
+            </div>
           <% } %>
           
         </div>
@@ -59,9 +70,6 @@
       <div class="navbar-nav ms-auto">
         <% if (currUser && currUser.role === 'admin') { %>
           <a class="nav-link" href="/coupons">Coupons</a>
-        <% } %>
-        <% if (currUser) { %>
-          <a class="nav-link" href="/analytics/dashboard">Analytics</a>
         <% } %>
         <a class="nav-link" href="/listings/new">Airbnb your home</a>
 
@@ -78,13 +86,21 @@
             </a>
             <ul class="dropdown-menu">
               <% if (currUser.role === 'admin') { %>
-                <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-gauge"></i> Admin Dashboard</a></li>
                 <li><hr class="dropdown-divider"></li>
+                <!-- <li><h6 class="dropdown-header"><i class="fa-solid fa-chart-bar me-2"></i>Analytics & ML</h6></li> -->
+                <li><a class="dropdown-item" href="/analytics/dashboard"><i class="fa-solid fa-chart-bar me-2"></i>Analytics Dashboard</a></li>
+                <!-- <li><a class="dropdown-item" href="/admin/ml/dashboard"><i class="fa-solid fa-brain me-2"></i>ML Performance Dashboard</a></li> -->
+                <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line me-2"></i>Host Performance</a></li>
+              <% } else { %>
+                <li><h6 class="dropdown-header"><i class="fa-solid fa-chart-bar me-2"></i>Analytics</h6></li>
+                <li><a class="dropdown-item" href="/analytics/dashboard"><i class="fa-solid fa-chart-bar me-2"></i>Analytics Dashboard</a></li>
+                <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line me-2"></i>Host Performance</a></li>
               <% } %>
-              <li><a class="dropdown-item" href="/bookings"><i class="fa-solid fa-calendar-check"></i> My Bookings</a></li>
-              <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line"></i> Performance</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+              <li><a class="dropdown-item" href="/bookings"><i class="fa-solid fa-calendar-check me-2"></i> My Bookings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a></li>
             </ul>
           </div>
         <% } %>

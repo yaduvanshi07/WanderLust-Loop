@@ -111,26 +111,74 @@
     try {
       const resp = await fetch('/admin/ml/analytics');
       const data = await resp.json();
-      if (!data || !data.success) return;
+      if (!data || !data.success) {
+        console.error('Failed to load ML analytics:', data.error);
+        return;
+      }
 
       // Update metric cards
-      if (data.ctrDiff) document.getElementById('ctr-diff').textContent = `+${data.ctrDiff.toFixed(1)}%`;
-      if (data.explorationRate) document.getElementById('explore-rate').textContent = `${(data.explorationRate*100).toFixed(0)}%`;
-      if (data.sentimentTrend) document.getElementById('sentiment-trend').textContent = `+${(data.sentimentTrend*100).toFixed(0)}%`;
-      if (data.revenueLift) document.getElementById('revenue-lift').textContent = `₹${(data.revenueLift/1000).toFixed(0)}K`;
+      if (data.ctrDiff !== undefined) {
+        const ctrElement = document.getElementById('ctr-diff');
+        if (ctrElement) {
+          const sign = data.ctrDiff >= 0 ? '+' : '';
+          ctrElement.textContent = `${sign}${data.ctrDiff.toFixed(1)}%`;
+          ctrElement.parentElement.querySelector('small').className = data.ctrDiff >= 0 ? 'text-success' : 'text-danger';
+        }
+      }
+      if (data.explorationRate !== undefined) {
+        const exploreElement = document.getElementById('explore-rate');
+        if (exploreElement) exploreElement.textContent = `${(data.explorationRate*100).toFixed(0)}%`;
+      }
+      if (data.sentimentTrend !== undefined) {
+        const sentimentElement = document.getElementById('sentiment-trend');
+        if (sentimentElement) {
+          const sign = data.sentimentTrend >= 0 ? '+' : '';
+          sentimentElement.textContent = `${sign}${(data.sentimentTrend*100).toFixed(0)}%`;
+        }
+      }
+      if (data.revenueLift !== undefined) {
+        const revenueElement = document.getElementById('revenue-lift');
+        if (revenueElement) {
+          if (data.revenueLift >= 1000) {
+            revenueElement.textContent = `₹${(data.revenueLift/1000).toFixed(1)}K`;
+          } else {
+            revenueElement.textContent = `₹${data.revenueLift.toFixed(0)}`;
+          }
+        }
+      }
 
       // Populate top listings
-      if (data.topListings && Array.isArray(data.topListings)) {
+      if (data.topListings && Array.isArray(data.topListings) && data.topListings.length > 0) {
         const tbody = document.getElementById('top-listings');
-        tbody.innerHTML = data.topListings.map(l => `
-          <tr>
-            <td><strong>${l.title}</strong></td>
-            <td><span class="badge bg-success">${(l.expectedReward*100).toFixed(0)}%</span></td>
-            <td><span class="badge bg-${l.confidence === 'high' ? 'success' : (l.confidence === 'medium' ? 'warning' : 'secondary')}">${l.confidence}</span></td>
-            <td><small>${(l.factors || []).map(f => f.message).slice(0,2).join('; ')}</small></td>
-            <td><button class="btn btn-sm btn-outline-primary" onclick="window.location.href='/listings/${l.id}'">View</button></td>
-          </tr>
-        `).join('');
+        if (tbody) {
+          tbody.innerHTML = data.topListings.map(l => `
+            <tr>
+              <td><strong>${l.title || 'Unknown'}</strong></td>
+              <td><span class="badge bg-success">${(l.expectedReward*100).toFixed(0)}%</span></td>
+              <td><span class="badge bg-${l.confidence === 'high' ? 'success' : (l.confidence === 'medium' ? 'warning' : 'secondary')}">${l.confidence}</span></td>
+              <td><small>${(l.factors || []).map(f => f.message).slice(0,2).join('; ')}</small></td>
+              <td><a href="/listings/${l.id}" class="btn btn-sm btn-outline-primary">View</a></td>
+            </tr>
+          `).join('');
+        }
+      } else {
+        const tbody = document.getElementById('top-listings');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No data available yet. Start using the platform to see ML recommendations.</td></tr>';
+        }
+      }
+
+      // Initialize exploration and sentiment charts with real data
+      if (data.explorationData) {
+        initializeExplorationChart(data.explorationData);
+      }
+      if (data.sentimentDistribution) {
+        initializeSentimentChart(data.sentimentDistribution);
+      }
+
+      // Update CTR chart with real data
+      if (data.ctrData && data.ctrData.overTime) {
+        updateCTRChart(data.ctrData.overTime);
       }
 
     } catch(e) {
@@ -141,64 +189,46 @@
   // CTR Chart - will be initialized with real data
   let ctrChart = null;
 
-  async function initializeCTRChart() {
-    try {
-      // Fetch real CTR data from bandit service
-      const banditResponse = await fetch('/admin/ml/bandit-ctr');
-      const banditData = await banditResponse.json();
-      
-      // Generate realistic time-based data
-      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      
-      // Create realistic CTR data based on actual bandit performance
-      const mabData = [];
-      const randomData = [];
-      
-      for (let i = 0; i < 7; i++) {
-        // Base CTR values (realistic range)
-        const baseMAB = 0.02 + (Math.random() * 0.01); // 2-3% range
-        const baseRandom = 0.015 + (Math.random() * 0.005); // 1.5-2% range
-        
-        // Add some realistic variation
-        const variation = (Math.sin(i * 0.5) * 0.003) + (Math.random() * 0.002);
-        
-        mabData.push(Math.max(0.01, Math.min(0.05, baseMAB + variation)));
-        randomData.push(Math.max(0.01, Math.min(0.03, baseRandom + variation * 0.5)));
-      }
+  function updateCTRChart(ctrOverTime) {
+    const ctrData = {
+      labels: ctrOverTime.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [
+        {
+          label: 'MAB Algorithm',
+          data: ctrOverTime.mab || [],
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13, 110, 253, 0.1)',
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true
+        },
+        {
+          label: 'Random Baseline',
+          data: ctrOverTime.random || [],
+          borderColor: '#6c757d',
+          backgroundColor: 'rgba(108, 117, 125, 0.1)',
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true
+        }
+      ]
+    };
 
-      const ctrData = {
-        labels: days,
-        datasets: [
-          {
-            label: 'MAB Algorithm',
-            data: mabData,
-            borderColor: '#0d6efd',
-            backgroundColor: 'rgba(13, 110, 253, 0.1)',
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          },
-          {
-            label: 'Random Baseline',
-            data: randomData,
-            borderColor: '#6c757d',
-            backgroundColor: 'rgba(108, 117, 125, 0.1)',
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6
-          }
-        ]
-      };
+    // Calculate proper scale limits dynamically
+    const allValues = [...(ctrOverTime.mab || []), ...(ctrOverTime.random || [])];
+    const maxValue = allValues.length > 0 ? Math.max(...allValues) : 0.03;
+    const minValue = allValues.length > 0 ? Math.min(...allValues) : 0.01;
+    const range = maxValue - minValue;
+    const padding = range > 0 ? range * 0.2 : 0.005; // 20% padding or minimum 0.5%
 
-      // Calculate proper scale limits
-      const allValues = [...mabData, ...randomData];
-      const maxValue = Math.max(...allValues);
-      const minValue = Math.min(...allValues);
-      const range = maxValue - minValue;
-      const padding = range * 0.2; // 20% padding
-
+    if (ctrChart) {
+      ctrChart.data = ctrData;
+      ctrChart.options.scales.y.min = Math.max(0, minValue - padding);
+      ctrChart.options.scales.y.max = Math.min(0.15, maxValue + padding); // Cap at 15% max
+      ctrChart.update();
+    } else {
       ctrChart = new Chart(document.getElementById('ctrChart'), {
         type: 'line',
         data: ctrData,
@@ -217,7 +247,7 @@
             y: {
               beginAtZero: false,
               min: Math.max(0, minValue - padding),
-              max: Math.min(0.1, maxValue + padding), // Cap at 10% for readability
+              max: Math.min(0.15, maxValue + padding), // Dynamic max, capped at 15%
               title: { display: true, text: 'CTR (Click-Through Rate)' },
               ticks: {
                 callback: (v) => (v * 100).toFixed(1) + '%'
@@ -229,9 +259,20 @@
           }
         }
       });
+    }
+  }
+
+  async function initializeCTRChart() {
+    try {
+      // Fetch real CTR data - will be updated when loadMLDashboard completes
+      // If no data available yet, show fallback
+      setTimeout(() => {
+        if (!ctrChart) {
+          initializeFallbackChart();
+        }
+      }, 2000);
     } catch (error) {
-      console.error('Failed to load CTR data:', error);
-      // Fallback to static realistic data
+      console.error('Failed to initialize CTR chart:', error);
       initializeFallbackChart();
     }
   }
@@ -294,35 +335,87 @@
   }
 
 
-  // Exploration vs Exploitation Chart
-  new Chart(document.getElementById('exploreChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Exploitation', 'Exploration'],
-      datasets: [
-        { data: [77, 23], backgroundColor: ['#28a745', '#ffc107'] }
-      ]
-    },
-    options: { responsive: true }
-  });
+  let exploreChart = null;
+  let sentimentChart = null;
 
-  // Sentiment Chart
-  new Chart(document.getElementById('sentimentChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Positive', 'Neutral', 'Negative'],
-      datasets: [
-        {
-          label: 'Reviews',
-          data: [65, 28, 7],
-          backgroundColor: ['#28a745', '#6c757d', '#dc3545']
+  async function initializeExplorationChart(explorationData) {
+    const ctx = document.getElementById('exploreChart');
+    if (exploreChart) exploreChart.destroy();
+    
+    exploreChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Exploitation', 'Exploration'],
+        datasets: [
+          { 
+            data: [explorationData?.exploitation || 77, explorationData?.exploration || 23], 
+            backgroundColor: ['#28a745', '#ffc107'] 
+          }
+        ]
+      },
+      options: { 
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ctx.label + ': ' + ctx.parsed + '%'
+            }
+          }
         }
-      ]
-    },
-    options: { responsive: true }
-  });
+      }
+    });
+  }
+
+  async function initializeSentimentChart(sentimentData) {
+    const ctx = document.getElementById('sentimentChart');
+    if (sentimentChart) sentimentChart.destroy();
+    
+    const total = (sentimentData?.positive || 0) + (sentimentData?.neutral || 0) + (sentimentData?.negative || 0);
+    const positive = total > 0 ? Math.round(((sentimentData?.positive || 0) / total) * 100) : 65;
+    const neutral = total > 0 ? Math.round(((sentimentData?.neutral || 0) / total) * 100) : 28;
+    const negative = total > 0 ? Math.round(((sentimentData?.negative || 0) / total) * 100) : 7;
+    
+    sentimentChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Positive', 'Neutral', 'Negative'],
+        datasets: [
+          {
+            label: 'Reviews (%)',
+            data: [positive, neutral, negative],
+            backgroundColor: ['#28a745', '#6c757d', '#dc3545']
+          }
+        ]
+      },
+      options: { 
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: { display: true, text: 'Percentage (%)' },
+            ticks: {
+              callback: (v) => v + '%'
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ctx.parsed.y + '%'
+            }
+          }
+        }
+      }
+    });
+  }
 
   // Initialize charts
-  loadMLDashboard();
-  initializeCTRChart();
+  loadMLDashboard().then(() => {
+    initializeCTRChart();
+  });
 </script>

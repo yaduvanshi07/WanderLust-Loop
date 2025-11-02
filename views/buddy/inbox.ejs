@@ -1,0 +1,192 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    min-height: 100vh;
+  }
+  
+  .inbox-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .inbox-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  .inbox-header h2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  
+  .conversation-item {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 2px solid #f0f0f0;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.6s ease-out backwards;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .conversation-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .conversation-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+    border-color: #f093fb;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .conversation-item:hover::before {
+    opacity: 1;
+  }
+  
+  .unread-badge {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 50%;
+    padding: 0.4rem 0.7rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+  
+  .empty-state {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+</style>
+
+<div class="container mt-4 inbox-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="inbox-header">
+                <h2><i class="fa-solid fa-inbox me-2"></i>Messages</h2>
+                <p class="text-muted mt-2">Chat with your accepted travel buddies</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <% if (conversations.length === 0) { %>
+                <div class="empty-state">
+                    <i class="fa-solid fa-inbox fa-4x mb-3" style="color: #f093fb;"></i>
+                    <h4>No conversations yet</h4>
+                    <p class="text-muted">You need to accept a request first to start chatting.</p>
+                    <a href="/buddy/requests" class="btn btn-primary mt-3" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none;">
+                        <i class="fa-solid fa-envelope me-2"></i>View Requests
+                    </a>
+                </div>
+            <% } else { %>
+                <div class="list-group">
+                    <% conversations.forEach((conv, index) => { %>
+                        <a href="/buddy/inbox/<%= conv.conversationId %>" class="conversation-item" style="animation-delay: <%= index * 0.1 %>s">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <% if (conv.otherUser.travelBuddyProfile?.profilePicture?.url) { %>
+                                        <img src="<%= conv.otherUser.travelBuddyProfile.profilePicture.url %>" 
+                                             class="rounded-circle me-3" 
+                                             style="width: 50px; height: 50px; object-fit: cover;">
+                                    <% } else { %>
+                                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center me-3" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fa-solid fa-user text-white"></i>
+                                        </div>
+                                    <% } %>
+                                    <div>
+                                        <h6 class="mb-0"><%= conv.otherUser.username %></h6>
+                                        <% if (conv.lastMessage) { %>
+                                            <small class="text-muted">
+                                                <%= conv.lastMessage.sender.username === currUser.username ? 'You: ' : '' %>
+                                                <%= conv.lastMessage.content.substring(0, 50) %>
+                                                <%= conv.lastMessage.content.length > 50 ? '...' : '' %>
+                                            </small>
+                                        <% } else { %>
+                                            <small class="text-muted">No messages yet</small>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <% if (conv.lastMessage) { %>
+                                        <small class="text-muted d-block">
+                                            <%= new Date(conv.lastMessage.createdAt).toLocaleDateString() %>
+                                        </small>
+                                    <% } %>
+                                    <% if (conv.unreadCount > 0) { %>
+                                        <span class="unread-badge"><%= conv.unreadCount %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,122 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fa-solid fa-plus-circle me-2"></i>Create Travel Buddy Listing</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/buddy/listings">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control" name="title" 
+                                   placeholder="e.g., Looking for adventure buddy in Goa" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Destination</label>
+                            <input type="text" class="form-control" name="destination" 
+                                   placeholder="e.g., Goa, India" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control" name="startDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control" name="endDate" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Bio/Description</label>
+                            <textarea class="form-control" name="bio" rows="4" 
+                                      placeholder="Tell others about yourself and what you're looking for..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Interests <small class="text-muted">(Select multiple)</small></label>
+                            <div class="row">
+                                <% const allInterests = ['foodie', 'adventure', 'culture', 'beach', 'mountains', 'city', 'nature', 'nightlife', 'budget', 'luxury', 'backpacking', 'wellness', 'photography', 'sports', 'music', 'art', 'history', 'wildlife', 'nomad', 'solo-travel']; %>
+                                <% allInterests.forEach(interest => { %>
+                                    <div class="col-md-3 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="interests" 
+                                                   value="<%= interest %>" id="int_<%= interest %>">
+                                            <label class="form-check-label" for="int_<%= interest %>">
+                                                <%= interest.charAt(0).toUpperCase() + interest.slice(1).replace(/-/g, ' ') %>
+                                            </label>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Travel Style</label>
+                            <select class="form-select" name="travelStyle">
+                                <option value="flexible">Flexible</option>
+                                <option value="budget">Budget</option>
+                                <option value="mid-range">Mid-range</option>
+                                <option value="luxury">Luxury</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Looking For</label>
+                            <select class="form-select" name="lookingFor" required>
+                                <option value="travel-buddy">Travel Buddy</option>
+                                <option value="roommate">Roommate</option>
+                                <option value="both">Both</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Max Partners</label>
+                            <input type="number" class="form-control" name="maxPartners" 
+                                   value="1" min="1" max="10" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Budget per Person (Min ₹)</label>
+                                <input type="number" class="form-control" name="budgetMin" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Budget per Person (Max ₹)</label>
+                                <input type="number" class="form-control" name="budgetMax" value="50000">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Accommodation Type</label>
+                            <select class="form-select" name="accommodationType">
+                                <option value="flexible">Flexible</option>
+                                <option value="shared-room">Shared Room</option>
+                                <option value="private-room">Private Room</option>
+                                <option value="hostel">Hostel</option>
+                                <option value="hotel">Hotel</option>
+                                <option value="airbnb">Airbnb</option>
+                                <option value="camping">Camping</option>
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-check me-2"></i>Create Listing
+                            </button>
+                            <a href="/buddy/listings" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

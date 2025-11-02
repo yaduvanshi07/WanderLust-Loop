@@ -80,7 +80,23 @@ const bookingSchema = new Schema({
     hostNotes: {
         type: String,
         maxlength: 500
-    }
+    },
+    // Location tracking for travel routes
+    routeLocations: [{
+        // GeoJSON Point for each stop
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number] // [longitude, latitude]
+        },
+        city: String,
+        country: String,
+        arrivalDate: Date,
+        departureDate: Date
+    }]
 });
 
 // Virtual for total guests count
@@ -102,6 +118,8 @@ bookingSchema.virtual('bookingRef').get(function() {
 bookingSchema.index({ listing: 1, checkin: 1, checkout: 1 });
 bookingSchema.index({ guest: 1, bookedAt: -1 });
 bookingSchema.index({ status: 1 });
+// GeoJSON index for route locations
+bookingSchema.index({ "routeLocations": "2dsphere" });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 module.exports = Booking;

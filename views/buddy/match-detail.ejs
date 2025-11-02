@@ -1,0 +1,322 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+  
+  .match-detail-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .match-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .match-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .compatibility-score {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: inline-block;
+    margin: 1rem 0;
+    box-shadow: 0 4px 20px rgba(17, 153, 142, 0.4);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  .profile-picture {
+    width: 150px;
+    height: 150px;
+    border: 5px solid white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  }
+  
+  .progress-section {
+    background: rgba(102, 126, 234, 0.05);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+  }
+  
+  .progress-section:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateX(5px);
+  }
+  
+  .progress {
+    border-radius: 10px;
+    height: 25px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.1);
+  }
+  
+  .progress-bar {
+    border-radius: 10px;
+    transition: width 1s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.85rem;
+  }
+  
+  .interest-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0.5rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+  
+  .interest-badge:hover {
+    transform: scale(1.1) rotate(2deg);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  }
+  
+  .icebreaker-item {
+    background: rgba(255, 193, 7, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 15px;
+    margin: 0.75rem 0;
+    border-left: 5px solid #ffc107;
+    transition: all 0.3s ease;
+  }
+  
+  .icebreaker-item:hover {
+    background: rgba(255, 193, 7, 0.2);
+    transform: translateX(10px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    color: white;
+  }
+  
+  .progress-interests {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
+  .progress-travel {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+  
+  .progress-personality {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%);
+  }
+  
+  .progress-booking {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+  
+  .progress-destination {
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.progress-bar[data-width]');
+    progressBars.forEach(bar => {
+      const width = parseFloat(bar.getAttribute('data-width'));
+      bar.style.width = width + '%';
+    });
+  });
+</script>
+
+<div class="container mt-4 match-detail-container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="match-card">
+                <div class="match-header">
+                    <h4 class="mb-3">
+                        <i class="fa-solid fa-heart me-2"></i>Match Details
+                    </h4>
+                    <!-- Profile Section -->
+                    <div class="text-center">
+                        <% if (otherUser.travelBuddyProfile?.profilePicture?.url) { %>
+                            <img src="<%= otherUser.travelBuddyProfile.profilePicture.url %>" 
+                                 class="rounded-circle profile-picture mb-3" 
+                                 style="object-fit: cover;">
+                        <% } else { %>
+                            <div class="rounded-circle bg-white d-inline-flex align-items-center justify-content-center mb-3 profile-picture">
+                                <i class="fa-solid fa-user fa-4x" style="color: #667eea;"></i>
+                            </div>
+                        <% } %>
+                        <h3 class="mb-2"><%= otherUser.username %></h3>
+                        <div class="compatibility-score"><%= match.compatibilityScore %>% Compatibility</div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Compatibility Breakdown -->
+                    <div class="mb-4">
+                        <h5 class="mb-4"><i class="fa-solid fa-chart-pie me-2"></i>Compatibility Breakdown</h5>
+                        <div class="progress-section">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold"><i class="fa-solid fa-tags me-2"></i>Interests Match</span>
+                                <strong><%= match.breakdown.interestsMatch.toFixed(1) %>%</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-interests" role="progressbar" 
+                                     data-width="<%= match.breakdown.interestsMatch %>">
+                                    <%= match.breakdown.interestsMatch.toFixed(0) %>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold"><i class="fa-solid fa-suitcase me-2"></i>Travel Style Match</span>
+                                <strong><%= match.breakdown.travelStyleMatch.toFixed(1) %>%</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-travel" role="progressbar" 
+                                     data-width="<%= match.breakdown.travelStyleMatch %>">
+                                    <%= match.breakdown.travelStyleMatch.toFixed(0) %>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold"><i class="fa-solid fa-user-friends me-2"></i>Personality Match</span>
+                                <strong><%= match.breakdown.personalityMatch.toFixed(1) %>%</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-personality" role="progressbar" 
+                                     data-width="<%= match.breakdown.personalityMatch %>">
+                                    <%= match.breakdown.personalityMatch.toFixed(0) %>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold"><i class="fa-solid fa-calendar-check me-2"></i>Booking History Match</span>
+                                <strong><%= match.breakdown.bookingHistoryMatch.toFixed(1) %>%</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-booking" role="progressbar" 
+                                     data-width="<%= match.breakdown.bookingHistoryMatch.toFixed(1) %>">
+                                    <%= match.breakdown.bookingHistoryMatch.toFixed(0) %>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold"><i class="fa-solid fa-map-marker-alt me-2"></i>Destination Match</span>
+                                <strong><%= match.breakdown.destinationMatch.toFixed(1) %>%</strong>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-destination" role="progressbar" 
+                                     data-width="<%= match.breakdown.destinationMatch.toFixed(1) %>">
+                                    <%= match.breakdown.destinationMatch.toFixed(0) %>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shared Interests -->
+                    <% if (match.sharedInterests && match.sharedInterests.length > 0) { %>
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fa-solid fa-tags me-2"></i>Shared Interests</h5>
+                            <div class="text-center">
+                                <% match.sharedInterests.forEach(interest => { %>
+                                    <span class="interest-badge"><%= interest %></span>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <!-- Ice Breakers -->
+                    <% if (match.iceBreakers && match.iceBreakers.length > 0) { %>
+                        <div class="mb-4">
+                            <h5 class="mb-3"><i class="fa-solid fa-lightbulb me-2 text-warning"></i>Suggested Ice Breakers</h5>
+                            <div>
+                                <% match.iceBreakers.forEach(icebreaker => { %>
+                                    <div class="icebreaker-item">
+                                        <i class="fa-solid fa-quote-left text-warning me-2"></i>
+                                        <%= icebreaker %>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <!-- Suggested Destinations -->
+                    <% if (match.suggestedDestinations && match.suggestedDestinations.length > 0) { %>
+                        <div class="mb-4">
+                            <h5><i class="fa-solid fa-map-marker-alt me-2"></i>Suggested Destinations</h5>
+                            <div class="mt-2">
+                                <% match.suggestedDestinations.forEach(dest => { %>
+                                    <span class="badge bg-success me-2 mb-2"><%= dest %></span>
+                                <% }) %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="/buddy/listings" class="btn btn-primary">
+                            <i class="fa-solid fa-search me-2"></i>Find Listings
+                        </a>
+                        <a href="/buddy/matches" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Matches
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

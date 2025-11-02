@@ -1,7 +1,7 @@
 <% layout("/layouts/boilerplate") %>
 <style>
   form {
-  background-color: #fdfdfd;
+  /* background-color: #fdfdfd; */
   border-radius: 12px;
   max-width: 500px;
   margin: auto;
@@ -283,12 +283,31 @@ form p {
   <div class="row">
     <div class="col-lg-8">
       <div class="reviews-section">
-        <h3>Reviews</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="mb-0">Reviews</h3>
+          <% 
+            const approvedReviews = listing.reviews ? listing.reviews.filter(r => r.status === "approved") : [];
+            const avgRating = approvedReviews.length > 0 
+              ? (approvedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / approvedReviews.length).toFixed(1)
+              : 0;
+            const totalReviews = approvedReviews.length;
+          %>
+          <div class="rating-summary">
+            <% if (totalReviews > 0) { %>
+              <div class="d-flex align-items-center gap-2">
+                <span class="average-rating"><i class="fa-solid fa-star text-warning"></i> <%= avgRating %></span>
+                <span class="text-muted">(<%= totalReviews %> <%= totalReviews === 1 ? 'review' : 'reviews' %>)</span>
+              </div>
+            <% } else { %>
+              <span class="text-muted">No reviews yet</span>
+            <% } %>
+          </div>
+        </div>
         
         <% if (currUser) { %>
           <div class="review-form-section mb-4">
             <h4>Leave a review</h4>
-            <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class="needs-validation">
+            <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
               <div class="mb-3">
                 <label for="rating" class="form-label">Rating</label>
                 <fieldset class="starability-slot">
@@ -321,46 +340,51 @@ form p {
 
         <!-- Reviews List -->
         <div class="reviews-list">
-          <% if (listing.reviews && listing.reviews.length > 0) { %>
+          <% if (approvedReviews && approvedReviews.length > 0) { %>
             <div class="row">
-              <% listing.reviews.forEach(review => { %>
-                <% if (review.status === "approved") { %>
-                  <div class="col-md-6 mb-4">
-                    <div class="review-card">
-                      <div class="review-header">
-                        <div class="reviewer-avatar">
-                          <i class="fa-solid fa-user"></i>
+              <% approvedReviews.forEach(review => { %>
+                <div class="col-md-6 mb-4">
+                  <div class="review-card">
+                    <div class="review-header">
+                      <div class="reviewer-avatar">
+                        <i class="fa-solid fa-user"></i>
+                      </div>
+                      <div class="reviewer-info">
+                        <div class="reviewer-name">
+                          <%= review.author && review.author.username ? review.author.username : 'Anonymous' %>
                         </div>
-                        <div class="reviewer-info">
-                          <div class="reviewer-name"><%= review.author.username %></div>
-                          <div class="review-date"><%= new Date(review.createdAt).toLocaleDateString() %></div>
-                        </div>
-                        <div class="review-rating">
-                          <div class="stars">
-                            <% for (let i = 1; i <= 5; i++) { %>
-                              <i class="fa-solid fa-star <%= i <= review.rating ? 'filled' : '' %>"></i>
-                            <% } %>
-                          </div>
+                        <div class="review-date">
+                          <%= review.createdAt ? new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '' %>
                         </div>
                       </div>
-                      <div class="review-content">
-                        <p><%= review.comment %></p>
-                        <% if (review.sentiment && review.sentiment.label) { %>
-                          <span class="badge <%= review.sentiment.label === 'positive' ? 'bg-success' : (review.sentiment.label === 'negative' ? 'bg-danger' : 'bg-secondary') %>">
-                            <%= review.sentiment.label %>
-                          </span>
-                        <% } %>
-                      </div>
-                      <% if (currUser && review.author._id.equals(currUser._id)) { %>
-                        <div class="review-actions">
-                          <form method="POST" action="/listings/<%= listing.id %>/reviews/<%= review.id %>?_method=DELETE">
-                            <button class="btn btn-sm btn-outline-danger">Delete</button>
-                          </form>
+                      <div class="review-rating">
+                        <div class="stars">
+                          <% for (let i = 1; i <= 5; i++) { %>
+                            <i class="fa-solid fa-star <%= i <= (review.rating || 0) ? 'filled' : 'empty' %>"></i>
+                          <% } %>
+                          <span class="rating-number ms-2"><%= review.rating || 0 %></span>
                         </div>
+                      </div>
+                    </div>
+                    <div class="review-content">
+                      <p><%= review.comment || 'No comment' %></p>
+                      <% if (review.sentiment && review.sentiment.label) { %>
+                        <span class="badge <%= review.sentiment.label === 'positive' ? 'bg-success' : (review.sentiment.label === 'negative' ? 'bg-danger' : 'bg-secondary') %>">
+                          <%= review.sentiment.label.charAt(0).toUpperCase() + review.sentiment.label.slice(1) %>
+                        </span>
                       <% } %>
                     </div>
+                    <% if (currUser && review.author && review.author._id && review.author._id.toString() === currUser._id.toString()) { %>
+                      <div class="review-actions">
+                        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this review?')">
+                            <i class="fa-solid fa-trash me-1"></i>Delete
+                          </button>
+                        </form>
+                      </div>
+                    <% } %>
                   </div>
-                <% } %>
+                </div>
               <% }); %>
             </div>
           <% } else { %>
@@ -448,6 +472,26 @@ form p {
 
 .review-rating .stars .filled {
   color: #ff385c;
+}
+
+.review-rating .stars .empty {
+  color: #ddd;
+}
+
+.review-rating .rating-number {
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+}
+
+.rating-summary {
+  text-align: right;
+}
+
+.average-rating {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
 }
 
 .review-content p {

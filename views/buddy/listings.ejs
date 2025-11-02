@@ -1,0 +1,238 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    min-height: 100vh;
+  }
+  
+  .listing-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .listing-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  .listing-header h2 {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  
+  .listing-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+    animation: slideIn 0.6s ease-out backwards;
+    cursor: pointer;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .listing-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #11998e, #38ef7d);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .listing-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(17, 153, 142, 0.4);
+  }
+  
+  .listing-card:hover::before {
+    opacity: 1;
+  }
+  
+  .listing-card .card-body {
+    padding: 2rem;
+  }
+  
+  .status-badge {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+  }
+  
+  .btn-create {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+  }
+  
+  .btn-create:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(17, 153, 142, 0.6);
+    color: white;
+  }
+  
+  .btn-sm {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.5);
+    color: white;
+  }
+  
+  .interest-badge {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0.25rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+  
+  .interest-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.5);
+  }
+  
+  .empty-state {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+</style>
+
+<div class="container mt-4 listing-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="listing-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2><i class="fa-solid fa-map-marked-alt me-2"></i>Travel Buddy Listings</h2>
+                    <a href="/buddy/listings/new" class="btn btn-create">
+                        <i class="fa-solid fa-plus me-2"></i>Create Listing
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <% if (listings.length === 0) { %>
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fa-solid fa-map-marked-alt fa-4x mb-3" style="color: #11998e;"></i>
+                    <h4>No active listings found</h4>
+                    <p class="text-muted">Be the first to create a travel buddy listing!</p>
+                    <a href="/buddy/listings/new" class="btn btn-create mt-3">
+                        <i class="fa-solid fa-plus me-2"></i>Create First Listing
+                    </a>
+                </div>
+            </div>
+        <% } else { %>
+            <% listings.forEach((listing, index) => { %>
+                <div class="col-md-6 mb-4" style="animation-delay: <%= index * 0.1 %>s">
+                    <div class="listing-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title fw-bold"><%= listing.title %></h5>
+                                <span class="status-badge">Active</span>
+                            </div>
+                            
+                            <p class="text-muted mb-2">
+                                <i class="fa-solid fa-user me-1"></i>
+                                <%= listing.creator.username %>
+                            </p>
+
+                            <p class="mb-2">
+                                <i class="fa-solid fa-map-marker-alt me-2 text-primary"></i>
+                                <strong><%= listing.destination %></strong>
+                            </p>
+
+                            <p class="mb-2">
+                                <i class="fa-solid fa-calendar me-2 text-info"></i>
+                                <%= new Date(listing.startDate).toLocaleDateString() %> - 
+                                <%= new Date(listing.endDate).toLocaleDateString() %>
+                            </p>
+
+                            <p class="mb-3 text-truncate"><%= listing.bio %></p>
+
+                            <% if (listing.interests && listing.interests.length > 0) { %>
+                                <div class="mb-3">
+                                    <% listing.interests.slice(0, 5).forEach(interest => { %>
+                                        <span class="interest-badge"><%= interest %></span>
+                                    <% }) %>
+                                </div>
+                            <% } %>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    Looking for: <strong><%= listing.lookingFor.replace('-', ' ') %></strong>
+                                </small>
+                                <a href="/buddy/listings/<%= listing._id %>" class="btn btn-sm btn-primary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+</div>
+

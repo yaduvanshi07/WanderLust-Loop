@@ -7,7 +7,7 @@
           <i class="fa-solid fa-tachometer-alt me-2"></i>
           Admin Dashboard
         </h2>
-        <div class="text-muted">
+        <div class="text-muted welcome-badge">
           <i class="fa-solid fa-user-shield me-1"></i>
           Welcome, <%= currUser.username %>!
         </div>
@@ -185,4 +185,315 @@
   </div>
 </div>
 
+<style>
+  /* Modern Dashboard Styling */
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+
+  .container {
+    animation: fadeIn 0.6s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Header Styling */
+  .d-flex.justify-content-between h2 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    font-size: 2rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .welcome-badge {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    display: inline-block;
+  }
+
+  hr.my-3 {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    margin: 1.5rem 0;
+  }
+
+  /* Overview Cards - Enhanced */
+  .card.border-0.shadow-sm {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card.border-0.shadow-sm::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .card.border-0.shadow-sm:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3) !important;
+  }
+
+  .card.border-0.shadow-sm:hover::before {
+    opacity: 1;
+  }
+
+  .card-body {
+    padding: 2rem 1.5rem !important;
+  }
+
+  /* Icon Styling in Cards */
+  .card-body .fa-2x {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+
+  .card.border-0.shadow-sm:hover .fa-2x {
+    transform: scale(1.2) rotate(5deg);
+  }
+
+  /* Card Title Styling */
+  .card-title {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    margin: 1rem 0 !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-text.text-muted {
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    color: #6c757d !important;
+  }
+
+  /* Quick Actions Card */
+  .card-header.bg-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.25rem 1.5rem !important;
+    border: none;
+  }
+
+  .card-header.bg-primary h5 {
+    font-weight: 600;
+    font-size: 1.2rem;
+  }
+
+  .card-header.bg-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    border-radius: 15px 15px 0 0 !important;
+  }
+
+  .card-header.bg-info {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%) !important;
+    border-radius: 15px 15px 0 0 !important;
+  }
+
+  /* Action Buttons */
+  .btn-outline-primary,
+  .btn-outline-success,
+  .btn-outline-warning,
+  .btn-outline-info,
+  .btn-outline-danger {
+    border-radius: 12px !important;
+    padding: 0.75rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    border-width: 2px !important;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-outline-primary::before,
+  .btn-outline-success::before,
+  .btn-outline-warning::before,
+  .btn-outline-info::before,
+  .btn-outline-danger::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn-outline-primary:hover::before,
+  .btn-outline-success:hover::before,
+  .btn-outline-warning:hover::before,
+  .btn-outline-info:hover::before,
+  .btn-outline-danger:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn-outline-success:hover {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(17, 153, 142, 0.4);
+  }
+
+  .btn-outline-warning:hover {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+  }
+
+  .btn-outline-info:hover {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(52, 148, 230, 0.4);
+  }
+
+  .btn-outline-danger:hover {
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%) !important;
+    border-color: transparent !important;
+    color: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(238, 9, 121, 0.4);
+  }
+
+  .btn i {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease;
+  }
+
+  .btn:hover i {
+    transform: scale(1.2);
+  }
+
+  /* List Items */
+  .list-group-item {
+    padding: 1rem 0 !important;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+  }
+
+  .list-group-item:last-child {
+    border-bottom: none !important;
+  }
+
+  .list-group-item:hover {
+    background: rgba(102, 126, 234, 0.05) !important;
+    padding-left: 0.5rem !important;
+    transform: translateX(5px);
+    border-radius: 8px;
+  }
+
+  .list-group-item:hover strong {
+    color: #667eea;
+  }
+
+  /* Badges */
+  .badge {
+    padding: 0.5rem 1rem !important;
+    border-radius: 20px !important;
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  /* Action Buttons in Cards */
+  .btn-success.btn-sm,
+  .btn-info.btn-sm {
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  .btn-success.btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+  }
+
+  .btn-info.btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 148, 230, 0.4);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .card.border-0.shadow-sm:hover {
+      transform: translateY(-5px) scale(1.01);
+    }
+    
+    .card-title {
+      font-size: 2rem !important;
+    }
+  }
+
+  /* Smooth scrolling */
+  * {
+    scroll-behavior: smooth;
+  }
+
+  /* Additional polish for empty states */
+  .text-muted.text-center {
+    padding: 2rem 0;
+    font-style: italic;
+  }
+
+  /* Card content spacing */
+  .card-body > .list-group {
+    margin-bottom: 0;
+  }
+</style>
 

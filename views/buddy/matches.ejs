@@ -1,0 +1,388 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+  
+  .buddy-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .buddy-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  .buddy-header h2 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  
+  .filter-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .filter-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+  }
+  
+  .match-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+    animation: slideIn 0.6s ease-out backwards;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .match-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .match-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+  }
+  
+  .match-card:hover::before {
+    opacity: 1;
+  }
+  
+  .match-card .card-body {
+    padding: 2rem;
+  }
+  
+  .compatibility-badge {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+  
+  .progress {
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.1);
+  }
+  
+  .progress-bar {
+    border-radius: 10px;
+    transition: width 1s ease;
+  }
+  
+  .interest-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0.25rem;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .interest-badge:hover {
+    transform: scale(1.1) rotate(2deg);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+  }
+  
+  .btn-refresh {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+  
+  .btn-refresh:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    color: white;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .btn-primary:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+    color: white;
+  }
+  
+  .icebreaker-item {
+    background: rgba(255, 193, 7, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    margin: 0.5rem 0;
+    border-left: 4px solid #ffc107;
+    transition: all 0.3s ease;
+  }
+  
+  .icebreaker-item:hover {
+    background: rgba(255, 193, 7, 0.2);
+    transform: translateX(5px);
+  }
+  
+  .empty-state {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+  
+  .form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="container mt-4 buddy-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="buddy-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2><i class="fa-solid fa-heart me-2"></i>Find Travel Buddies</h2>
+                    <a href="/buddy/matches?refresh=true" class="btn btn-refresh">
+                        <i class="fa-solid fa-sync-alt me-2"></i>Refresh Matches
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="filter-card">
+                <div class="card-body p-4">
+                    <form method="GET" action="/buddy/matches" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Min Compatibility Score</label>
+                            <input type="number" class="form-control" name="minScore" 
+                                   value="<%= filters.minScore %>" min="0" max="100">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Travel Style</label>
+                            <select class="form-select" name="travelStyle">
+                                <option value="">All</option>
+                                <option value="travel-buddy" <%= filters.travelStyle === 'travel-buddy' ? 'selected' : '' %>>Travel Buddy</option>
+                                <option value="roommate" <%= filters.travelStyle === 'roommate' ? 'selected' : '' %>>Roommate</option>
+                                <option value="both" <%= filters.travelStyle === 'both' ? 'selected' : '' %>>Both</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Shared Interests</label>
+                            <input type="text" class="form-control" name="interests" 
+                                   placeholder="foodie, adventure, culture" 
+                                   value="<%= filters.interests.join(', ') %>">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fa-solid fa-filter me-1"></i>Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matches -->
+    <div class="row">
+        <% if (matches.length === 0) { %>
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fa-solid fa-heart-broken fa-4x mb-3" style="color: #667eea;"></i>
+                    <h4>No matches found</h4>
+                    <p class="text-muted">Update your profile to get better matches!</p>
+                    <a href="/buddy/profile" class="btn btn-primary mt-3">
+                        <i class="fa-solid fa-user-edit me-2"></i>Update Profile
+                    </a>
+                </div>
+            </div>
+        <% } else { %>
+            <% matches.forEach((match, index) => { %>
+                <div class="col-md-6 mb-4" style="animation-delay: <%= index * 0.1 %>s">
+                    <div class="match-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title mb-2">
+                                        <% if (match.otherUser.travelBuddyProfile?.profilePicture?.url) { %>
+                                            <img src="<%= match.otherUser.travelBuddyProfile.profilePicture.url %>" 
+                                                 class="rounded-circle me-2" 
+                                                 style="width: 60px; height: 60px; object-fit: cover; border: 3px solid #667eea;">
+                                        <% } else { %>
+                                            <div class="rounded-circle bg-gradient d-inline-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                                <i class="fa-solid fa-user fa-2x text-white"></i>
+                                            </div>
+                                        <% } %>
+                                        <strong><%= match.otherUser.username %></strong>
+                                    </h5>
+                                </div>
+                                <div class="text-end">
+                                    <span class="compatibility-badge"><%= match.compatibilityScore %>% Match</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong class="d-block mb-2"><i class="fa-solid fa-tags me-2"></i>Shared Interests:</strong>
+                                <div class="mt-1">
+                                    <% match.sharedInterests.forEach(interest => { %>
+                                        <span class="interest-badge"><%= interest %></span>
+                                    <% }) %>
+                                    <% if (match.sharedInterests.length === 0) { %>
+                                        <span class="text-muted">None</span>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>Compatibility Breakdown:</strong>
+                                <div class="mt-2">
+                                    <small>Interests: <%= match.breakdown.interestsMatch.toFixed(1) %>%</small>
+                                    <div class="progress mb-1" style="height: 5px;">
+                                        <div class="progress-bar" style="width: <%= match.breakdown.interestsMatch %>%"></div>
+                                    </div>
+                                    <small>Travel Style: <%= match.breakdown.travelStyleMatch.toFixed(1) %>%</small>
+                                    <div class="progress mb-1" style="height: 5px;">
+                                        <div class="progress-bar bg-success" style="width: <%= match.breakdown.travelStyleMatch %>%"></div>
+                                    </div>
+                                    <small>Personality: <%= match.breakdown.personalityMatch.toFixed(1) %>%</small>
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar bg-info" style="width: <%= match.breakdown.personalityMatch %>%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <% if (match.iceBreakers && match.iceBreakers.length > 0) { %>
+                                <div class="mb-3">
+                                    <strong class="d-block mb-2"><i class="fa-solid fa-lightbulb text-warning me-2"></i>Ice Breakers:</strong>
+                                    <div class="mt-2">
+                                        <% match.iceBreakers.slice(0, 2).forEach(icebreaker => { %>
+                                            <div class="icebreaker-item">
+                                                <i class="fa-solid fa-quote-left text-warning me-2"></i><%= icebreaker %>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                </div>
+                            <% } %>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <a href="/buddy/matches/<%= match._id %>" class="btn btn-primary">
+                                    <i class="fa-solid fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+</div>
+

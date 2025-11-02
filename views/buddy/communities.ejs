@@ -1,0 +1,233 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%);
+    min-height: 100vh;
+  }
+  
+  .community-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .community-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  .community-header h2 {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  
+  .community-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+    animation: slideIn 0.6s ease-out backwards;
+    cursor: pointer;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .community-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3494E6, #EC6EAD);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .community-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(52, 148, 230, 0.4);
+  }
+  
+  .community-card:hover::before {
+    opacity: 1;
+  }
+  
+  .community-card .card-body {
+    padding: 2rem;
+  }
+  
+  .member-badge {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 15px rgba(52, 148, 230, 0.4);
+  }
+  
+  .btn-join {
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%);
+    border: none;
+    color: white;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-join::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .btn-join:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .btn-join:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(52, 148, 230, 0.5);
+    color: white;
+  }
+  
+  .btn-leave {
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: white;
+  }
+  
+  .btn-leave:hover {
+    background: #e74c3c;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+  }
+  
+  .community-icon {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .empty-state {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 4rem 2rem;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  }
+</style>
+
+<div class="container mt-4 community-container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="community-header">
+                <h2><i class="fa-solid fa-users me-2"></i>Travel Communities</h2>
+                <p class="text-muted mt-2">Join interest-based communities to connect with like-minded travelers</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <% if (communities.length === 0) { %>
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fa-solid fa-users fa-4x mb-3" style="color: #3494E6;"></i>
+                    <h4>No communities available yet</h4>
+                    <p class="text-muted">Communities will be available soon!</p>
+                </div>
+            </div>
+        <% } else { %>
+            <% communities.forEach((community, index) => { %>
+                <div class="col-md-4 mb-4" style="animation-delay: <%= index * 0.1 %>s">
+                    <div class="community-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title fw-bold">
+                                    <i class="fa-solid fa-<%= community.icon || 'users' %> me-2 community-icon"></i>
+                                    <%= community.name %>
+                                </h5>
+                                <span class="member-badge"><%= community.memberCount %> members</span>
+                            </div>
+                            
+                            <p class="text-muted"><%= community.description || 'Join this community to connect with fellow travelers!' %></p>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="fa-solid fa-tag me-1"></i>
+                                    Category: <strong><%= community.category %></strong>
+                                </small>
+                            </div>
+
+                            <% if (userCommunities.includes(community._id.toString())) { %>
+                                <form method="POST" action="/buddy/communities/<%= community._id %>/leave">
+                                    <button type="submit" class="btn btn-leave w-100">
+                                        <i class="fa-solid fa-sign-out-alt me-2"></i>Leave Community
+                                    </button>
+                                </form>
+                            <% } else { %>
+                                <form method="POST" action="/buddy/communities/<%= community._id %>/join">
+                                    <button type="submit" class="btn btn-join w-100">
+                                        <i class="fa-solid fa-user-plus me-2"></i>Join Community
+                                    </button>
+                                </form>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+</div>
+

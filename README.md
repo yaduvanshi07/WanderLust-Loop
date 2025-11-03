@@ -342,15 +342,10 @@ Scores are calculated using weighted metrics and cached for performance.
 - Email/SMS notifications
 - Payment gateway integration
 
-## 📝 License
-
-ISC
-
 ## 👨‍💻 Author
 
-Student Project - Academic Development
-
+Abhinav Kumar Yadav
 ---
 
-**Note**: This project is part of academic coursework and demonstrates full-stack development with ML integration.
+
 

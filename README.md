@@ -426,7 +426,6 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 - No payment gateway integration
 
 ---
-
 ## 🔮 Future Enhancements
 
 - [ ] A/B testing framework
@@ -496,16 +495,6 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 - Full visibility of travel buddy connections
 - Community management
 - Comprehensive insights dashboard
-
----
-
-## 📝 License
-
-ISC License
-
----
-
-## 👨‍💻 Author
 
 **Student Project - Academic Development**
 

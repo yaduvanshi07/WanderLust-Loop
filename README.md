@@ -379,6 +379,8 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 5. Use interactive map to find nearby travelers
 
 ### Test What-If Explorer
+
+**For Hosts:**
 1. Navigate to `/host/performance`
 2. Click "What-If Explorer" on any listing
 3. Test scenarios:
@@ -387,9 +389,13 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
    - **Policy**: Select flexible/moderate/strict
 4. Review predictions and recommendations
 
----
+**For Guests:**
+1. Visit `/listings`
+2. Click "What If Explorer"
+3. Adjust budget, stay duration, dates
+4. View scenario suggestions
 
-## 🔒 Security Features
+---
 
 - ✅ Password hashing with Passport-Local-Mongoose
 - ✅ Session-based authentication

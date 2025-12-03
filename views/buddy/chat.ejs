@@ -204,10 +204,10 @@
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    // Auto-refresh messages every 5 seconds
+    // Auto-refresh messages every 5 minutes (300,000 ms)
     setInterval(() => {
         location.reload();
-    }, 5000);
+    }, 300000);
     
     // Focus input on load
     document.getElementById('messageInput')?.focus();

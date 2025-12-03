@@ -20,21 +20,85 @@
     width:300px;
     /* padding:0.5rem, 3rem, 0.5rem, 3rem; */
   }
+
+  .navbar-saffron {
+    background-color: antiquewhite !important;
+    color: black;
+  }
+
+  .navbar-saffron .navbar-brand,
+  .navbar-saffron .navbar-brand:hover,
+  .navbar-saffron .navbar-brand:focus {
+    color: black !important;
+  }
+
+  .navbar-saffron .nav-link {
+    color: black !important;
+  }
+
+  .navbar-saffron .nav-link:hover,
+  .navbar-saffron .nav-link:focus {
+    color: red !important;
+  }
+
+  .navbar-saffron .navbar-toggler {
+    border-color: rgba(0, 0, 0, 0.3);
+  }
+
+  .navbar-saffron .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  }
+
+  .navbar-saffron .dropdown-menu {
+    background-color: #fff !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .navbar-saffron .dropdown-item {
+    color: #212529 !important;
+  }
+
+  .navbar-saffron .dropdown-item:hover,
+  .navbar-saffron .dropdown-item:focus {
+    color: #1e2125 !important;
+    background-color: #e9ecef !important;
+  }
+
+  .navbar-saffron .dropdown-item.active,
+  .navbar-saffron .dropdown-item:active {
+    color: #fff !important;
+    background-color: #2B6CB0 !important;
+  }
+
+  .navbar-saffron .dropdown-divider {
+    border-top: 1px solid rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .navbar-saffron .dropdown-header {
+    color: #6c757d !important;
+  }
+
+  .navbar-saffron .form-control {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .navbar-saffron .form-control:focus {
+    background-color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
 </style>
 
 <!-- Add to your header or navigation part -->
 
 
 
-<nav class="navbar navbar-expand-md border-bottom sticky-top <%= currUser && currUser.role === 'admin' ? 'navbar-dark bg-dark' : 'bg-light' %>">
+<nav class="navbar navbar-expand-md border-bottom sticky-top <%= currUser && currUser.role === 'admin' ? 'navbar-saffron' : 'bg-light' %>">
     <div class="container-fluid">
-      <a class="navbar-brand" href="<%= currUser && currUser.role === 'admin' ? '/admin' : '/listings' %>">
+      <a class="navbar-brand" href="/listings">
         <i class="fa-regular fa-compass"></i>
-        <% if (currUser && currUser.role === 'admin') { %>
-          <span class="ms-2 text-warning">Admin Panel</span>
-        <% } else { %>
-          <span class="ms-2">WanderLust</span>
-        <% } %>
+        <span class="ms-2">StaySense</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
         <span class="navbar-toggler-icon"></span>
@@ -52,7 +116,6 @@
                 <li><a class="dropdown-item" href="/buddy/matches"><i class="fa-solid fa-heart me-2"></i>Find Matches</a></li>
                 <li><a class="dropdown-item" href="/buddy/listings"><i class="fa-solid fa-map-marked-alt me-2"></i>Listings</a></li>
                 <li><a class="dropdown-item" href="/buddy/map"><i class="fa-solid fa-map me-2"></i>Interactive Map</a></li>
-                <li><a class="dropdown-item" href="/buddy/communities"><i class="fa-solid fa-users me-2"></i>Communities</a></li>
                 <li><a class="dropdown-item" href="/buddy/requests"><i class="fa-solid fa-envelope me-2"></i>Requests</a></li>
                 <li><a class="dropdown-item" href="/buddy/inbox"><i class="fa-solid fa-inbox me-2"></i>Inbox</a></li>
               </ul>
@@ -69,9 +132,6 @@
         </form>
       </div>
       <div class="navbar-nav ms-auto">
-        <% if (currUser && currUser.role === 'admin') { %>
-          <a class="nav-link" href="/coupons">Coupons</a>
-        <% } %>
         <a class="nav-link" href="/listings/new">Airbnb your home</a>
 
         <% if (typeof currUser === "undefined" || !currUser) { %>
@@ -87,15 +147,13 @@
             </a>
             <ul class="dropdown-menu">
               <% if (currUser.role === 'admin') { %>
-                <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-gauge"></i> Admin Dashboard</a></li>
+                <li><h6 class="dropdown-header"><i class="fa-solid fa-shield-halved me-2"></i>Admin Panel</h6></li>
+                <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-gauge me-2"></i>Admin Dashboard</a></li>
+                <li><a class="dropdown-item" href="/coupons"><i class="fa-solid fa-ticket-alt me-2"></i>Manage Coupons</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <!-- <li><h6 class="dropdown-header"><i class="fa-solid fa-chart-bar me-2"></i>Analytics & ML</h6></li> -->
                 <li><a class="dropdown-item" href="/analytics/dashboard"><i class="fa-solid fa-chart-bar me-2"></i>Analytics Dashboard</a></li>
-                <!-- <li><a class="dropdown-item" href="/admin/ml/dashboard"><i class="fa-solid fa-brain me-2"></i>ML Performance Dashboard</a></li> -->
                 <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line me-2"></i>Host Performance</a></li>
-                <li><a class="dropdown-item" href="/admin/map"><i class="fa-solid fa-map-location-dot me-2"></i>User Location Map</a></li>
               <% } else { %>
-                <li><h6 class="dropdown-header"><i class="fa-solid fa-chart-bar me-2"></i>Analytics</h6></li>
                 <li><a class="dropdown-item" href="/analytics/dashboard"><i class="fa-solid fa-chart-bar me-2"></i>Analytics Dashboard</a></li>
                 <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line me-2"></i>Host Performance</a></li>
               <% } %>

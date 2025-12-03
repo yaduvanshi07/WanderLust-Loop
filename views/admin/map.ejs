@@ -6,10 +6,13 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<!-- MapLibre (Vector map, no API key needed using demo style) -->
+<link href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
 
 <style>
   body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
     min-height: 100vh;
   }
   
@@ -60,13 +63,31 @@
       <i class="fa-solid fa-map-location-dot me-2"></i>Admin - All Users Location Map
     </h2>
     <p class="text-muted">View all users' live locations on the map. All location data is visible to admins regardless of privacy settings.</p>
-    <button class="btn btn-primary" id="refreshAdminMap">
-      <i class="fa-solid fa-sync-alt me-2"></i>Refresh All Locations
-    </button>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary" id="refreshAdminMap">
+        <i class="fa-solid fa-sync-alt me-2"></i>Refresh All Locations
+      </button>
+      <button class="btn btn-outline-primary" id="showBooked">
+        <i class="fa-solid fa-bed me-2"></i>Show Booked Only
+      </button>
+      <button class="btn btn-outline-secondary" id="showAll">
+        <i class="fa-solid fa-user-group me-2"></i>Show All
+      </button>
+      <button class="btn btn-outline-info" id="addDemoPins">
+        <i class="fa-solid fa-location-dot me-2"></i>Add Demo Pins
+      </button>
+      <button class="btn btn-outline-success" id="showListings">
+        <i class="fa-solid fa-building me-2"></i>Show Listings
+      </button>
+      <button class="btn btn-outline-dark" id="openVectorMap">
+        <i class="fa-solid fa-layer-group me-2"></i>Refresh Listings Map (Vector)
+      </button>
+    </div>
   </div>
   
   <div class="map-container">
     <div id="adminMap"></div>
+    <div id="vectorMap" style="width: 100%; height: 700px; border-radius: 15px; display:none;"></div>
   </div>
 </div>
 
@@ -74,6 +95,17 @@
   let adminMap;
   let adminMarkerCluster;
   let adminSocket;
+  const statusColorMap = {
+    accepted: '#28a745', // green
+    pending: '#ffc107',  // yellow
+    rejected: '#dc3545', // red
+    cancelled: '#6c757d' // gray
+  };
+  let filterBookedOnly = false;
+  let listingsShown = false;
+  let vectorMap = null;
+  let vectorMarkers = [];
+  const CURRENT_USER_ID = '<%= currUser ? currUser._id : "" %>';
 
   // Initialize admin map
   function initAdminMap() {
@@ -105,73 +137,340 @@
     loadAllUserLocations();
   }
 
-  // Load all users with location data
+  // Load Travel Buddy map data (users, requests, bookings)
   async function loadAllUserLocations() {
     try {
-        const response = await fetch('/admin/api/users/locations');
+        const response = await fetch('/admin/api/buddy/map-data');
         const data = await response.json();
         
         if (data.success) {
             adminMarkerCluster.clearLayers();
-            
-            data.users.forEach(user => {
-                if (!user.location?.coordinates) return;
-                
-                const [lon, lat] = user.location.coordinates;
-                
-                // Create marker
-                const marker = L.marker([lat, lon]);
-                
-                // Status badge
-                const statusClass = `status-${user.location.travelStatus || 'at-home'}`;
-                const statusText = (user.location.travelStatus || 'at-home').replace('-', ' ');
-                
-                // Popup content
-                const popupContent = `
-                    <div style="min-width: 200px;">
-                        <h6 style="margin: 0 0 0.5rem 0;">
-                            <strong>${user.username}</strong>
-                            ${user.role === 'admin' ? '<span class="badge bg-warning text-dark ms-2">Admin</span>' : ''}
-                        </h6>
-                        <p style="margin: 0.25rem 0;">
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                        </p>
-                        <p style="margin: 0.5rem 0 0.25rem 0; font-size: 0.9rem; color: #666;">
-                            <i class="fa-solid fa-map-marker-alt"></i> ${user.location.city || 'Unknown City'}
-                        </p>
-                        <p style="margin: 0.25rem 0; font-size: 0.85rem; color: #888;">
-                            <i class="fa-solid fa-eye"></i> Privacy: ${user.location.visibility || 'hidden'}
-                        </p>
-                        <p style="margin: 0.25rem 0; font-size: 0.85rem; color: #888;">
-                            <i class="fa-solid fa-clock"></i> Updated: ${user.location.lastUpdated ? new Date(user.location.lastUpdated).toLocaleString() : 'Never'}
-                        </p>
-                        <a href="/buddy/profile?userId=${user._id}" class="btn btn-sm btn-primary mt-2" style="width: 100%;">
-                            View Profile
-                        </a>
-                    </div>
-                `;
-                
-                marker.bindPopup(popupContent);
-                adminMarkerCluster.addLayer(marker);
+
+            // Build a map of highest-priority request status per user
+            const statusPriority = { accepted: 3, pending: 2, rejected: 1, cancelled: 0 };
+            const userStatus = new Map(); // userId -> { status, conversationId }
+            (data.requests || []).forEach(req => {
+              ['from', 'to'].forEach(side => {
+                const u = req[side];
+                if (!u || !u._id) return;
+                const prev = userStatus.get(u._id) || { status: 'cancelled', conversationId: null };
+                if (!prev.status || statusPriority[req.status] > statusPriority[prev.status]) {
+                  userStatus.set(u._id, { status: req.status, conversationId: req.conversationId });
+                }
+              });
             });
+
+            // Render markers only for users involved in requests
+            for (const user of data.users) {
+                const statusInfo = userStatus.get(user._id);
+                if (!statusInfo) continue; // skip users with no buddy requests
+
+                const hasCoords = !!(user.location && Array.isArray(user.location.coordinates));
+                const lon = hasCoords ? user.location.coordinates[0] : null;
+                const lat = hasCoords ? user.location.coordinates[1] : null;
+                const markerColor = statusColorMap[statusInfo.status] || '#2B6CB0';
+
+                const booking = user.latestBooking;
+                if (filterBookedOnly && !booking) {
+                  continue;
+                }
+                if (hasCoords && typeof lat === 'number' && typeof lon === 'number') {
+                const icon = L.divIcon({
+                  className: 'custom-marker',
+                  html: `<div style="background:${markerColor}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                  iconSize: [28, 28],
+                  iconAnchor: [14, 14]
+                });
+
+                const marker = L.marker([lat, lon], { icon });
+
+                // Tooltip on hover with username (hide for the current user)
+                if (String(user._id) !== String(CURRENT_USER_ID)) {
+                  marker.bindTooltip(user.username || 'User', { permanent: false, direction: 'top' });
+                }
+
+                // Travel status badge
+                const travelStatusClass = `status-${(user.location && user.location.travelStatus) || 'at-home'}`;
+                const travelStatusText = (((user.location && user.location.travelStatus) || 'at-home')).replace('-', ' ');
+
+                // Popup content with latest booking if available
+                const bookingHtml = booking ? `
+                  <div style="margin-top: 0.5rem; font-size: 0.85rem; color: #444;">
+                    <i class="fa-solid fa-bed"></i> Booked: <strong>${booking.title}</strong><br/>
+                    <i class="fa-solid fa-location-dot"></i> ${booking.address || '—'}
+                  </div>
+                ` : '';
+
+                const popupContent = `
+                  <div style="min-width: 220px;">
+                    <h6 style="margin: 0 0 0.5rem 0;"><strong>${String(user._id) === String(CURRENT_USER_ID) ? 'You' : (user.username || 'User')}</strong> <span class="badge" style="background:${markerColor};">${statusInfo.status}</span></h6>
+                    <p style="margin: 0.25rem 0;"><span class="status-badge ${travelStatusClass}">${travelStatusText}</span></p>
+                    <p style="margin: 0.25rem 0; font-size: 0.85rem; color: #888;"><i class="fa-solid fa-city"></i> ${(user.location && user.location.city) || 'Unknown'}</p>
+                    ${bookingHtml}
+                    ${statusInfo.conversationId ? `<a href="/buddy/inbox/${statusInfo.conversationId}" class="btn btn-sm btn-primary mt-2" style="width: 100%;">Open Conversation</a>` : ''}
+                  </div>
+                `;
+
+                marker.bindPopup(popupContent);
+
+                // Redirect to conversation on marker click if available
+                if (statusInfo.conversationId) {
+                  marker.on('click', () => {
+                    window.location.href = `/buddy/inbox/${statusInfo.conversationId}`;
+                  });
+                }
+
+                adminMarkerCluster.addLayer(marker);
+
+                // Add booking location marker (geocode textual address)
+                if (booking && (booking.address || (user.location && user.location.country))) {
+                  const addressToTry = booking.address || user.location.country;
+                  const placed = await geocodeAddressAndAddMarker(addressToTry, user.username, booking.title);
+                  if (!placed) {
+                    // Fallback: place a small badge near user's marker
+                    const offsetLat = lat + 0.0008;
+                    const offsetLon = lon + 0.0008;
+                    const badgeIcon = L.divIcon({
+                      className: 'booking-badge',
+                      html: `<div title="${booking.title}" style="width: 14px; height: 14px; border-radius: 50%; background: #0d6efd; border: 2px solid white;"></div>`,
+                      iconSize: [14, 14],
+                      iconAnchor: [7, 7]
+                    });
+                    const b = L.marker([offsetLat, offsetLon], { icon: badgeIcon });
+                    b.bindTooltip(`${user.username}: ${booking.title}`, { direction: 'top' });
+                    adminMarkerCluster.addLayer(b);
+                  }
+                }
+                } else {
+                  // No user coordinates: still try to show booking location
+                  if (booking && (booking.address || (user.location && user.location.country))) {
+                    const addressToTry = booking.address || user.location.country;
+                    await geocodeAddressAndAddMarker(addressToTry, user.username, booking.title);
+                  }
+                }
+            }
         }
     } catch (error) {
         console.error('Error loading user locations:', error);
     }
   }
 
+  // Geocode textual address using Nominatim and place a small house marker
+  async function geocodeAddressAndAddMarker(address, username, bookingTitle) {
+    try {
+      const url = `/admin/api/geocode?address=${encodeURIComponent(address)}`;
+      const resp = await fetch(url);
+      const payload = await resp.json();
+      if (payload && payload.success && Array.isArray(payload.results) && payload.results.length > 0) {
+        const lat = parseFloat(payload.results[0].lat);
+        const lon = parseFloat(payload.results[0].lon);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          const houseIcon = L.divIcon({
+            className: 'booking-marker',
+            html: `<div title="${bookingTitle}" style="width: 18px; height: 18px; border-radius: 4px; background: #0d6efd; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"></div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+          });
+          const m = L.marker([lat, lon], { icon: houseIcon });
+          m.bindTooltip(`${username}: ${bookingTitle}`, { direction: 'top' });
+          m.bindPopup(`<div><strong>${username}</strong><br/><i class=\"fa-solid fa-bed\"></i> ${bookingTitle}<br/><small>${address}</small></div>`);
+          adminMarkerCluster.addLayer(m);
+          return true;
+        }
+      }
+      return false;
+    } catch (_) {}
+    return false;
+  }
+
   // Event listeners
   document.addEventListener('DOMContentLoaded', () => {
-    initAdminMap();
+    // Default to Vector map for reliability
+    openVectorMap();
     
     document.getElementById('refreshAdminMap').addEventListener('click', () => {
+        openVectorMap();
+    });
+    document.getElementById('showBooked').addEventListener('click', () => {
+        filterBookedOnly = true;
         loadAllUserLocations();
     });
+    document.getElementById('showAll').addEventListener('click', () => {
+        filterBookedOnly = false;
+        loadAllUserLocations();
+    });
+    document.getElementById('addDemoPins').addEventListener('click', addDemoPins);
+    document.getElementById('showListings').addEventListener('click', toggleListingsPins);
+    document.getElementById('openVectorMap').addEventListener('click', openVectorMap);
   });
 
   // Auto-refresh every 30 seconds
   setInterval(() => {
-    loadAllUserLocations();
+    // Periodically refresh vector map listings
+    if (document.getElementById('vectorMap').style.display !== 'none') {
+      openVectorMap();
+    }
   }, 30000);
+
+  // Demo pins for quick visual
+  function addDemoPins(){
+    const demos = [
+      { name: 'Demo - Delhi', lat: 28.6139, lon: 77.2090, color: '#6f42c1' },
+      { name: 'Demo - Mumbai', lat: 19.0760, lon: 72.8777, color: '#fd7e14' },
+      { name: 'Demo - Bengaluru', lat: 12.9716, lon: 77.5946, color: '#20c997' }
+    ];
+    demos.forEach(d => {
+      const icon = L.divIcon({
+        className: 'demo-marker',
+        html: `<div style="background:${d.color}; width: 22px; height: 22px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+      const m = L.marker([d.lat, d.lon], { icon });
+      m.bindTooltip(d.name, { direction: 'top' });
+      adminMarkerCluster.addLayer(m);
+    });
+    // Fit to markers roughly
+    try { adminMap.fitBounds(adminMarkerCluster.getBounds(), { padding: [40,40] }); } catch(_) {}
+  }
+
+  // Show all listings on the map using saved location/country. Click -> listing page
+  async function toggleListingsPins(){
+    // If already shown once, refresh markers
+    try {
+      const resp = await fetch('/admin/api/listings/map');
+      const data = await resp.json();
+      if (!data || !data.success) return;
+      // Clear and re-load user markers too for a clean view
+      adminMarkerCluster.clearLayers();
+      // Place listing markers by geocoding address (location + country)
+      for (const l of data.listings){
+        const address = l.address || l.country || l.location;
+        if (!address) continue;
+        const ok = await placeListingMarker(address, l);
+        if (!ok && l.country){
+          await placeListingMarker(l.country, l);
+        }
+      }
+      try { adminMap.fitBounds(adminMarkerCluster.getBounds(), { padding: [40,40] }); } catch(_) {}
+      listingsShown = true;
+    } catch(_){}
+  }
+
+  async function placeListingMarker(address, listing){
+    try{
+      const r = await fetch(`/admin/api/geocode?address=${encodeURIComponent(address)}`);
+      const p = await r.json();
+      let results = (p && p.success && p.results) ? p.results : [];
+      if ((!results || results.length === 0) && listing && listing.country) {
+        const r2 = await fetch(`/admin/api/geocode?address=${encodeURIComponent(address + ', ' + listing.country)}`);
+        const p2 = await r2.json();
+        results = (p2 && p2.success && p2.results) ? p2.results : [];
+      }
+      if ((!results || results.length === 0)) {
+        const r3 = await fetch(`/admin/api/geocode?address=${encodeURIComponent(address + ', India')}`);
+        const p3 = await r3.json();
+        results = (p3 && p3.success && p3.results) ? p3.results : [];
+      }
+      // Final fallback: Photon (free, no key)
+      if ((!results || results.length === 0)) {
+        try {
+          const pr = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(address)}&limit=1`);
+          const pd = await pr.json();
+          if (pd && pd.features && pd.features.length) {
+            const f = pd.features[0];
+            results = [{ lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] }];
+          }
+        } catch(_) {}
+      }
+      if (results && results.length){
+        const { lat, lon } = results[0];
+        const icon = L.divIcon({
+          className: 'listing-marker',
+          html: `<div style="background:#dc3545; width: 22px; height: 22px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+          iconSize: [22,22],
+          iconAnchor: [11,11]
+        });
+        const m = L.marker([parseFloat(lat), parseFloat(lon)], { icon });
+        const img = listing.image ? `<img src="${listing.image}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;"/>` : '';
+        m.bindPopup(`
+          <div style=\"min-width:220px\">${img}
+            <h6 class=\"mt-2 mb-1\">${listing.title}</h6>
+            <p class=\"mb-2 text-muted\"><i class=\"fa-solid fa-location-dot me-1\"></i>${address}</p>
+            <a href=\"/listings/${listing._id}\" class=\"btn btn-sm btn-outline-primary w-100\">Open Listing</a>
+          </div>`);
+        m.on('click', () => { window.location.href = `/listings/${listing._id}`; });
+        adminMarkerCluster.addLayer(m);
+        return true;
+      }
+    }catch(_){ }
+    return false;
+  }
+
+  // MapLibre Vector Map – alternate option for showing all listings
+  async function openVectorMap(){
+    // Hide Leaflet, show MapLibre container
+    document.getElementById('adminMap').style.display = 'none';
+    document.getElementById('vectorMap').style.display = 'block';
+
+    if (!vectorMap){
+      vectorMap = new maplibregl.Map({
+        container: 'vectorMap',
+        style: 'https://demotiles.maplibre.org/style.json',
+        center: [78.9629, 20.5937],
+        zoom: 4.5,
+        attributionControl: true
+      });
+      vectorMap.addControl(new maplibregl.NavigationControl(), 'top-right');
+    }
+
+    // Clear previous markers
+    vectorMarkers.forEach(m => m.remove());
+    vectorMarkers = [];
+
+    try{
+      const resp = await fetch('/admin/api/listings/map');
+      const data = await resp.json();
+      if (!data || !data.success) return;
+      const bounds = new maplibregl.LngLatBounds();
+      for (const l of data.listings){
+        const addr = l.address || l.location || l.country;
+        if (!addr) continue;
+        const coord = await photonGeocode(addr, l.country);
+        if (!coord) continue;
+        const el = document.createElement('div');
+        el.style.width = '14px';
+        el.style.height = '14px';
+        el.style.borderRadius = '50%';
+        el.style.background = '#dc3545';
+        el.style.border = '2px solid white';
+        el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.3)';
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat([coord.lon, coord.lat])
+          .setPopup(new maplibregl.Popup({ offset: 12 }).setHTML(`
+            <div style=\"min-width:220px\">${l.image ? `<img src='${l.image}' style='width:100%;max-height:120px;object-fit:cover;border-radius:8px;'/>` : ''}
+            <h6 class=\"mt-2 mb-1\">${l.title}</h6>
+            <p class=\"mb-2 text-muted\"><i class=\"fa-solid fa-location-dot me-1\"></i>${addr}</p>
+            <a href=\"/listings/${l._id}\" class=\"btn btn-sm btn-outline-primary w-100\">Open Listing</a></div>`))
+          .addTo(vectorMap);
+        vectorMarkers.push(marker);
+        bounds.extend([coord.lon, coord.lat]);
+      }
+      if (!bounds.isEmpty()) vectorMap.fitBounds(bounds, { padding: 40, maxZoom: 12 });
+    }catch(_){ }
+  }
+
+  async function photonGeocode(q, country){
+    try{
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q + (country ? ', ' + country : ''))}&limit=1`;
+      const r = await fetch(url);
+      const p = await r.json();
+      if (p && p.features && p.features.length){
+        const f = p.features[0];
+        return { lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] };
+      }
+    }catch(_){ }
+    return null;
+  }
 </script>
 

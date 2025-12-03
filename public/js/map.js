@@ -5,6 +5,7 @@ let markerCluster;
 let userMarker;
 let currentRadius = 50;
 let socket;
+let listingMarkers = [];
 
 // Initialize Leaflet map
 function initMap() {
@@ -39,6 +40,9 @@ function initMap() {
     
     // Load nearby travelers
     loadNearbyTravelers();
+
+    // Load all listings onto the interactive map
+    loadAllListingsOnMap();
 }
 
 // Request browser geolocation
@@ -120,7 +124,7 @@ async function loadNearbyTravelers() {
         const response = await fetch(`/buddy/location/nearby?radius=${currentRadius}&maxResults=100`);
         const data = await response.json();
         
-        if (data.success) {
+        if (response.ok && data.success) {
             // Clear existing markers
             markerCluster.clearLayers();
             markers = [];
@@ -185,6 +189,15 @@ async function loadNearbyTravelers() {
                 markerCluster.addLayer(marker);
                 markers.push({ marker, user });
             });
+        } else {
+            // If location sharing disabled or other error, inform the user
+            if (response.status === 400) {
+                console.warn('Nearby travelers unavailable: enable location sharing.');
+                const toggle = document.getElementById('locationSharingToggle');
+                if (toggle && !toggle.checked) {
+                    alert('Turn on Location Sharing to refresh nearby travelers.');
+                }
+            }
         }
     } catch (error) {
         console.error('Error loading nearby travelers:', error);
@@ -247,9 +260,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Refresh map button
     document.getElementById('refreshMap').addEventListener('click', () => {
-        loadNearbyTravelers();
-        if (document.getElementById('locationSharingToggle').checked) {
+        const sharingToggle = document.getElementById('locationSharingToggle');
+        if (sharingToggle && sharingToggle.checked) {
+            // Update location first, then reload nearby users
             requestLocation();
+            setTimeout(loadNearbyTravelers, 500);
+        } else {
+            alert('Enable Location Sharing to refresh your nearby travelers.');
         }
     });
 });
@@ -275,4 +292,52 @@ setInterval(() => {
         requestLocation();
     }
 }, 30000);
+
+// Geocode helper using Photon (no API key)
+async function geocodeAddressPhoton(address) {
+    try {
+        const resp = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(address)}&limit=1`);
+        const data = await resp.json();
+        if (data && data.features && data.features.length) {
+            const f = data.features[0];
+            return { lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] };
+        }
+    } catch(_) {}
+    return null;
+}
+
+// Load all listings (title, address) and add markers
+async function loadAllListingsOnMap() {
+    try {
+        const resp = await fetch('/api/listings/map');
+        const data = await resp.json();
+        if (!data || !data.success) return;
+        // Remove previous listing markers
+        listingMarkers.forEach(m => markerCluster.removeLayer(m));
+        listingMarkers = [];
+        for (const l of data.listings) {
+            const addr = l.address || l.location || l.country;
+            if (!addr) continue;
+            const coord = await geocodeAddressPhoton(addr);
+            if (!coord) continue;
+            const icon = L.divIcon({
+                className: 'listing-pin',
+                html: `<div style="background:#dc3545; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.3);"></div>`,
+                iconSize: [18, 18],
+                iconAnchor: [9, 9]
+            });
+            const m = L.marker([coord.lat, coord.lon], { icon });
+            const img = l.image ? `<img src="${l.image}" style="width:100%;max-height:100px;object-fit:cover;border-radius:8px;"/>` : '';
+            const popup = `
+                <div style="min-width:200px">${img}
+                    <h6 class="mt-2 mb-1">${l.title}</h6>
+                    <p class="mb-2 text-muted" style="font-size:.9rem;">${addr}</p>
+                    <a href="/listings/${l._id}" class="btn btn-sm btn-outline-primary w-100">Open Listing</a>
+                </div>`;
+            m.bindPopup(popup);
+            markerCluster.addLayer(m);
+            listingMarkers.push(m);
+        }
+    } catch(_) {}
+}
 

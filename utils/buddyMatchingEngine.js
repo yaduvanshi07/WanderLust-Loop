@@ -193,8 +193,7 @@ async function calculateCompatibilityScore(user1Id, user2Id) {
         breakdown.routeOverlap = calculateRouteOverlapScore(user1.travelRoutes, user2.travelRoutes);
     }
 
-    // Calculate weighted overall score
-    // Adjusted weights: Interests 25%, Travel Style 15%, Personality 15%, Booking History 15%, Destinations 5%, Geographic Proximity 25%
+    
     const compatibilityScore = 
         breakdown.interestsMatch * 0.25 +
         breakdown.travelStyleMatch * 0.15 +
@@ -202,10 +201,10 @@ async function calculateCompatibilityScore(user1Id, user2Id) {
         breakdown.bookingHistoryMatch * 0.15 +
         breakdown.destinationMatch * 0.05 +
         breakdown.geographicProximity * 0.25 +
-        (breakdown.routeOverlap * 0.05); // Bonus for route overlap
+        (breakdown.routeOverlap * 0.05); 
 
     return {
-        score: Math.min(100, Math.round(compatibilityScore)), // Cap at 100
+        score: Math.min(100, Math.round(compatibilityScore)),
         breakdown,
         sharedInterests: pref1.interests?.filter(i => pref2.interests?.includes(i)) || [],
         distance: user1?.location?.coordinates && user2?.location?.coordinates ? 
@@ -218,9 +217,7 @@ async function calculateCompatibilityScore(user1Id, user2Id) {
     };
 }
 
-/**
- * Generate ice-breaker suggestions based on shared interests
- */
+
 function generateIceBreakers(sharedInterests, preferences1, preferences2) {
     const iceBreakers = [];
 

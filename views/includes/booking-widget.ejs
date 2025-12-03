@@ -1,6 +1,9 @@
 <!-- Airbnb-style Booking Widget -->
 <div class="booking-widget-container">
   <div class="booking-widget">
+    <div class="booking-widget-header">
+      <h5><i class="fa-solid fa-calendar-check me-2"></i>Book Your Stay</h5>
+    </div>
     <div class="price-section">
       <div class="price-row">
         <span class="price-amount">₹<%= listing.price.toLocaleString("en-IN") %></span>
@@ -39,7 +42,7 @@
       </div>
     </div>
 
-    <form id="booking-form" class="booking-form" action="/bookings/<%= listing._id %>" method="POST">
+    <form id="booking-form" class="booking-form" action="/bookings/<%= listing._id || listing.id %>" method="POST">
       <!-- Date Selection -->
       <div class="date-section">
         <div class="date-input-group">
@@ -168,10 +171,11 @@
           <span>Add a coupon</span>
         </button>
         <div class="coupon-input-container" id="coupon-input-container" style="display: none;">
-          <input type="text" name="couponCode" id="couponCode" placeholder="Enter coupon code" class="coupon-input">
+          <input type="text" id="couponCode" placeholder="Enter coupon code" class="coupon-input" autocomplete="off">
           <button type="button" class="coupon-apply-btn" id="coupon-apply-btn">Apply</button>
         </div>
         <div class="coupon-feedback" id="coupon-feedback"></div>
+        <div id="coupon-suggestions" class="mt-2" style="display:none;"></div>
       </div>
     </form>
 
@@ -190,7 +194,7 @@
     <div class="safety-info">
       <div class="safety-item">
         <i class="fa-solid fa-shield-halved"></i>
-        <span>Free cancellation before 3:00 PM on Mar 27</span>
+        <span>Free cancellation before 3:00 PM on Jan 26</span>
       </div>
       <div class="safety-item">
         <i class="fa-solid fa-lock"></i>
@@ -207,65 +211,88 @@
 }
 
 .booking-widget {
-  border: 1px solid #dddddd;
-  border-radius: 12px;
-  padding: 24px;
+  border: none;
+  border-radius: 16px;
+  padding: 0;
   background: white;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.booking-widget-header {
+  background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
+  color: white;
+  padding: 20px 24px;
+  margin: 0;
+}
+
+.booking-widget-header h5 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
 }
 
 .price-section {
   margin-bottom: 24px;
+  padding: 24px 24px 0 24px;
 }
 
 .price-row {
   display: flex;
   align-items: baseline;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .price-amount {
-  font-size: 22px;
-  font-weight: 600;
-  color: #222;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1A202C;
 }
 
 .price-period {
   font-size: 16px;
-  color: #717171;
-  margin-left: 4px;
+  color: #6c757d;
+  margin-left: 6px;
 }
 
 .rating-section {
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 0 24px;
 }
 
 .stars {
-  color: #ff385c;
-  font-size: 12px;
+  color: #F6AD55;
+  font-size: 13px;
   display: flex;
   gap: 2px;
 }
 
 .stars .filled {
-  color: #ff385c;
+  color: #F6AD55;
 }
 
 .stars .empty {
-  color: #ddd;
+  color: #e9ecef;
 }
 
 .rating-text {
   font-size: 14px;
-  color: #222;
-  text-decoration: underline;
+  color: #1A202C;
+  font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
+}
+
+.rating-text:hover {
+  text-decoration: underline;
 }
 
 .booking-form {
   margin-bottom: 24px;
+  padding: 0 24px;
 }
 
 .date-section {
@@ -275,9 +302,15 @@
 .date-input-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border: 1px solid #b0b0b0;
-  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.date-input-group:focus-within {
+  border-color: #2B6CB0;
+  box-shadow: 0 0 0 0.2rem rgba(43, 108, 176, 0.25);
 }
 
 .date-input-container {
@@ -285,7 +318,7 @@
 }
 
 .date-input-container:first-child {
-  border-right: 1px solid #b0b0b0;
+  border-right: 2px solid #e9ecef;
 }
 
 .date-label {
@@ -294,7 +327,7 @@
   left: 12px;
   font-size: 10px;
   font-weight: 600;
-  color: #222;
+  color: #2B6CB0;
   text-transform: uppercase;
   z-index: 1;
 }
@@ -319,18 +352,19 @@
 .guest-selector {
   width: 100%;
   padding: 16px;
-  border: 1px solid #b0b0b0;
-  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
   background: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .guest-selector:hover {
-  border-color: #222;
+  border-color: #2B6CB0;
+  box-shadow: 0 0 0 0.2rem rgba(43, 108, 176, 0.1);
 }
 
 .guest-info {
@@ -358,11 +392,12 @@
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #b0b0b0;
-  border-radius: 8px;
+  border: 2px solid #2B6CB0;
+  border-radius: 12px;
   padding: 16px;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(43, 108, 176, 0.25);
+  margin-top: 4px;
 }
 
 .guest-option {
@@ -400,9 +435,9 @@
 }
 
 .guest-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #b0b0b0;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #2B6CB0;
   border-radius: 50%;
   background: white;
   display: flex;
@@ -410,12 +445,15 @@
   justify-content: center;
   cursor: pointer;
   font-size: 16px;
-  color: #222;
-  transition: all 0.2s;
+  color: #2B6CB0;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .guest-btn:hover:not(:disabled) {
-  border-color: #222;
+  background: #2B6CB0;
+  color: white;
+  transform: scale(1.1);
 }
 
 .guest-btn:disabled {
@@ -437,45 +475,57 @@
 .special-requests-input {
   width: 100%;
   padding: 16px;
-  border: 1px solid #b0b0b0;
-  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
   font-size: 14px;
   resize: vertical;
   min-height: 80px;
+  transition: all 0.3s ease;
 }
 
 .special-requests-input:focus {
   outline: none;
-  border-color: #222;
+  border-color: #2B6CB0;
+  box-shadow: 0 0 0 0.2rem rgba(43, 108, 176, 0.25);
 }
 
 .booking-button {
   width: 100%;
   padding: 16px;
-  background: #ff385c;
+  background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
   margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
 }
 
 .booking-button:hover {
-  background: #e31c5f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(43, 108, 176, 0.4);
+}
+
+.booking-button:active {
+  transform: translateY(0);
 }
 
 .booking-button:disabled {
-  background: #b0b0b0;
+  background: #cbd5e0;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .pricing-breakdown {
-  border-top: 1px solid #ebebeb;
-  padding-top: 16px;
+  border-top: 2px solid #f7fafc;
+  padding: 20px 24px;
   margin-bottom: 16px;
+  background: #f7fafc;
+  border-radius: 0 0 16px 16px;
 }
 
 .pricing-line {
@@ -483,6 +533,7 @@
   justify-content: space-between;
   margin-bottom: 12px;
   font-size: 14px;
+  color: #1A202C;
 }
 
 .pricing-line:last-child {
@@ -490,27 +541,41 @@
 }
 
 .total-line {
-  font-weight: 600;
-  font-size: 16px;
-  padding-top: 12px;
-  border-top: 1px solid #ebebeb;
+  font-weight: 700;
+  font-size: 18px;
+  padding-top: 16px;
+  border-top: 2px solid #e9ecef;
+  margin-top: 8px;
+  color: #1A202C;
 }
 
 .coupon-section {
   margin-bottom: 16px;
+  padding: 0 24px;
+}
+
+.pricing-breakdown {
+  padding: 0 24px;
 }
 
 .coupon-toggle {
   background: none;
   border: none;
-  color: #222;
-  text-decoration: underline;
+  color: #2B6CB0;
+  text-decoration: none;
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.coupon-toggle:hover {
+  color: #38B2AC;
+  text-decoration: underline;
 }
 
 .coupon-input-container {
@@ -522,19 +587,33 @@
 .coupon-input {
   flex: 1;
   padding: 12px;
-  border: 1px solid #b0b0b0;
-  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.coupon-input:focus {
+  outline: none;
+  border-color: #2B6CB0;
+  box-shadow: 0 0 0 0.2rem rgba(43, 108, 176, 0.25);
 }
 
 .coupon-apply-btn {
-  padding: 12px 16px;
-  background: #222;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.coupon-apply-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(43, 108, 176, 0.3);
 }
 
 .coupon-feedback {
@@ -554,9 +633,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 0;
-  border-top: 1px solid #ebebeb;
-  margin-bottom: 16px;
+  padding: 20px 24px;
+  border-top: 2px solid #f7fafc;
+  margin: 0;
+  background: #f7fafc;
 }
 
 .host-avatar {
@@ -586,8 +666,10 @@
 }
 
 .safety-info {
-  border-top: 1px solid #ebebeb;
-  padding-top: 16px;
+  border-top: 2px solid #f7fafc;
+  padding: 20px 24px;
+  background: #f7fafc;
+  margin: 0;
 }
 
 .safety-item {
@@ -745,11 +827,172 @@ document.addEventListener('DOMContentLoaded', function() {
     couponContainer.style.display = couponContainer.style.display === 'none' ? 'flex' : 'none';
   });
   
+  // Coupon apply - just update pricing without form submission
+  const couponApplyBtn = document.getElementById('coupon-apply-btn');
+  const couponCodeInput = document.getElementById('couponCode');
+  const couponFeedback = document.getElementById('coupon-feedback');
+  let appliedDiscount = 0;
+  let appliedCouponCode = '';
+  
+  couponApplyBtn.addEventListener('click', async function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const code = couponCodeInput.value.trim().toUpperCase();
+    if (!code) {
+      couponFeedback.textContent = 'Please enter a coupon code';
+      couponFeedback.className = 'coupon-feedback error';
+      return;
+    }
+    
+    // Validate dates first
+    const checkin = new Date(checkinInput.value);
+    const checkout = new Date(checkoutInput.value);
+    
+    if (!checkinInput.value || !checkoutInput.value || checkout <= checkin) {
+      couponFeedback.textContent = 'Please select valid check-in and check-out dates first';
+      couponFeedback.className = 'coupon-feedback error';
+      return;
+    }
+    
+    try {
+      // Fetch coupon validation from server
+      const response = await fetch(`/api/coupon/validate?code=${encodeURIComponent(code)}`);
+      const data = await response.json();
+      
+      if (data.valid && data.coupon) {
+        const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+        const basePrice = <%= listing.price %> * nights;
+        let discount = 0;
+        
+        if (data.coupon.discountType === 'percent') {
+          discount = Math.min(basePrice, (basePrice * data.coupon.amount) / 100);
+        } else {
+          discount = Math.min(basePrice, data.coupon.amount);
+        }
+        
+        appliedDiscount = discount;
+        appliedCouponCode = code;
+        
+        // Update pricing breakdown with discount
+        updatePricingWithCoupon(discount);
+        
+        couponFeedback.textContent = `✓ Coupon "${code}" applied! You saved ₹${discount.toLocaleString('en-IN')}`;
+        couponFeedback.className = 'coupon-feedback success';
+        
+        // Hide coupon input after successful apply
+        couponContainer.style.display = 'none';
+      } else {
+        appliedDiscount = 0;
+        appliedCouponCode = '';
+        couponFeedback.textContent = data.message || 'Invalid or expired coupon code';
+        couponFeedback.className = 'coupon-feedback error';
+        updatePricingWithCoupon(0);
+      }
+    } catch (error) {
+      couponFeedback.textContent = 'Error validating coupon. Please try again.';
+      couponFeedback.className = 'coupon-feedback error';
+      console.error('Coupon validation error:', error);
+    }
+  });
+  
+  // Update pricing with coupon discount
+  function updatePricingWithCoupon(discount = appliedDiscount) {
+    const checkin = new Date(checkinInput.value);
+    const checkout = new Date(checkoutInput.value);
+    
+    if (checkin && checkout && checkout > checkin) {
+      const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+      const basePrice = <%= listing.price %> * nights;
+      const cleaningFee = 500;
+      const serviceFee = 200;
+      const taxes = Math.round(Math.max(0, (basePrice - discount)) * 0.18);
+      const total = Math.max(0, basePrice - discount) + cleaningFee + serviceFee + taxes;
+      
+      document.getElementById('nights-display').textContent = nights;
+      document.getElementById('base-price').textContent = `₹${basePrice.toLocaleString('en-IN')}`;
+      
+      // Show discount line if coupon is applied
+      let discountLine = document.getElementById('discount-line');
+      if (discount > 0) {
+        if (!discountLine) {
+          const pricingBreakdown = document.getElementById('pricing-breakdown');
+          const cleaningLine = document.querySelector('.pricing-line:nth-of-type(2)');
+          discountLine = document.createElement('div');
+          discountLine.className = 'pricing-line';
+          discountLine.id = 'discount-line';
+          discountLine.innerHTML = `
+            <span style="color: #28a745;"><i class="fa-solid fa-tag me-1"></i>Coupon Discount</span>
+            <span style="color: #28a745;">-₹<span id="discount-amount">0</span></span>
+          `;
+          pricingBreakdown.insertBefore(discountLine, cleaningLine);
+        }
+        document.getElementById('discount-amount').textContent = discount.toLocaleString('en-IN');
+        discountLine.style.display = 'flex';
+      } else if (discountLine) {
+        discountLine.style.display = 'none';
+      }
+      
+      document.getElementById('cleaning-fee').textContent = `₹${cleaningFee}`;
+      document.getElementById('service-fee').textContent = `₹${serviceFee}`;
+      document.getElementById('taxes').textContent = `₹${taxes.toLocaleString('en-IN')}`;
+      document.getElementById('total-price').textContent = `₹${total.toLocaleString('en-IN')}`;
+      
+      pricingBreakdown.style.display = 'block';
+      
+      // Update hidden coupon input
+      if (discount > 0) {
+        if (!document.getElementById('couponCode-hidden')) {
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.id = 'couponCode-hidden';
+          hiddenInput.name = 'couponCode';
+          bookingForm.appendChild(hiddenInput);
+        }
+        document.getElementById('couponCode-hidden').value = appliedCouponCode;
+      } else {
+        const hiddenInput = document.getElementById('couponCode-hidden');
+        if (hiddenInput) hiddenInput.value = '';
+      }
+    }
+  }
+  
+  // Update pricing when dates change (remove coupon if dates change)
+  const originalUpdatePricing = updatePricing;
+  updatePricing = function() {
+    originalUpdatePricing();
+    if (appliedDiscount > 0) {
+      updatePricingWithCoupon(appliedDiscount);
+    }
+  };
+  
   // Set minimum date to today
   const today = new Date().toISOString().split('T')[0];
   checkinInput.min = today;
   checkoutInput.min = today;
   
+  // Coupon suggestions (fetch and render list)
+  (async function loadCouponSuggestions(){
+    try {
+      const r = await fetch('/api/coupon/suggestions');
+      const d = await r.json();
+      if (d && d.success && Array.isArray(d.coupons) && d.coupons.length){
+        const box = document.getElementById('coupon-suggestions');
+        const pills = d.coupons.slice(0,3).map(c => {
+          const label = c.discountType === 'percent' ? `${c.amount}% off` : `₹${c.amount} off`;
+          return `<button type="button" class="btn btn-sm btn-outline-secondary me-2 mb-2" data-code="${c.code}">${c.code} — ${label}</button>`;
+        }).join('');
+        box.innerHTML = `<div class="small text-muted mb-1">Coupons you may like:</div>${pills}`;
+        box.style.display = 'block';
+        box.querySelectorAll('button[data-code]').forEach(btn => btn.addEventListener('click', () => {
+          couponContainer.style.display = 'flex';
+          couponCodeInput.value = btn.getAttribute('data-code');
+          couponApplyBtn.click();
+        }));
+      }
+    } catch(_) {}
+  })();
+
   // Initialize
   updateGuestCounts();
 });

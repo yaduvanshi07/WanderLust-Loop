@@ -167,7 +167,7 @@ app.post("/signup", wrapAsync(async(req,res)=>{
         if(err){
             return next(err);
         }
-        req.flash("success", `Welcome to Wanderlust! Your account has been created successfully.`);
+        req.flash("success", `Welcome to StaySense! Your account has been created successfully.`);
         res.redirect("/listings");
     })
     
@@ -200,10 +200,10 @@ async (req, res, next) => {
                 return res.redirect('/login');
             }
         }
-        req.flash("successs", `Welcome back to WanderLust!`);
+        req.flash("success", `Welcome back to StaySense!`);
         let redirectUrl = "/listings";
         if (req.user && req.user.role === 'admin') {
-            redirectUrl = "/admin";
+            redirectUrl = "/analytics/dashboard";
         }
         if (res.locals.redirectUrl) {
             redirectUrl = res.locals.redirectUrl;
@@ -286,8 +286,6 @@ app.get("/listings", wrapAsync(async (req, res) => {
                 listingObj.performanceBadge = { text: 'Top Performer', class: 'bg-success' };
             } else if (score >= 60) {
                 listingObj.performanceBadge = { text: 'Good', class: 'bg-primary' };
-            } else if (score <= 30) {
-                listingObj.performanceBadge = { text: 'Needs Attention', class: 'bg-warning' };
             }
             
             return listingObj;
@@ -344,6 +342,18 @@ app.get("/listings/:id", wrapAsync(async(req,res)=>{
     console.log(listing);
     // Track view count analytics
     try { await incrementListingViewCount(listing._id); } catch (_) {}
+    
+    // Get all bookings for this listing to check verified users (users who booked)
+    const bookingsForListing = await Booking.find({ 
+        listing: listing._id,
+        status: { $in: ['confirmed', 'completed'] }
+    }).select('guest');
+    
+    const verifiedUserIds = new Set(bookingsForListing
+        .filter(b => b && b.guest)
+        .map(b => b.guest.toString())
+    );
+    
     // basic recommendations
     let recommendations = [];
     try {
@@ -356,7 +366,7 @@ app.get("/listings/:id", wrapAsync(async(req,res)=>{
         const basePrice = (listing.price||0);
         couponSuggestion = suggestCouponForUser(null, basePrice);
     } catch(_){}
-    res.render("listings/show.ejs", {listing, recommendations, couponSuggestion});
+    res.render("listings/show.ejs", {listing, recommendations, couponSuggestion, verifiedUserIds});
 }));
 
 
@@ -614,38 +624,49 @@ app.patch("/bookings/:id/host-cancel", isLoggedIn, wrapAsync(async (req, res) =>
 
 
 // Apply coupon to a booking calculation preview
-app.post("/bookings/:id/apply-coupon", async (req, res) => {
-    const listingId = req.params.id;
-    const { checkin, checkout, guests, couponCode } = req.body;
-    const checkinDate = new Date(checkin);
-    const checkoutDate = new Date(checkout);
-    if (checkoutDate <= checkinDate) {
-        req.flash("error", "Checkout date must be after check-in date.");
-        return res.redirect(`/listings/${listingId}`);
+// API endpoint to validate coupon (used by booking widget)
+app.get("/api/coupon/validate", wrapAsync(async (req, res) => {
+    const { code } = req.query;
+    if (!code) {
+        return res.json({ valid: false, message: "Coupon code is required" });
     }
-    const listing = await Listing.findById(listingId);
-    const days = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
-    const basePrice = (listing.price || 0) * days;
-    const tax = basePrice * 0.18;
-    const serviceFee = 200;
-    let discount = 0;
-    let couponApplied = null;
-    if (couponCode) {
-        const coupon = await Coupon.findOne({ code: String(couponCode).trim().toUpperCase(), isActive: true });
-        if (coupon && coupon.isValidForUse()) {
-            couponApplied = coupon;
-            if (coupon.discountType === "percent") {
-                discount = Math.min(basePrice, (basePrice * coupon.amount) / 100);
-            } else {
-                discount = Math.min(basePrice, coupon.amount);
-            }
-        } else {
-            req.flash("error", "Invalid or expired coupon.");
+    
+    const coupon = await Coupon.findOne({ 
+        code: String(code).trim().toUpperCase(), 
+        isActive: true 
+    });
+    
+    if (!coupon) {
+        return res.json({ valid: false, message: "Coupon code not found" });
+    }
+    
+    if (!coupon.isValidForUse()) {
+        return res.json({ valid: false, message: "Coupon has expired or reached maximum uses" });
+    }
+    
+    return res.json({ 
+        valid: true, 
+        coupon: {
+            code: coupon.code,
+            discountType: coupon.discountType,
+            amount: coupon.amount
         }
-    }
-    const total = basePrice - discount + tax + serviceFee;
-    return res.render("listings/confirmation", { listing, checkin, checkout, guests, days, basePrice, tax, serviceFee, total, discount, couponApplied });
-});
+    });
+}));
+
+// Coupon suggestions (top few active coupons)
+app.get("/api/coupon/suggestions", wrapAsync(async (req, res) => {
+    const coupons = await Coupon.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(5);
+    const list = coupons.map(c => ({
+        code: c.code,
+        discountType: c.discountType,
+        amount: c.amount,
+        expiresAt: c.expiresAt
+    }));
+    res.json({ success: true, coupons: list });
+}));
 
 app.post("/bookings/:id", isLoggedIn, wrapAsync(async (req, res) => {
     const { checkin, checkout, guests, specialRequests, couponCode } = req.body;
@@ -701,10 +722,13 @@ app.post("/bookings/:id", isLoggedIn, wrapAsync(async (req, res) => {
     if (couponCode) {
         const coupon = await Coupon.findOne({ code: String(couponCode).trim().toUpperCase(), isActive: true });
         if (coupon && coupon.isValidForUse()) {
+            const amountNum = Math.max(0, Number(coupon.amount) || 0);
             if (coupon.discountType === "percent") {
-                discount = Math.min(basePrice, (basePrice * coupon.amount) / 100);
+                const pct = Math.min(100, amountNum); // guard bad data like 500 => 100%
+                discount = Math.min(basePrice, Math.round((basePrice * pct) / 100));
             } else {
-                discount = Math.min(basePrice, coupon.amount);
+                // fixed amount in currency
+                discount = Math.min(basePrice, Math.round(amountNum));
             }
             coupon.uses += 1;
             await coupon.save();
@@ -1074,6 +1098,139 @@ app.get('/admin/api/users/locations', isAdmin, wrapAsync(async (req, res) => {
     res.json({ success: true, users: formattedUsers, count: formattedUsers.length });
 }));
 
+// Admin API - Travel Buddy map data (requests, users, bookings)
+app.get('/admin/api/buddy/map-data', isAdmin, wrapAsync(async (req, res) => {
+    const BuddyRequest = require('./models/buddyRequest');
+    const Booking = require('./models/booking');
+    const User = require('./models/user');
+
+    // Fetch latest requests (limit for performance)
+    const requests = await BuddyRequest.find({})
+        .populate('from', 'username email location travelBuddyProfile')
+        .populate('to', 'username email location travelBuddyProfile')
+        .sort({ updatedAt: -1 })
+        .limit(1000);
+
+    // Collect unique user ids involved in requests
+    const userIds = new Set();
+    requests.forEach(r => { if (r.from) userIds.add(r.from._id.toString()); if (r.to) userIds.add(r.to._id.toString()); });
+
+    // Load users to ensure we have latest locations and roles
+    const users = await User.find({ _id: { $in: Array.from(userIds) } })
+        .select('username email role location');
+
+    // Latest booking per user (confirmed/completed)
+    const bookingsByUser = {};
+    if (userIds.size > 0) {
+        const latestBookings = await Booking.aggregate([
+            { $match: { guest: { $in: Array.from(userIds).map(id => new mongoose.Types.ObjectId(id)) }, status: { $in: ['confirmed', 'completed'] } } },
+            { $sort: { bookedAt: -1 } },
+            { $group: { _id: '$guest', booking: { $first: '$$ROOT' } } }
+        ]);
+        // Populate listing for location text
+        const listingIds = latestBookings.map(b => b.booking.listing);
+        const listings = await Listing.find({ _id: { $in: listingIds } }).select('title location country');
+        const listingById = new Map(listings.map(l => [l._id.toString(), l]));
+        latestBookings.forEach(b => {
+            const l = listingById.get(b.booking.listing.toString());
+            bookingsByUser[b._id.toString()] = l ? {
+                listingId: l._id,
+                title: l.title,
+                address: [l.location, l.country].filter(Boolean).join(', ')
+            } : null;
+        });
+    }
+
+    // Build request summaries with conversationId and statuses
+    const requestSummaries = requests.map(r => {
+        const a = r.from?._id?.toString();
+        const b = r.to?._id?.toString();
+        const sorted = [a, b].filter(Boolean).sort();
+        return {
+            id: r._id,
+            from: r.from && r.from._id ? { _id: r.from._id, username: r.from.username } : null,
+            to: r.to && r.to._id ? { _id: r.to._id, username: r.to.username } : null,
+            status: r.status,
+            conversationId: sorted.length === 2 ? `${sorted[0]}_${sorted[1]}` : null,
+            updatedAt: r.updatedAt
+        };
+    });
+
+    // Format users
+    const formattedUsers = users.map(u => ({
+        _id: u._id,
+        username: u.username,
+        email: u.email,
+        role: u.role,
+        location: u.location && u.location.coordinates ? {
+            coordinates: u.location.coordinates,
+            visibility: u.location.visibility,
+            travelStatus: u.location.travelStatus,
+            city: u.location.city,
+            country: u.location.country,
+            lastUpdated: u.location.lastUpdated
+        } : null,
+        latestBooking: bookingsByUser[u._id.toString()] || null
+    }));
+
+    return res.json({ success: true, users: formattedUsers, requests: requestSummaries });
+}));
+
+// Admin API - Geocode address (proxy to Nominatim with proper headers)
+app.get('/admin/api/geocode', isAdmin, wrapAsync(async (req, res) => {
+    const { address } = req.query;
+    if (!address || String(address).trim().length === 0) {
+        return res.status(400).json({ success: false, error: 'address_required' });
+    }
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(String(address))}`;
+        const resp = await axios.get(url, {
+            timeout: 5000,
+            headers: {
+                'User-Agent': 'StaySense-Admin-Map/1.0 (+contact@staysense.example)'
+            }
+        });
+        const results = Array.isArray(resp.data) ? resp.data : [];
+        if (!results.length) {
+            return res.json({ success: true, results: [] });
+        }
+        const top = results[0];
+        return res.json({ success: true, results: [{ lat: parseFloat(top.lat), lon: parseFloat(top.lon), display_name: top.display_name }] });
+    } catch (e) {
+        return res.status(200).json({ success: false, error: 'geocode_failed' });
+    }
+}));
+
+// Admin API - List all listings with basic location fields for map
+app.get('/admin/api/listings/map', isAdmin, wrapAsync(async (req, res) => {
+    const listings = await Listing.find({})
+        .select('title location country image');
+    const payload = listings.map(l => ({
+        _id: l._id,
+        title: l.title,
+        address: [l.location, l.country].filter(Boolean).join(', '),
+        location: l.location,
+        country: l.country,
+        image: l.image?.url || null
+    }));
+    return res.json({ success: true, listings: payload, count: payload.length });
+}));
+
+// Public API - minimal listing info for maps (no admin required)
+app.get('/api/listings/map', wrapAsync(async (req, res) => {
+    const listings = await Listing.find({})
+        .select('title location country image');
+    const payload = listings.map(l => ({
+        _id: l._id,
+        title: l.title,
+        address: [l.location, l.country].filter(Boolean).join(', '),
+        location: l.location,
+        country: l.country,
+        image: l.image?.url || null
+    }));
+    return res.json({ success: true, listings: payload, count: payload.length });
+}));
+
 // Admin utility: backfill ML fields on listings
 app.post('/admin/ml/backfill-listing-fields', isAdmin, wrapAsync(async (req, res) => {
     const filter = {
@@ -1271,6 +1428,111 @@ app.get('/admin/ml/bandit-ctr', isAdmin, wrapAsync(async (req, res) => {
     } catch (e) {
         return res.status(200).json({ success: false, error: 'bandit_unavailable' });
     }
+}));
+
+// Flexible dates API: compute real availability and pricing across nearby dates
+app.post('/api/search/flexible', wrapAsync(async (req, res) => {
+    const { checkin, nights = 2, windowDays = 6, maxBudget } = req.body || {};
+    const baseCheckin = checkin ? new Date(checkin) : null;
+    const numNights = Math.max(1, Number(nights) || 2);
+    const window = Math.min(14, Math.max(1, Number(windowDays) || 6));
+
+    // Build candidate date ranges: +/- window from base (or next window if no base)
+    const candidates = [];
+    const today = new Date();
+    const startBase = baseCheckin || today;
+    for (let d = -window; d <= window; d++) {
+        const start = new Date(startBase);
+        start.setDate(start.getDate() + d);
+        const end = new Date(start);
+        end.setDate(end.getDate() + numNights);
+        if (end <= start) continue;
+        candidates.push({ start, end });
+    }
+
+    // Fetch all listings and existing bookings for availability checks
+    const allListings = await Listing.find({}).select('title price location country image');
+    const allBookings = await Booking.find({ status: { $in: ['confirmed', 'pending'] } })
+        .select('listing checkin checkout');
+    const bookingsByListing = new Map();
+    allBookings.forEach(b => {
+        const key = b.listing.toString();
+        if (!bookingsByListing.has(key)) bookingsByListing.set(key, []);
+        bookingsByListing.get(key).push({ checkin: new Date(b.checkin), checkout: new Date(b.checkout) });
+    });
+
+    function isAvailable(listingId, start, end) {
+        const list = bookingsByListing.get(listingId.toString()) || [];
+        return !list.some(b => (b.checkin <= start && b.checkout > start) || (b.checkin < end && b.checkout >= end) || (b.checkin >= start && b.checkout <= end));
+    }
+
+    const results = [];
+    for (const cand of candidates) {
+        const available = [];
+        for (const l of allListings) {
+            if (!isAvailable(l._id, cand.start, cand.end)) continue;
+            const nightly = Number(l.price) || 0;
+            const total = nightly * numNights;
+            if (maxBudget && Number(maxBudget) > 0 && total > Number(maxBudget)) continue;
+            available.push({
+                _id: l._id,
+                title: l.title,
+                pricePerNight: nightly,
+                total,
+                location: l.location,
+                country: l.country,
+                image: l.image?.url || null
+            });
+        }
+        if (available.length === 0) {
+            results.push({
+                date: cand.start.toISOString().slice(0,10),
+                start: cand.start,
+                end: cand.end,
+                availableCount: 0,
+                minPrice: null,
+                avgPrice: null,
+                listings: []
+            });
+        } else {
+            available.sort((a,b) => a.total - b.total);
+            const minPrice = available[0].total;
+            const avgPrice = Math.round(available.reduce((s,a)=>s+a.total,0) / available.length);
+            results.push({
+                date: cand.start.toISOString().slice(0,10),
+                start: cand.start,
+                end: cand.end,
+                availableCount: available.length,
+                minPrice,
+                avgPrice,
+                listings: available.slice(0, 10) // top 10 cheapest
+            });
+        }
+    }
+
+    // Recommend top 5 cheapest ranges
+    const recommended = results
+        .filter(r => r.availableCount > 0)
+        .slice()
+        .sort((a,b) => a.minPrice - b.minPrice)
+        .slice(0,5);
+
+    // Calendar heatmap data
+    const calendar = results.map(r => ({
+        date: r.date,
+        score: r.minPrice === null ? null : r.minPrice
+    }));
+
+    res.json({ success: true, nights: numNights, windowDays: window, results, recommended, calendar });
+}));
+
+// Simple price watch registration in session (best-effort demo)
+app.post('/api/alerts/price-watch', wrapAsync(async (req, res) => {
+    const { start, nights = 2, maxBudget } = req.body || {};
+    if (!req.session) req.session = {};
+    if (!req.session.priceWatches) req.session.priceWatches = [];
+    req.session.priceWatches.push({ start, nights, maxBudget, createdAt: new Date() });
+    res.json({ success: true });
 }));
 
 app.get("/listings/:id/analytics", isLoggedIn, canViewAnalytics, wrapAsync(async (req, res) => {

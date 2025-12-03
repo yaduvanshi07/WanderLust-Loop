@@ -21,10 +21,10 @@
     <div class="col-md-3 mb-3">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body text-center">
-          <div class="text-primary mb-2">
+          <div class="mb-2" style="color: #2B6CB0;">
             <i class="fa-solid fa-eye fa-2x"></i>
           </div>
-          <h4 class="card-title text-primary"><%= overview.totalViews %></h4>
+          <h4 class="card-title" style="color: #2B6CB0;"><%= overview.totalViews %></h4>
           <p class="card-text text-muted">Total Views</p>
         </div>
       </div>
@@ -32,10 +32,10 @@
     <div class="col-md-3 mb-3">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body text-center">
-          <div class="text-success mb-2">
+          <div class="mb-2" style="color: #38B2AC;">
             <i class="fa-solid fa-calendar-check fa-2x"></i>
           </div>
-          <h4 class="card-title text-success"><%= overview.totalBookings %></h4>
+          <h4 class="card-title" style="color: #38B2AC;"><%= overview.totalBookings %></h4>
           <p class="card-text text-muted">Total Bookings</p>
         </div>
       </div>
@@ -43,10 +43,10 @@
     <div class="col-md-3 mb-3">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body text-center">
-          <div class="text-warning mb-2">
+          <div class="mb-2" style="color: #F6AD55;">
             <i class="fa-solid fa-rupee-sign fa-2x"></i>
           </div>
-          <h4 class="card-title text-warning">₹<%= overview.totalRevenue %></h4>
+          <h4 class="card-title" style="color: #F6AD55;">₹<%= overview.totalRevenue %></h4>
           <p class="card-text text-muted">Total Revenue</p>
         </div>
       </div>
@@ -54,10 +54,10 @@
     <div class="col-md-3 mb-3">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body text-center">
-          <div class="text-info mb-2">
+          <div class="mb-2" style="color: #2B6CB0;">
             <i class="fa-solid fa-star fa-2x"></i>
           </div>
-          <h4 class="card-title text-info"><%= (overview.averageRating||0).toFixed(2) %></h4>
+          <h4 class="card-title" style="color: #2B6CB0;"><%= (overview.averageRating||0).toFixed(2) %></h4>
           <p class="card-text text-muted">Average Rating</p>
         </div>
       </div>
@@ -188,7 +188,7 @@
 <style>
   /* Modern Dashboard Styling */
   body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #F7FAFC 0%, #E6F0F5 100%);
     min-height: 100vh;
     padding-bottom: 2rem;
   }
@@ -210,7 +210,7 @@
 
   /* Header Styling */
   .d-flex.justify-content-between h2 {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -232,7 +232,7 @@
   hr.my-3 {
     border: none;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #667eea, transparent);
+    background: linear-gradient(90deg, transparent, #2B6CB0, transparent);
     margin: 1.5rem 0;
   }
 
@@ -255,14 +255,14 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #2B6CB0, #38B2AC);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   .card.border-0.shadow-sm:hover {
     transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 20px 40px rgba(43, 108, 176, 0.3) !important;
   }
 
   .card.border-0.shadow-sm:hover::before {
@@ -275,7 +275,7 @@
 
   /* Icon Styling in Cards */
   .card-body .fa-2x {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -292,7 +292,7 @@
     font-size: 2.5rem !important;
     font-weight: 700 !important;
     margin: 1rem 0 !important;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -307,7 +307,7 @@
 
   /* Quick Actions Card */
   .card-header.bg-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%) !important;
     border-radius: 15px 15px 0 0 !important;
     padding: 1.25rem 1.5rem !important;
     border: none;
@@ -319,12 +319,12 @@
   }
 
   .card-header.bg-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    background: linear-gradient(135deg, #38B2AC 0%, #2B6CB0 100%) !important;
     border-radius: 15px 15px 0 0 !important;
   }
 
   .card-header.bg-info {
-    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%) !important;
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%) !important;
     border-radius: 15px 15px 0 0 !important;
   }
 
@@ -370,43 +370,43 @@
   }
 
   .btn-outline-primary:hover {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%) !important;
     border-color: transparent !important;
     color: white !important;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 25px rgba(43, 108, 176, 0.4);
   }
 
   .btn-outline-success:hover {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+    background: linear-gradient(135deg, #38B2AC 0%, #2B6CB0 100%) !important;
     border-color: transparent !important;
     color: white !important;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(17, 153, 142, 0.4);
+    box-shadow: 0 10px 25px rgba(56, 178, 172, 0.4);
   }
 
   .btn-outline-warning:hover {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+    background: linear-gradient(135deg, #F6AD55 0%, #ED8936 100%) !important;
     border-color: transparent !important;
     color: white !important;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+    box-shadow: 0 10px 25px rgba(246, 173, 85, 0.4);
   }
 
   .btn-outline-info:hover {
-    background: linear-gradient(135deg, #3494E6 0%, #EC6EAD 100%) !important;
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%) !important;
     border-color: transparent !important;
     color: white !important;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(52, 148, 230, 0.4);
+    box-shadow: 0 10px 25px rgba(43, 108, 176, 0.4);
   }
 
   .btn-outline-danger:hover {
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%) !important;
+    background: linear-gradient(135deg, #E53E3E 0%, #C53030 100%) !important;
     border-color: transparent !important;
     color: white !important;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(238, 9, 121, 0.4);
+    box-shadow: 0 10px 25px rgba(229, 62, 62, 0.4);
   }
 
   .btn i {
@@ -431,14 +431,14 @@
   }
 
   .list-group-item:hover {
-    background: rgba(102, 126, 234, 0.05) !important;
+    background: rgba(43, 108, 176, 0.05) !important;
     padding-left: 0.5rem !important;
     transform: translateX(5px);
     border-radius: 8px;
   }
 
   .list-group-item:hover strong {
-    color: #667eea;
+    color: #2B6CB0;
   }
 
   /* Badges */
@@ -461,12 +461,12 @@
 
   .btn-success.btn-sm:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+    box-shadow: 0 6px 20px rgba(56, 178, 172, 0.4);
   }
 
   .btn-info.btn-sm:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 148, 230, 0.4);
+    box-shadow: 0 6px 20px rgba(43, 108, 176, 0.4);
   }
 
   /* Responsive adjustments */

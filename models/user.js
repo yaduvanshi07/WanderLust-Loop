@@ -49,7 +49,7 @@ const userSchema=new Schema({
         type: {
             type: String,
             enum: ['Point'],
-            default: 'Point'
+            default: undefined // Don't set default - only set when coordinates exist
         },
         coordinates: {
             type: [Number], // [longitude, latitude]
@@ -93,7 +93,7 @@ const userSchema=new Schema({
         type: {
             type: String,
             enum: ['Point'],
-            default: 'Point'
+            default: undefined // Don't set default - only set when coordinates exist
         },
         coordinates: {
             type: [Number] // [longitude, latitude]
@@ -128,9 +128,41 @@ const userSchema=new Schema({
 
 userSchema.plugin(passportLocalMongoose);
 
-// Create 2dsphere index for geospatial queries on location
-userSchema.index({ "location": "2dsphere" });
-userSchema.index({ "travelRoutes": "2dsphere" });
+// Pre-save hook to handle location field properly
+// Remove location object if coordinates are not set (required for GeoJSON)
+userSchema.pre('save', function(next) {
+    // If location exists but coordinates are undefined/null/not an array, remove the location object
+    if (this.location) {
+        if (!this.location.coordinates || !Array.isArray(this.location.coordinates) || this.location.coordinates.length !== 2) {
+            // Don't set location at all if coordinates are invalid
+            this.location = undefined;
+        } else {
+            // Ensure type is set when coordinates are valid
+            if (!this.location.type) {
+                this.location.type = 'Point';
+            }
+        }
+    }
+    
+    // Clean up travelRoutes - remove entries without valid coordinates and set type when valid
+    if (this.travelRoutes && Array.isArray(this.travelRoutes)) {
+        this.travelRoutes = this.travelRoutes.map(route => {
+            if (route.coordinates && Array.isArray(route.coordinates) && route.coordinates.length === 2) {
+                if (!route.type) {
+                    route.type = 'Point';
+                }
+                return route;
+            }
+            return null;
+        }).filter(route => route !== null);
+    }
+    
+    next();
+});
+
+// Create 2dsphere index for geospatial queries on location (sparse - allows documents without location)
+userSchema.index({ "location": "2dsphere" }, { sparse: true });
+userSchema.index({ "travelRoutes": "2dsphere" }, { sparse: true });
 userSchema.index({ "location.visibility": 1, "location.sharingEnabled": 1 });
 userSchema.index({ "location.travelStatus": 1 });
 

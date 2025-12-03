@@ -1,109 +1,210 @@
-# QuickStay - Vacation Rental Platform with ML Features
+# 🏠 StaySense - Where Intelligence Finds Home
 
-## 📋 Project Overview
+<div align="center">
 
-QuickStay is a full-stack vacation rental booking platform built with Node.js, Express, MongoDB, and integrated ML services. The platform features intelligent listing recommendations, sentiment analysis, performance tracking, and an analytics dashboard.
+![StaySense Logo](https://img.shields.io/badge/StaySense-Intelligence%20Finds%20Home-blue?style=for-the-badge)
+![Node.js](https://img.shields.io/badge/Node.js-20.9+-green?style=for-the-badge&logo=node.js)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-brightgreen?style=for-the-badge&logo=mongodb)
+![ML](https://img.shields.io/badge/ML-Powered-orange?style=for-the-badge)
+
+**An intelligent vacation rental platform powered by Machine Learning, AI-driven recommendations, and real-time analytics**
+
+[Features](#-key-features) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Tech Stack](#-tech-stack)
+
+</div>
+
+---
+
+## 🌟 What is StaySense?
+
+StaySense is not just another booking platform—it's an **intelligent ecosystem** that combines cutting-edge machine learning with real-time analytics to revolutionize how people find and book vacation rentals. Whether you're a traveler seeking the perfect stay or a host optimizing your property, StaySense uses AI to make smarter decisions.
+
+### ✨ Why StaySense?
+
+- 🤖 **AI-Powered Matching**: Find your perfect travel buddy using ML compatibility algorithms
+- 📊 **Real-Time Analytics**: Track performance metrics and get actionable insights
+- 🎯 **Smart Recommendations**: Personalized listings based on your behavior and preferences
+- 💡 **What-If Scenarios**: Test decisions before making them with predictive analytics
+- 🗺️ **Live Location Tracking**: Connect with nearby travelers in real-time
+- 🎨 **Beautiful UI**: Modern glassmorphism design with smooth animations
+
+---
 
 ## 🚀 Key Features
 
-### Core Features
-- **User Authentication**: Secure login/signup system with Passport.js (local strategy)
-- **Listing Management**: Create, read, update, and delete property listings
-- **Booking System**: Complete booking workflow with date validation and conflict checking
-- **Review & Rating System**: User reviews with sentiment analysis
-- **Coupon/Discount System**: Admin-controlled coupon management
-- **Image Upload**: Cloudinary integration for listing images
-- **Search Functionality**: Real-time search across listings
-- **Travel Buddy Finder**: AI-powered social compatibility matching for travelers
+### 🎯 Core Platform Features
 
-### Advanced Features
+| Feature | Description |
+|---------|-------------|
+| 🔐 **Authentication** | Secure login/signup with Passport.js |
+| 🏘️ **Listing Management** | Create, update, and manage property listings |
+| 📅 **Booking System** | Complete booking workflow with date validation |
+| ⭐ **Reviews & Ratings** | User reviews with AI sentiment analysis |
+| 🎫 **Coupon System** | Admin-controlled discount management |
+| 📸 **Image Upload** | Cloudinary integration for seamless media handling |
+| 🔍 **Smart Search** | Real-time search with ML-powered ranking |
 
-#### 1. **Machine Learning Integration**
-- **Multi-Armed Bandit (Thompson Sampling)**: Personalized search ranking
-- **NLP Sentiment Analysis**: Automated review sentiment detection
-- **Recommendation Engine**: Intelligent listing suggestions based on user behavior
-- **What-If Explorer**: Counterfactual analysis for booking decisions
+### 🤖 Machine Learning & AI Features
 
-#### 2. **Analytics & Performance Tracking**
-- **Listing Performance Tracker**: CTR, conversion rates, engagement metrics
-- **Analytics Dashboard**: Comprehensive data visualization
-- **Host Notifications**: Automated alerts for low-performing listings
+#### 1. **Intelligent Search Ranking**
+- **Multi-Armed Bandit (Thompson Sampling)** for personalized recommendations
+- Balances exploration vs. exploitation
+- Provides explainable AI insights
+
+#### 2. **Sentiment Analysis**
+- Automated review sentiment detection
+- Categorizes reviews as positive, neutral, or negative
+- Helps surface quality issues automatically
+
+#### 3. **Recommendation Engine**
+- Profile-based recommendations
+- Similar listing suggestions
+- Price-range and location matching
+
+#### 4. **What-If Explorer**
+- **For Guests**: Test different budgets, dates, and preferences
+- **For Hosts**: Predict impact of price changes, discounts, and policies
+- Visual comparisons with actionable recommendations
+
+### 📊 Analytics & Performance Tracking
+
+- **Real-Time Dashboards**: Comprehensive analytics for users and hosts
+- **Performance Scoring**: CTR, conversion rates, engagement metrics
+- **Automated Alerts**: Host notifications for underperforming listings
 - **Revenue Tracking**: Detailed financial analytics
-- **Host What-If Scenario Explorer**: Test hypothetical changes (price, discounts, policies) and see predicted impacts
-  - Price elasticity predictions
-  - Discount effectiveness analysis
-  - Policy impact evaluation
-  - Market position analysis
-  - Risk level assessment
+- **Market Position Analysis**: Compare your pricing with market trends
 
-#### 3. **Travel Buddy Finder (AI-Powered Social Compatibility Matching)**
-- **AI-Based Matching**: ML algorithms match users based on:
+### 👥 Travel Buddy Finder (AI-Powered Social Matching)
+
+Find your perfect travel companion using advanced ML algorithms:
+
+- **🎯 Compatibility Matching**: 
   - Booking history analysis
   - Travel interests compatibility
   - Personality trait matching
   - Destination preferences
   - Travel style alignment
-  - **Geographic Proximity (25% weight)**: Real-time location-based matching
-  - **Route Overlap Scoring**: Multi-city travel itinerary matching
-- **Find Matches**: Discover compatible travel partners with compatibility scores
-- **Listings**: Create/browse travel partner posts with destination, dates, bio, and preferences
-- **Communities**: Join interest-based micro-communities (foodies, adventure lovers, nomads, etc.)
-- **Requests System**: Send/receive connection requests with admin moderation
-- **Inbox**: Real-time chat system (opens only after mutual acceptance)
-- **Ice Breakers**: AI-suggested conversation starters based on shared interests
-- **Modern UI**: Highly interactive interface with glassmorphism design, animations, and gradient themes
+  - Geographic proximity (25% weight)
+  - Route overlap scoring for multi-city trips
 
-#### 4. **Real-Time Location Tracking & Interactive Map**
-- **Browser Geolocation**: User permission-based location tracking
-- **Privacy Controls**: Multiple visibility levels (exact, city, country, hidden)
-- **Travel Status Tracking**: Real-time status updates (at-home, in-transit, at-destination, planning)
-- **Interactive Map View**: Leaflet.js integration with color-coded compatibility markers
-- **Marker Clustering**: Automatic clustering when multiple users are nearby
-- **Radius Filter**: Adjustable search radius (5km-500km)
-- **WebSocket Integration**: Real-time location updates via Socket.IO
-- **Geospatial Queries**: MongoDB 2dsphere indexes for efficient location-based searches
-- **Multi-City Routes**: Track and match users with overlapping travel itineraries
-- **Distance-Based Scoring**: Proximity boosts compatibility scores (<10km = +10%, <50km = +5%)
-- **Admin Map View**: Admins can view all users' locations regardless of privacy settings
+- **🗺️ Real-Time Location Tracking**:
+  - Browser-based geolocation
+  - Privacy controls (exact, city, country, hidden)
+  - Travel status updates
+  - Interactive map with Leaflet.js
+  - WebSocket real-time updates
 
-#### 5. **Admin Features**
-- **Admin Dashboard**: Platform-wide overview
-- **ML Performance Dashboard**: Track ML algorithm effectiveness
-- **Coupon Management**: Create, enable, disable, and delete coupons
-- **User Management**: Role-based access control
-- **Analytics Dashboard**: Comprehensive analytics for all users
-- **User Location Map**: View all users' live locations with travel status and privacy settings
+- **💬 Social Features**:
+  - Find matches with compatibility scores
+  - Create/browse travel partner listings
+  - Join interest-based communities
+  - Secure messaging system
+  - AI-suggested ice breakers
 
-##  Architecture
+### 👨‍💼 Admin Features
 
-### Tech Stack
+- Platform-wide analytics dashboard
+- ML performance monitoring
+- Coupon management system
+- User management with role-based access
+- Global location map view
+- Community management
 
-**Backend:**
-- Node.js & Express.js
-- MongoDB with Mongoose ODM (GeoJSON support)
-- Passport.js for authentication
-- Cloudinary for image storage
-- Axios for HTTP requests
-- Socket.IO for real-time WebSocket communication
+---
 
-**Frontend:**
-- EJS templating engine
-- Bootstrap CSS framework
-- Custom JavaScript for interactivity
-- Chart.js for analytics visualization
-- Leaflet.js for interactive maps
-- Browser Geolocation API
+## 🛠️ Tech Stack
 
-**ML Services:**
-- FastAPI (Python) for ML services
-- Thompson Sampling algorithm
-- Rule-based sentiment analysis
-- Contextual bandit for ranking
+### Backend
+- **Node.js** & **Express.js** - Server framework
+- **MongoDB** with **Mongoose** - Database (GeoJSON support)
+- **Passport.js** - Authentication
+- **Cloudinary** - Image storage
+- **Socket.IO** - Real-time WebSocket communication
 
-### File Structure
+### Frontend
+- **EJS** - Templating engine
+- **Bootstrap 5** - CSS framework
+- **Chart.js** - Analytics visualization
+- **Leaflet.js** - Interactive maps
+- **Font Awesome** - Icons
+
+### ML Services
+- **FastAPI (Python)** - ML microservices
+- **Thompson Sampling** - Multi-armed bandit algorithm
+- **Rule-based NLP** - Sentiment analysis
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 20.9.0 or higher
+- Python 3.8+
+- MongoDB Atlas account
+- Cloudinary account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yaduvanshi07/StaySense-Where-Intelligence-Finds-Home.git
+   cd StaySense-Where-Intelligence-Finds-Home
+   ```
+
+2. **Install Node.js dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   
+   Create a `.env` file in the root directory:
+   ```env
+   ATLASDB_URL=your_mongodb_atlas_connection_string
+   CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUD_API_KEY=your_cloudinary_api_key
+   CLOUD_API_SECRET=your_cloudinary_api_secret
+   BANDIT_SERVICE_URL=http://127.0.0.1:8001
+   NLP_SERVICE_URL=http://127.0.0.1:8002
+   PORT=8080
+   ```
+
+4. **Start ML Services**
+
+   **Bandit Service (Port 8001):**
+   ```powershell
+   cd ml-services\bandit_service
+   py -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   python app.py
+   ```
+
+   **NLP Service (Port 8002):**
+   ```powershell
+   cd ml-services\nlp_service
+   py -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   python app.py
+   ```
+
+5. **Start the application**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   
+   Navigate to `http://localhost:8080` 🎉
+
+---
+
+## 📁 Project Structure
 
 ```
-QuickStay/
+StaySense/
 ├── app.js                          # Main application entry point
 ├── schema.js                       # Joi validation schemas
 ├── cloudConfig.js                  # Cloudinary configuration
@@ -111,12 +212,11 @@ QuickStay/
 │
 ├── models/                         # Database models
 │   ├── listing.js                  # Property listings with ML fields
-│   ├── user.js                     # User authentication (with travelBuddyProfile, location tracking)
-│   ├── booking.js                  # Booking management (with route locations)
+│   ├── user.js                     # User authentication & profiles
+│   ├── booking.js                  # Booking management
 │   ├── review.js                   # Reviews with sentiment
 │   ├── coupon.js                   # Coupon system
 │   ├── analytics.js                # Analytics tracking
-│   ├── SearchInteraction.js        # ML interaction data
 │   ├── preference.js               # Travel preferences
 │   ├── match.js                    # AI compatibility matches
 │   ├── buddyRequest.js             # Connection requests
@@ -128,18 +228,13 @@ QuickStay/
 │   ├── search.js                   # ML search endpoints
 │   └── buddy.js                    # Travel Buddy Finder routes
 │
-├── controllers/                    # Business logic (currently inline)
-│   └── listing.js                  # Listing operations
-│
-├── middleware.js                   # Auth & validation middleware
-│
 ├── utils/                          # Helper utilities
 │   ├── recommendationEngine.js    # Similar listing recommendations
 │   ├── analyticsHelper.js          # Analytics calculations
 │   ├── listingPerformanceTracker.js # Performance scoring
 │   ├── hostNotificationService.js  # Host alerts
 │   ├── hostScenarioPredictor.js   # What-If scenario predictions
-│   └── buddyMatchingEngine.js      # AI travel buddy matching algorithm
+│   └── buddyMatchingEngine.js      # AI travel buddy matching
 │
 ├── views/                          # EJS templates
 │   ├── layouts/                    # Layout templates
@@ -148,94 +243,30 @@ QuickStay/
 │   ├── users/                      # Auth pages
 │   ├── admin/                      # Admin dashboards
 │   ├── analytics/                  # Analytics views
-│   ├── coupons/                    # Coupon management
 │   └── buddy/                      # Travel Buddy Finder pages
-│       ├── matches.ejs             # Find matches page
-│       ├── match-detail.ejs        # Match details
-│       ├── listings.ejs            # Browse listings
-│       ├── listing-detail.ejs      # Listing details
-│       ├── communities.ejs         # Communities page
-│       ├── requests.ejs            # Connection requests
-│       ├── inbox.ejs               # Messages inbox
-│       └── chat.ejs                # Chat interface
 │
 ├── public/                         # Static assets
 │   ├── css/                        # Stylesheets
 │   └── js/                         # Client-side scripts
-│       └── map.js                  # Interactive map functionality
 │
 └── ml-services/                    # Python ML services
-    ├── bandit_service/
-    │   ├── app.py                  # Thompson Sampling service
-    │   └── requirements.txt
-    └── nlp_service/
-        ├── app.py                  # Sentiment analysis service
-        └── requirements.txt
+    ├── bandit_service/             # Thompson Sampling service
+    └── nlp_service/                # Sentiment analysis service
 ```
 
-## 🔧 Setup Instructions
+---
 
-### Prerequisites
-- Node.js 20.9.0 or higher
-- Python 3.8+
-- MongoDB Atlas account
-- Cloudinary account
+## 📖 API Documentation
 
-### 1. Install Node.js Dependencies
-```bash
-npm install
-```
-
-### 2. Environment Variables
-Create a `.env` file in the root directory:
-```env
-ATLASDB_URL=your_mongodb_atlas_connection_string
-CLOUD_NAME=your_cloudinary_cloud_name
-CLOUD_API_KEY=your_cloudinary_api_key
-CLOUD_API_SECRET=your_cloudinary_api_secret
-BANDIT_SERVICE_URL=http://127.0.0.1:8001
-NLP_SERVICE_URL=http://127.0.0.1:8002
-PORT=8080
-```
-
-### 3. Start ML Services
-
-#### Bandit Service (Port 8001):
-```powershell
-cd ml-services\bandit_service
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python app.py
-```
-
-#### NLP Service (Port 8002):
-```powershell
-cd ml-services\nlp_service
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python app.py
-```
-
-### 4. Start Node Application
-```bash
-npm run dev
-```
-
-The application will run on `http://localhost:8080`
-
-## 📖 API Endpoints
-
-### Authentication
+### 🔐 Authentication
 - `GET /signup` - Signup page
 - `POST /signup` - Create new user
 - `GET /login` - Login page
 - `POST /login` - Authenticate user
 - `GET /logout` - Logout user
 
-### Listings
-- `GET /listings` - View all listings (with search)
+### 🏘️ Listings
+- `GET /listings` - View all listings (with ML-powered search)
 - `GET /listings/new` - Create listing form
 - `POST /listings` - Create new listing
 - `GET /listings/:id` - View listing details
@@ -243,181 +274,96 @@ The application will run on `http://localhost:8080`
 - `PUT /listings/:id` - Update listing
 - `DELETE /listings/:id` - Delete listing
 
-### Bookings
+### 📅 Bookings
 - `GET /bookings` - User bookings
 - `POST /listings/:id` - Create booking
 - `PATCH /bookings/:id/cancel` - Cancel booking
 
-### Reviews
-- `POST /listings/:id/reviews` - Create review
-- `DELETE /listings/:id/reviews/:reviewId` - Delete review
-
-### Analytics
-- `GET /analytics/dashboard` - Analytics dashboard (Available in user/admin dropdown)
-- `GET /listings/:id/analytics` - Listing analytics
-- `GET /host/performance` - Host performance dashboard
-
-### Travel Buddy Finder
+### 👥 Travel Buddy Finder
 - `GET /buddy/matches` - Find AI-matched travel buddies
-- `GET /buddy/matches/:id` - View match details
+- `GET /buddy/profile` - View/edit travel buddy profile
 - `GET /buddy/listings` - Browse travel buddy listings
-- `GET /buddy/listings/new` - Create new listing
-- `GET /buddy/listings/:id` - View listing details
-- `POST /buddy/listings/:id/request` - Send connection request
-- `GET /buddy/communities` - Browse/join communities
-- `POST /buddy/communities/:id/join` - Join community
-- `POST /buddy/communities/:id/leave` - Leave community
-- `GET /buddy/requests` - View sent/received requests (Admin sees all)
-- `POST /buddy/requests/:id/accept` - Accept request
-- `POST /buddy/requests/:id/reject` - Reject request
-- `DELETE /buddy/requests/:id` - Delete request (Admin only)
-- `GET /buddy/inbox` - Messages inbox
-- `GET /buddy/inbox/:id` - Chat conversation
-- `POST /buddy/inbox/:id/message` - Send message
 - `GET /buddy/map` - Interactive map showing nearby travelers
+- `GET /buddy/inbox` - Messages inbox
 - `POST /buddy/location/update` - Update user location (real-time)
-- `GET /buddy/location/nearby` - Get nearby travelers within radius
-- `POST /buddy/location/privacy` - Update location privacy settings
-- `POST /buddy/location/route` - Add travel route for multi-city trips
 
-### Admin
+### 📊 Analytics
+- `GET /analytics/dashboard` - Analytics dashboard
+- `GET /host/performance` - Host performance dashboard
+- `GET /host/performance/:id/whatif` - What-If scenario explorer
+
+### 👨‍💼 Admin
 - `GET /admin` - Admin dashboard
 - `GET /admin/ml/dashboard` - ML performance dashboard
-- `GET /admin/ml/analytics` - ML analytics API
-- `POST /admin/ml/backfill-listing-fields` - Initialize ML fields
-- `GET /admin/map` - Admin map view (all users' locations)
-- `GET /admin/api/users/locations` - Get all users with locations (API)
+- `GET /admin/map` - Admin map view
 - `GET /coupons` - Coupon management
-- `POST /coupons` - Create coupon
-- `POST /coupons/:id/toggle` - Toggle coupon status
-- `DELETE /coupons/:id` - Delete coupon
 
-### ML APIs
+### 🤖 ML APIs
 - `POST /api/search/rank` - Get personalized ranking
 - `POST /api/search/feedback` - Log user interactions
-- `POST /api/risk/score` - Get cancellation risk score
 - `POST /api/search/whatif` - Guest counterfactual analysis
-- `POST /api/host/whatif` - Host scenario analysis (price, discount, policy predictions)
+- `POST /api/host/whatif` - Host scenario analysis
 
-##  How It Works
+---
 
-### 1. Listing Performance Tracking
+## 🎯 How It Works
 
-The `listingPerformanceTracker.js` module calculates performance scores based on:
-- **Click-Through Rate (CTR)**: Views vs. clicks
-- **Conversion Rate**: Clicks vs. bookings
-- **Overall Engagement**: Total user interactions
-- **Average Rating**: Review feedback
-- **Total Revenue**: Financial performance
+### 1. Intelligent Search & Ranking
 
-Scores are calculated using weighted metrics and cached for performance.
+StaySense uses **Thompson Sampling** (Multi-Armed Bandit) to personalize search results:
 
-### 2. Machine Learning Integration
-
-#### Multi-Armed Bandit (Thompson Sampling)
-- Uses Beta distribution to model listing success rates
-- Balances exploration vs. exploitation
+- Learns from user interactions (clicks, bookings)
+- Balances exploration (trying new listings) vs. exploitation (showing popular ones)
 - Provides explanations for recommendations
-- Tracks CTR history for analytics
+- Continuously improves based on feedback
 
-#### NLP Sentiment Analysis
-- Rule-based sentiment detection
+### 2. Sentiment Analysis
+
+Automatically analyzes review sentiment:
+
 - Categorizes reviews as positive, neutral, or negative
-- Helps surface quality issues
+- Helps identify quality issues
+- Improves user trust and decision-making
 
-#### Recommendation Engine
-- Profile-based recommendations
-- Similar listing suggestions
-- Price-range matching
-- Location preferences
+### 3. Travel Buddy Matching
 
-### 3. Booking Flow
+Advanced ML algorithm matches users based on:
 
-1. User searches/browses listings
-2. Selects listing and checks availability
-3. Enters guest details and dates
-4. Applies coupon (optional)
-5. System validates dates and availability
-6. Creates booking with pricing breakdown
-7. Tracks analytics and records interactions
+- **Interests Compatibility** (30% weight)
+- **Travel Style Alignment** (25% weight)
+- **Geographic Proximity** (25% weight)
+- **Personality Traits** (20% weight)
 
-### 4. Host Performance Monitoring
+Compatibility scores range from 0-100%, with detailed breakdowns.
 
-- Scheduled checks every 6 hours
-- Identifies listings with score < 40
-- Generates recommendations for improvement
-- Sends notifications to hosts
+### 4. What-If Scenarios
 
-### 5. Host What-If Scenario Explorer
+**For Hosts:**
+- Test price changes and see predicted impact
+- Analyze discount effectiveness
+- Evaluate cancellation policy changes
+- Get market position insights
 
-A sophisticated decision-support tool that enables hosts to test hypothetical changes:
+**For Guests:**
+- Explore different budgets and dates
+- See alternative recommendations
+- Compare options side-by-side
 
-**Price Impact Analysis**
-- Predicts how price changes affect bookings and revenue
-- Uses price elasticity theory (-1.5% demand per 1% price change)
-- Provides market position analysis (above/at/below market)
-- Shows recommendations based on elasticity
+### 5. Real-Time Location Tracking
 
-**Discount Impact Analysis**
-- Estimates booking increases from offering discounts
-- Calculates total revenue impact
-- Uses formula: 1.2x booking boost per 10% discount
-- Shows percentage increase predictions
+- Users can share their location (with privacy controls)
+- Find nearby travelers on interactive map
+- Real-time updates via WebSocket
+- Distance-based compatibility boosts
 
-**Policy Impact Analysis**
-- Predicts how cancellation policies affect bookings
-- Estimates cancellation rates
-- Evaluates booking boost vs. cancellation risk
-- Provides risk level assessment
+---
 
-**Features**:
-- Visual comparisons (current vs. predicted metrics)
-- Color-coded indicators (↗️ positive, ↘️ negative, → neutral)
-- Risk level badges (low/medium/high)
-- Market position display
-- Actionable recommendations
-
-**Usage**: Navigate to `/host/performance` → Click "What-If Explorer" on any listing → Enter scenarios → Review predictions
-
-## 📊 Data Models
-
-### Listing Model
-```javascript
-{
-  title, description, price, location, country,
-  image: { url, filename },
-  owner: ObjectId,
-  reviews: [ObjectId],
-  clickThroughRate, conversionRate,
-  rankingScore, performanceStatus,
-  smartPricingEnabled
-}
-```
-
-### Booking Model
-```javascript
-{
-  listing, guest, checkin, checkout,
-  guests: { adults, children, infants, pets },
-  pricing: { basePrice, cleaningFee, serviceFee, taxes, discount, total },
-  status, bookingType, paymentStatus, coupon
-}
-```
-
-### Analytics Model
-```javascript
-{
-  listing, viewsCount, bookingsCount,
-  revenue, averageRating, reviewsCount
-}
-```
-
-## 🧪 Testing the Application
+## 🧪 Testing Guide
 
 ### Test Authentication
 1. Sign up with a new account
 2. Login with credentials
-3. Logout and verify session cleared
+3. Verify session management
 
 ### Test ML Features
 1. Browse listings to see personalized ranking
@@ -425,122 +371,150 @@ A sophisticated decision-support tool that enables hosts to test hypothetical ch
 3. Post a review to test sentiment analysis
 4. Check admin ML dashboard for CTR metrics
 
-### Test Guest What-If Explorer
-1. Visit `/listings`
-2. Click "What If Explorer" button
-3. Adjust budget, stay duration, dates
-4. View scenario suggestions
+### Test Travel Buddy Finder
+1. Complete your travel buddy profile (`/buddy/profile`)
+2. Find matches (`/buddy/matches`)
+3. View match details and compatibility scores
+4. Send connection requests
+5. Use interactive map to find nearby travelers
 
-### Test Host What-If Scenario Explorer
-1. Navigate to `/host/performance` dashboard
-2. Click "What-If Explorer" button next to any listing
+### Test What-If Explorer
+1. Navigate to `/host/performance`
+2. Click "What-If Explorer" on any listing
 3. Test scenarios:
-   - **Price Scenario**: Enter new price (e.g., change from ₹2000 to ₹1800)
-   - **Discount Scenario**: Enter discount percentage (e.g., 10%)
-   - **Policy Scenario**: Select cancellation policy (flexible/moderate/strict)
-4. Click "Analyze Scenario"
-5. Review predictions showing current vs. predicted metrics:
-   - Views, Bookings, Revenue changes
-   - Market position analysis
-   - Risk level assessment
-   - Actionable recommendations
+   - **Price**: Change from ₹2000 to ₹1800
+   - **Discount**: Enter 10% discount
+   - **Policy**: Select flexible/moderate/strict
+4. Review predictions and recommendations
 
-## 🔐 Security Features
+---
 
-- Password hashing with Passport-Local-Mongoose
-- Session-based authentication
-- CSRF protection via method-override
-- Admin-only routes with role verification
-- Input validation with Joi
-- MongoDB injection prevention
+## 🔒 Security Features
 
-## 🚧 Limitations & Future Enhancements
+- ✅ Password hashing with Passport-Local-Mongoose
+- ✅ Session-based authentication
+- ✅ CSRF protection via method-override
+- ✅ Role-based access control (Admin/User)
+- ✅ Input validation with Joi
+- ✅ MongoDB injection prevention
+- ✅ Secure file uploads with Cloudinary
 
-### Current Limitations
+---
+
+## 🎨 UI/UX Highlights
+
+- **Modern Design**: Glassmorphism effects with gradient themes
+- **Smooth Animations**: CSS transitions and keyframe animations
+- **Responsive Layout**: Mobile-first design with Bootstrap
+- **Interactive Maps**: Leaflet.js integration with custom markers
+- **Real-Time Updates**: WebSocket for live location tracking
+- **Visual Analytics**: Chart.js for data visualization
+
+---
+
+## 🚧 Current Limitations
+
 - Sentiment analysis is rule-based (not transformer-based)
-- ML services run locally
-- No email notifications
-- No payment integration
+- ML services run locally (not cloud-deployed)
+- No email/SMS notifications
+- No payment gateway integration
 
-### Future Enhancements
-- A/B testing framework
-- Scheduled model retraining
-- Computer vision for image quality
-- Demand forecasting
-- Fraud detection
-- Email/SMS notifications
-- Payment gateway integration
-- Push notifications for location-based matches
+---
 
-## 🎯 Project Highlights
+## 🔮 Future Enhancements
 
-### What Makes This Project Special
+- [ ] A/B testing framework
+- [ ] Scheduled model retraining
+- [ ] Computer vision for image quality
+- [ ] Demand forecasting
+- [ ] Fraud detection system
+- [ ] Email/SMS notifications
+- [ ] Payment gateway integration
+- [ ] Push notifications for location-based matches
+- [ ] Mobile app (React Native)
 
-1. **Intelligent Search Ranking**: ML-driven personalized listing recommendations
-2. **Sentiment Analysis**: Automated review sentiment detection
-3. **Performance Analytics**: Real-time listing performance tracking with automated host notifications
-4. **What-If Scenarios**: Both guests and hosts can explore counterfactual decisions
-5. **Host Decision Support**: Price elasticity and policy impact predictions
-6. **Explainable AI**: Recommendations come with explanations
-7. **Automated Notifications**: Hosts receive alerts for underperforming listings
-8. **Travel Buddy Finder**: AI-powered social compatibility matching system connecting like-minded travelers
-9. **Real-Time Location Tracking**: Geolocation-based matching with interactive map visualization
-10. **Modern Interactive UI**: Glassmorphism design with smooth animations and gradient themes
-11. **Comprehensive Analytics**: Analytics dashboard accessible to both users and admins
+---
 
-### Key Technical Achievements
+## 📊 Project Highlights
+
+### What Makes StaySense Special?
+
+1. **🤖 AI-Powered Everything**: From search to matching to recommendations
+2. **📈 Real-Time Analytics**: Track everything, optimize continuously
+3. **💡 Decision Support**: What-If scenarios for better choices
+4. **👥 Social Features**: Find travel buddies with ML compatibility
+5. **🗺️ Location Intelligence**: Real-time geolocation with privacy controls
+6. **🎨 Beautiful UI**: Modern, responsive, and intuitive design
+7. **⚡ Performance**: Optimized queries and caching
+8. **🔐 Security**: Enterprise-grade authentication and validation
+
+### Technical Achievements
 
 - ✅ Full-stack web application with Express.js
-- ✅ MongoDB database with complex relationships and geospatial queries
-- ✅ Machine learning integration (Python FastAPI services)
+- ✅ MongoDB with geospatial queries (2dsphere indexes)
+- ✅ Machine learning integration (Python FastAPI)
 - ✅ Real-time analytics and performance tracking
-- ✅ Real-time location tracking with WebSocket (Socket.IO)
-- ✅ Interactive map visualization with Leaflet.js
-- ✅ Geospatial database queries with MongoDB 2dsphere indexes
+- ✅ WebSocket real-time communication (Socket.IO)
+- ✅ Interactive map visualization (Leaflet.js)
 - ✅ Predictive analytics for decision support
 - ✅ Role-based authentication and authorization
-- ✅ Image upload with Cloudinary
+- ✅ Cloud-based image storage (Cloudinary)
 - ✅ RESTful API design
-- ✅ Responsive UI with Bootstrap
-- ✅ Session-based authentication with Passport.js
 
-### Business Value
+---
 
-**For Users**:
+## 💼 Business Value
+
+### For Travelers 🧳
 - Personalized booking recommendations
 - Sentiment-based review filtering
 - Counterfactual analysis for better decisions
-- Find compatible travel buddies through AI matching
+- Find compatible travel buddies through AI
 - Join interest-based communities
-- Connect with travelers through secure messaging
-- Analytics dashboard for performance insights
+- Connect with travelers securely
+- Analytics dashboard for insights
 
-**For Hosts**:
+### For Hosts 🏠
 - Performance insights and tracking
 - Automated recommendations for improvement
 - What-If scenarios for strategic planning
 - Market position analysis
+- Revenue optimization tools
+- Low-performance alerts
 
-**For Admins**:
+### For Admins 👨‍💼
 - Platform-wide analytics
 - ML performance monitoring
 - Coupon management
 - User management
-- Full visibility of all travel buddy requests and connections
+- Full visibility of travel buddy connections
 - Community management
-- Analytics dashboard with comprehensive insights
-
-## 📝 License
-
-ISC
-
-## 👨‍💻 Author
-
-Student Project - Academic Development
+- Comprehensive insights dashboard
 
 ---
 
-**Repository**: [https://github.com/yaduvanshi07/Quickstay-Advance-ML-AI-.git](https://github.com/yaduvanshi07/Quickstay-Advance-ML-AI-.git)
+## 📝 License
 
-**Note**: This project demonstrates full-stack development with machine learning integration, real-time analytics, and intelligent decision-support systems. All features are production-ready and fully documented.
+ISC License
 
+---
+
+## 👨‍💻 Author
+
+**Student Project - Academic Development**
+
+---
+
+## 🔗 Repository
+
+**GitHub**: [StaySense-Where-Intelligence-Finds-Home](https://github.com/yaduvanshi07/StaySense-Where-Intelligence-Finds-Home)
+
+---
+
+<div align="center">
+
+**Made with ❤️ and 🤖 AI**
+
+*StaySense - Where Intelligence Finds Home*
+
+</div>

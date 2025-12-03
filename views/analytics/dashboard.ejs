@@ -1,72 +1,650 @@
 <% layout('layouts/boilerplate') %>
-<div class="container mt-4">
-  <h2>
-    Analytics Dashboard 
-    <% if (isAdmin) { %>
-      <span class="badge bg-warning text-dark">Admin View - All Listings</span>
-    <% } else { %>
-      <span class="badge bg-info text-dark">Your Listings Only</span>
-    <% } %>
-  </h2>
-  <div class="row mb-4">
-    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Total Views</div><div class="fs-4 fw-bold"><%= overview.totalViews %></div></div></div></div>
-    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Bookings</div><div class="fs-4 fw-bold"><%= overview.totalBookings %></div></div></div></div>
-    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Revenue</div><div class="fs-4 fw-bold">₹<%= overview.totalRevenue %></div></div></div></div>
-    <div class="col-md-3 mb-3"><div class="card border-0 shadow-sm h-100"><div class="card-body"><div class="text-muted">Avg Rating</div><div class="fs-4 fw-bold"><%= (overview.averageRating||0).toFixed(2) %></div></div></div></div>
-  </div>
 
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <canvas id="viewsChart" height="140"></canvas>
+<style>
+  .analytics-container {
+    background: linear-gradient(135deg, #F7FAFC 0%, #E6F0F5 100%);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+
+  .dashboard-header {
+    background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(43, 108, 176, 0.3);
+  }
+
+  .dashboard-header h2 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+
+  .dashboard-header .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    height: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(43, 108, 176, 0.3);
+  }
+
+  .stat-card:hover::before {
+    opacity: 1;
+  }
+
+  .stat-card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+    color: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .stat-card.views {
+    --card-color-1: #2B6CB0;
+    --card-color-2: #3182CE;
+  }
+
+  .stat-card.bookings {
+    --card-color-1: #38B2AC;
+    --card-color-2: #2B6CB0;
+  }
+
+  .stat-card.revenue {
+    --card-color-1: #F6AD55;
+    --card-color-2: #ED8936;
+  }
+
+  .stat-card.rating {
+    --card-color-1: #2B6CB0;
+    --card-color-2: #38B2AC;
+  }
+
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1A202C;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-trend {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .stat-trend.up {
+    color: #38B2AC;
+  }
+
+  .stat-trend.down {
+    color: #E53E3E;
+  }
+
+  .chart-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border: none;
+    margin-bottom: 2rem;
+  }
+
+  .chart-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f7fafc;
+  }
+
+  .chart-card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #1A202C;
+    font-size: 1.3rem;
+  }
+
+  .chart-card-header .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2B6CB0, #38B2AC);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+  }
+
+  .listings-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border: none;
+  }
+
+  .listings-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f7fafc;
+  }
+
+  .listing-item-card {
+    background: #f7fafc;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .listing-item-card:hover {
+    background: white;
+    border-color: #2B6CB0;
+    transform: translateX(5px);
+    box-shadow: 0 8px 20px rgba(43, 108, 176, 0.15);
+  }
+
+  .listing-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1A202C;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+  }
+
+  .listing-title:hover {
+    color: #2B6CB0;
+  }
+
+  .listing-metrics {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+
+  .metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .metric-item i {
+    color: #2B6CB0;
+    width: 20px;
+  }
+
+  .metric-value {
+    font-weight: 600;
+    color: #1A202C;
+  }
+
+  .score-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .score-badge.excellent {
+    background: linear-gradient(135deg, #38B2AC, #2B6CB0);
+    color: white;
+  }
+
+  .score-badge.good {
+    background: linear-gradient(135deg, #2B6CB0, #3182CE);
+    color: white;
+  }
+
+  .score-badge.poor {
+    background: linear-gradient(135deg, #F6AD55, #ED8936);
+    color: white;
+  }
+
+  .score-badge.low {
+    background: #cbd5e0;
+    color: #1A202C;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-header h2 {
+      font-size: 1.8rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+    }
+
+    .listing-metrics {
+      gap: 1rem;
+    }
+  }
+</style>
+
+<div class="analytics-container">
+  <div class="container mt-4">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+          <h2><i class="fa-solid fa-chart-line me-2"></i>Analytics Dashboard</h2>
+          <% if (isAdmin) { %>
+            <span class="badge bg-warning text-dark"><i class="fa-solid fa-shield-halved me-1"></i>Admin View - All Listings</span>
+          <% } else { %>
+            <span class="badge bg-info text-white"><i class="fa-solid fa-user me-1"></i>Your Listings Only</span>
+          <% } %>
+        </div>
+        <div class="mt-3 mt-md-0">
+          <button class="btn btn-light btn-sm" onclick="window.print()">
+            <i class="fa-solid fa-print me-2"></i>Print Report
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="col-md-6">
-      <canvas id="revenueChart" height="140"></canvas>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3 mb-4">
+        <div class="stat-card views">
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-eye"></i>
+          </div>
+          <div class="stat-value"><%= overview.totalViews %></div>
+          <div class="stat-label">Total Views</div>
+          <div class="stat-trend up">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>Overall performance</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 mb-4">
+        <div class="stat-card bookings">
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="stat-value"><%= overview.totalBookings %></div>
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-trend up">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>Bookings tracked</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 mb-4">
+        <div class="stat-card revenue">
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-rupee-sign"></i>
+          </div>
+          <div class="stat-value">₹<%= overview.totalRevenue.toLocaleString('en-IN') %></div>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-trend up">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+            <span>Revenue generated</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 mb-4">
+        <div class="stat-card rating">
+          <div class="stat-card-icon">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="stat-value"><%= (overview.averageRating||0).toFixed(2) %></div>
+          <div class="stat-label">Average Rating</div>
+          <div class="stat-trend up">
+            <i class="fa-solid fa-star"></i>
+            <span>Customer satisfaction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+      <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5><i class="fa-solid fa-chart-bar me-2"></i>Views & Bookings</h5>
+            <div class="icon">
+              <i class="fa-solid fa-chart-column"></i>
+            </div>
+          </div>
+          <div style="position: relative; height: 300px;">
+            <canvas id="viewsChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mb-4">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h5><i class="fa-solid fa-chart-line me-2"></i>Revenue Trend</h5>
+            <div class="icon">
+              <i class="fa-solid fa-money-bill-trend-up"></i>
+            </div>
+          </div>
+          <div style="position: relative; height: 300px;">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Listings Section -->
+    <div class="listings-card">
+      <div class="listings-card-header">
+        <h5 class="mb-0"><i class="fa-solid fa-trophy me-2" style="color: #F6AD55;"></i>Top Performing Listings</h5>
+        <span class="badge bg-primary"><%= (perListing||[]).length %> Listings</span>
+      </div>
+      
+      <% if (perListing && perListing.length > 0) { %>
+        <% perListing.forEach((a, index) => { %>
+          <div class="listing-item-card">
+            <div class="d-flex justify-content-between align-items-start flex-wrap">
+              <div class="flex-grow-1">
+                <a href="/listings/<%= a.listing?._id %>" class="listing-title">
+                  <%= a.listing?.title || 'Unknown Listing' %>
+                </a>
+                <% if (a.listing && a.listing.rankingScore) { %>
+                  <span class="score-badge <%= a.listing.rankingScore >= 80 ? 'excellent' : (a.listing.rankingScore >= 60 ? 'good' : (a.listing.rankingScore <= 30 ? 'poor' : 'low')) %> ms-2">
+                    <i class="fa-solid fa-star me-1"></i>Score: <%= a.listing.rankingScore %>
+                  </span>
+                <% } %>
+                <div class="listing-metrics">
+                  <div class="metric-item">
+                    <i class="fa-solid fa-eye"></i>
+                    <span><span class="metric-value"><%= a.viewsCount || 0 %></span> views</span>
+                  </div>
+                  <div class="metric-item">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span><span class="metric-value"><%= a.bookingsCount || 0 %></span> bookings</span>
+                  </div>
+                  <div class="metric-item">
+                    <i class="fa-solid fa-rupee-sign"></i>
+                    <span><span class="metric-value">₹<%= (a.revenue || 0).toLocaleString('en-IN') %></span> revenue</span>
+                  </div>
+                  <div class="metric-item">
+                    <i class="fa-solid fa-star"></i>
+                    <span><span class="metric-value"><%= (a.averageRating||0).toFixed(2) %></span> (<%= a.reviewsCount || 0 %> reviews)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-end ms-3">
+                <span class="badge bg-light text-dark" style="font-size: 1.2rem; padding: 0.5rem;">
+                  #<%= index + 1 %>
+                </span>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="text-center py-5">
+          <i class="fa-solid fa-chart-line fa-3x text-muted mb-3"></i>
+          <p class="text-muted">No analytics data available yet.</p>
+        </div>
+      <% } %>
     </div>
   </div>
-
-  <h4 class="mt-2 mb-2">Top Listings</h4>
-  <table class="table table-hover align-middle">
-    <thead>
-      <tr>
-        <th>Listing</th>
-        <th>Views</th>
-        <th>Bookings</th>
-        <th>Revenue</th>
-        <th>Avg Rating</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% (perListing||[]).forEach(a => { %>
-        <tr>
-          <td>
-            <a class="text-decoration-none" href="/listings/<%= a.listing?._id %>"><%= a.listing?.title || 'Unknown' %></a>
-            <% if (a.listing && a.listing.rankingScore) { %>
-              <span class="badge <%= a.listing.rankingScore >= 80 ? 'bg-success' : (a.listing.rankingScore >= 60 ? 'bg-primary' : (a.listing.rankingScore <= 30 ? 'bg-warning text-dark' : 'bg-secondary')) %> ms-2">
-                Score <%= a.listing.rankingScore %>
-              </span>
-            <% } %>
-          </td>
-          <td><%= a.viewsCount %></td>
-          <td><%= a.bookingsCount %></td>
-          <td>₹<%= a.revenue %></td>
-          <td><%= (a.averageRating||0).toFixed(2) %> (<%= a.reviewsCount %>)</td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
 </div>
 
 <script>
-  (function(){
-    const labels = (perListing||[]).map(a => a.listing?.title || 'Unknown');
-    const views = (perListing||[]).map(a => a.viewsCount || 0);
-    const revenue = (perListing||[]).map(a => a.revenue || 0);
-    const bookings = (perListing||[]).map(a => a.bookingsCount || 0);
+  // Wait for DOM and Chart.js to be ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit to ensure Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+      console.error('Chart.js is not loaded');
+      return;
+    }
+
+    const perListingData = <%- JSON.stringify(perListing || []) %>;
+    
+    const labels = perListingData.map(a => {
+      const title = (a.listing && a.listing.title) ? a.listing.title : 'Unknown';
+      return title.length > 15 ? title.substring(0, 15) + '...' : title;
+    });
+    const views = perListingData.map(a => a.viewsCount || 0);
+    const revenue = perListingData.map(a => a.revenue || 0);
+    const bookings = perListingData.map(a => a.bookingsCount || 0);
+    
     const ctx1 = document.getElementById('viewsChart');
     const ctx2 = document.getElementById('revenueChart');
-    if (ctx1) new Chart(ctx1, { type: 'bar', data: { labels, datasets: [{ label: 'Views', data: views, backgroundColor: 'rgba(54, 162, 235, 0.5)' }, { label: 'Bookings', data: bookings, backgroundColor: 'rgba(255, 206, 86, 0.5)' }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' }}}});
-    if (ctx2) new Chart(ctx2, { type: 'line', data: { labels, datasets: [{ label: 'Revenue', data: revenue, borderColor: 'rgba(75, 192, 192, 1)', fill: false }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' }}}});
-  })();
+    
+    if (ctx1 && views.length > 0) {
+      try {
+        new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Views',
+                data: views,
+                backgroundColor: 'rgba(43, 108, 176, 0.7)',
+                borderColor: '#2B6CB0',
+                borderWidth: 2,
+                borderRadius: 8
+              },
+              {
+                label: 'Bookings',
+                data: bookings,
+                backgroundColor: 'rgba(56, 178, 172, 0.7)',
+                borderColor: '#38B2AC',
+                borderWidth: 2,
+                borderRadius: 8
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 20,
+                  font: {
+                    size: 12,
+                    weight: '600'
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(26, 32, 44, 0.9)',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: {
+                  size: 14,
+                  weight: '600'
+                },
+                bodyFont: {
+                  size: 13
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                  font: {
+                    size: 11
+                  }
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    size: 11
+                  },
+                  maxRotation: 45,
+                  minRotation: 45
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error creating views chart:', error);
+      }
+    } else if (ctx1 && views.length === 0) {
+      ctx1.parentElement.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-bar fa-2x mb-3"></i><p>No data available for charts</p></div>';
+    }
+    
+    if (ctx2 && revenue.length > 0) {
+      try {
+        new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Revenue (₹)',
+              data: revenue,
+              borderColor: '#F6AD55',
+              backgroundColor: 'rgba(246, 173, 85, 0.1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 5,
+              pointBackgroundColor: '#F6AD55',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointHoverRadius: 7
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  padding: 20,
+                  font: {
+                    size: 12,
+                    weight: '600'
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(26, 32, 44, 0.9)',
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function(context) {
+                    return 'Revenue: ₹' + context.parsed.y.toLocaleString('en-IN');
+                  }
+                },
+                titleFont: {
+                  size: 14,
+                  weight: '600'
+                },
+                bodyFont: {
+                  size: 13
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                  font: {
+                    size: 11
+                  },
+                  callback: function(value) {
+                    return '₹' + value.toLocaleString('en-IN');
+                  }
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    size: 11
+                  },
+                  maxRotation: 45,
+                  minRotation: 45
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Error creating revenue chart:', error);
+      }
+    } else if (ctx2 && revenue.length === 0) {
+      ctx2.parentElement.innerHTML = '<div class="text-center py-5 text-muted"><i class="fa-solid fa-chart-line fa-2x mb-3"></i><p>No data available for charts</p></div>';
+    }
+  });
 </script>
-
-

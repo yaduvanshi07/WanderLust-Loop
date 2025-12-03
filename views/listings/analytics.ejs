@@ -1,12 +1,194 @@
 <% layout('layouts/boilerplate') %>
 <div class="container mt-4">
-  <h2>Listing Analytics: <%= listing.title %></h2>
+  <div class="analytics-hero p-4 p-md-5 mb-4 rounded-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div>
+        <h2 class="mb-1 text-white"><i class="fa-solid fa-chart-line me-2"></i>Listing Analytics</h2>
+        <div class="text-white-50">For <strong><%= listing.title %></strong></div>
+      </div>
+      <div class="text-white-50 small">Last updated: <%= stats && stats.updatedAt ? new Date(stats.updatedAt).toLocaleString() : '—' %></div>
+    </div>
+  </div>
+
+  <% const views = (stats && stats.viewsCount) || 0; %>
+  <% const bookings = (stats && stats.bookingsCount) || 0; %>
+  <% const revenue = (stats && stats.revenue) || 0; %>
+  <% const avgRating = (stats && stats.averageRating) || 0; %>
+  <% const reviewsCount = (stats && stats.reviewsCount) || 0; %>
+  <% const conversion = views > 0 ? (bookings / views) * 100 : 0; %>
+  <% const arpb = bookings > 0 ? (revenue / bookings) : 0; %>
+
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm rounded-4 p-3 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="kpi-icon bg-primary-subtle text-primary"><i class="fa-solid fa-eye"></i></div>
+          <div>
+            <div class="kpi-label">Views</div>
+            <div class="kpi-value"><%= views.toLocaleString('en-IN') %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm rounded-4 p-3 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="kpi-icon bg-success-subtle text-success"><i class="fa-solid fa-calendar-check"></i></div>
+          <div>
+            <div class="kpi-label">Bookings</div>
+            <div class="kpi-value"><%= bookings.toLocaleString('en-IN') %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm rounded-4 p-3 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="kpi-icon bg-warning-subtle text-warning"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+          <div>
+            <div class="kpi-label">Revenue</div>
+            <div class="kpi-value">₹<%= Math.round(revenue).toLocaleString('en-IN') %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="kpi-card card border-0 shadow-sm rounded-4 p-3 h-100">
+        <div class="d-flex align-items-center gap-3">
+          <div class="kpi-icon bg-info-subtle text-info"><i class="fa-solid fa-star"></i></div>
+          <div>
+            <div class="kpi-label">Avg Rating</div>
+            <div class="kpi-value"><%= avgRating.toFixed(2) %> <span class="text-muted">(<%= reviewsCount %>)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Performance Overview</h5>
+          <span class="badge bg-light text-dark">Conversion: <strong><%= conversion.toFixed(1) %>%</strong></span>
+        </div>
+        <canvas id="kpiBar"></canvas>
+      </div>
+    </div>
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+        <h5 class="mb-2">Traffic vs Bookings</h5>
+        <canvas id="mixDoughnut"></canvas>
+        <div class="small text-muted mt-2">Shows the proportion of views that convert into bookings.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="row g-3">
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Views</div><div><%= (stats&&stats.viewsCount)||0 %></div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Bookings</div><div><%= (stats&&stats.bookingsCount)||0 %></div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Revenue</div><div>₹<%= (stats&&stats.revenue)||0 %></div></div></div>
-    <div class="col-md-3"><div class="card p-3"><div class="fw-bold">Avg Rating</div><div><%= ((stats&&stats.averageRating)||0).toFixed(2) %> (<%= (stats&&stats.reviewsCount)||0 %>)</div></div></div>
+    <div class="col-12 col-xl-6">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+        <h5 class="mb-2">Revenue Efficiency</h5>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="efficiency-pill">
+            <span class="pill-label">Avg revenue / booking</span>
+            <span class="pill-value">₹<%= Math.round(arpb).toLocaleString('en-IN') %></span>
+          </div>
+          <div class="efficiency-pill">
+            <span class="pill-label">Bookings / 1,000 views</span>
+            <span class="pill-value"><%= views > 0 ? Math.round((bookings / Math.max(views,1)) * 1000) : 0 %></span>
+          </div>
+        </div>
+        <div class="small text-muted mt-3">Track how effectively your listing turns views into revenue.</div>
+      </div>
+    </div>
+    <div class="col-12 col-xl-6">
+      <div class="card border-0 shadow-sm rounded-4 p-3 h-100">
+        <h5 class="mb-2">Quality Signals</h5>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="efficiency-pill">
+            <span class="pill-label">Average rating</span>
+            <span class="pill-value"><i class="fa-solid fa-star text-warning"></i> <%= avgRating.toFixed(1) %></span>
+          </div>
+          <div class="efficiency-pill">
+            <span class="pill-label">Total reviews</span>
+            <span class="pill-value"><%= reviewsCount %></span>
+          </div>
+        </div>
+        <div class="small text-muted mt-3">Higher ratings and more reviews often improve conversion.</div>
+      </div>
+    </div>
   </div>
 </div>
+
+<style>
+.analytics-hero {
+  background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(43,108,176,0.25);
+}
+.kpi-icon {
+  width: 44px; height: 44px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.kpi-label { font-size: .85rem; color: #6c757d; }
+.kpi-value { font-weight: 700; font-size: 1.25rem; }
+.efficiency-pill { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 999px; padding: .5rem 1rem; display: inline-flex; align-items: baseline; gap: .5rem; }
+.pill-label { font-size: .85rem; color: #6c757d; }
+.pill-value { font-weight: 700; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  (function(){
+    const views = <%= views %>;
+    const bookings = <%= bookings %>;
+    const revenue = <%= Math.round(revenue) %>;
+    const avgRating = <%= Number(avgRating.toFixed(2)) %>;
+    const reviews = <%= reviewsCount %>;
+
+    const kpiBarCtx = document.getElementById('kpiBar');
+    if (kpiBarCtx && window.Chart) {
+      new Chart(kpiBarCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Views', 'Bookings', 'Revenue', 'Rating'],
+          datasets: [{
+            label: 'KPI',
+            backgroundColor: ['#2B6CB0', '#38B2AC', '#ffc107', '#6f42c1'],
+            borderRadius: 8,
+            data: [views, bookings, revenue, Math.round(avgRating * 100)] // scale rating for visualization
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    const mixCtx = document.getElementById('mixDoughnut');
+    if (mixCtx && window.Chart) {
+      const nonConverted = Math.max(views - bookings, 0);
+      new Chart(mixCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Converted', 'Not Converted'],
+          datasets: [{
+            data: [bookings, nonConverted],
+            backgroundColor: ['#38B2AC', '#e9ecef'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          cutout: '65%',
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    }
+  })();
+</script>
 
 

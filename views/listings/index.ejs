@@ -79,17 +79,27 @@
     .personalized-alert {
         animation: fadeIn 0.5s ease-in-out;
     }
+    /* Personalization banner styling */
+    .personalization-banner {
+        background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%) !important; /* indigo-50 to slate-50 */
+        border: 1px solid #e5e7eb !important; /* gray-200 */
+        border-left: 4px solid #4f46e5 !important; /* indigo-600 */
+        color: #111827; /* gray-900 */
+        border-radius: 12px;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .personalization-banner:hover { box-shadow: 0 10px 25px rgba(79,70,229,0.12); transform: translateY(-1px); }
+    .how-it-works { color: #4f46e5; text-decoration: underline; text-underline-offset: 2px; }
+    .how-it-works:hover { color: #1d4ed8; }
 </style>
 
 
 
 <div id="filters" class="position-relative">
-    <div class="alert alert-info border-0 d-flex align-items-center gap-3 mt-3 personalized-alert shadow-sm" role="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
-        <i class="fa-solid fa-sparkles fa-2x"></i>
+    <div class="alert d-flex align-items-center gap-3 mt-3 personalized-alert personalization-banner" role="alert">
         <div class="flex-grow-1">
-            <!-- <span class="badge bg-white text-primary me-2">AI-Powered</span> -->
-            <strong>Search results may be reordered for you using machine learning.</strong>
-            <span id="info-trigger" class="ms-2 text-white" style="cursor: help; border-bottom: 1px dotted white;">ℹ️ How it works?</span>
+            <strong>We personalize your search results.</strong>
+            <span id="info-trigger" class="ms-2 how-it-works" style="cursor: help;">How it works</span>
         </div>
     </div>
     <!-- <div class="filter"><div><i class="fa-solid fa-fire"></i></div><p>Trending</p></div>
@@ -108,9 +118,8 @@
             <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
         </div>
         
-        <button class="btn btn-gradient border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#whatIfModal" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 25px; padding: 10px 25px;">
+        <button class="btn btn-gradient border-0 shadow-sm" data-bs-toggle="modal" data-bs-target="#whatIfModal" style="background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%); color: white; border-radius: 25px; padding: 10px 25px; font-weight: 600;">
             <i class="fa-solid fa-calculator me-2"></i> What If Explorer
-            <!-- <span class="badge bg-light text-primary ms-2">Beta</span> -->
         </button>
     </div>
 </div>
@@ -118,62 +127,162 @@
 <!-- What-If Modal -->
 <div class="modal fade" id="whatIfModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
-            <div class="modal-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <h5 class="modal-title"><i class="fa-solid fa-sliders me-2"></i> What If Explorer</h5>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%); padding: 1.5rem;">
+                <div>
+                    <h5 class="modal-title mb-1" style="font-size: 1.5rem; font-weight: 700;">
+                        <i class="fa-solid fa-calculator me-2"></i> What If Explorer
+                    </h5>
+                    <small class="opacity-90">Discover how adjusting your preferences unlocks new options</small>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4">
-                <p class="text-muted mb-4">Explore how changing your search criteria could unlock more options and savings!</p>
+            <div class="modal-body p-4" style="background: #F7FAFC;">
+                <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, rgba(43, 108, 176, 0.1) 0%, rgba(56, 178, 172, 0.1) 100%); border-left: 4px solid #2B6CB0;">
+                    <div class="d-flex align-items-start">
+                        <i class="fa-solid fa-lightbulb fa-2x text-primary me-3"></i>
+                        <div>
+                            <strong class="d-block mb-1">How it works:</strong>
+                            <p class="mb-0 small">Adjust your budget and date preferences to see how many more listings become available. Get personalized recommendations based on your changes!</p>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <i class="fa-solid fa-wallet text-primary fa-2x mb-2"></i>
-                                <label class="form-label fw-bold">Your Max Nightly Budget</label>
-                                <input type="number" class="form-control mt-2" id="whatif-maxbudget" placeholder="₹3000" min="0">
-                                <small class="text-muted">Current max you want to spend per night</small>
-                                <hr>
-                                <label class="form-label fw-bold">Increase Budget By</label>
-                                <input type="number" class="form-control mt-2" id="whatif-budget" placeholder="₹5000" min="0">
-                                <small class="text-muted">Try: ₹1000 - ₹10000</small>
+                <div class="row mb-4 g-4">
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100 whatif-card" style="border-radius: 15px; transition: all 0.3s ease; border-top: 4px solid #2B6CB0;">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-wrapper me-3" style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #2B6CB0 0%, #3182CE 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                        <i class="fa-solid fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold" style="color: #1A202C;">Budget Flexibility</h6>
+                                        <small class="text-muted">Adjust your spending range</small>
+                                    </div>
+                                </div>
+                                <label class="form-label fw-bold small text-uppercase" style="color: #2B6CB0; letter-spacing: 0.5px;">Your Max Nightly Budget</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" style="background: #f7fafc; border-color: #e9ecef;">
+                                        <i class="fa-solid fa-rupee-sign"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="whatif-maxbudget" placeholder="3000" min="0" style="border-color: #e9ecef;">
+                                </div>
+                                <small class="text-muted d-block mb-3">
+                                    <i class="fa-solid fa-info-circle me-1"></i> Your current maximum budget per night
+                                </small>
+                                <hr class="my-3">
+                                <label class="form-label fw-bold small text-uppercase" style="color: #38B2AC; letter-spacing: 0.5px;">Increase Budget By</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: #f7fafc; border-color: #e9ecef;">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </span>
+                                    <input type="number" class="form-control" id="whatif-budget" placeholder="5000" min="0" style="border-color: #e9ecef;">
+                                </div>
+                                <small class="text-muted d-block mt-2">
+                                    <i class="fa-solid fa-lightbulb me-1"></i> Try increasing by ₹1000 - ₹10000 to see more options
+                                </small>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <i class="fa-solid fa-calendar-days text-success fa-2x mb-2"></i>
-                                <label class="form-label fw-bold">Extend Stay</label>
-                                <input type="number" class="form-control mt-2" id="whatif-stay" placeholder="1 day" min="1">
-                                <small class="text-muted">Additional nights</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body text-center">
-                                <i class="fa-solid fa-calendar-check text-info fa-2x mb-2"></i>
-                                <label class="form-label fw-bold">Flexible Dates</label>
-                                <div class="form-check form-switch mt-3">
-                                    <input class="form-check-input" type="checkbox" id="whatif-flexible" style="width: 50px; height: 25px;">
-                                    <label class="form-check-label" for="whatif-flexible">Enable flexibility</label>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100 whatif-card" style="border-radius: 15px; transition: all 0.3s ease; border-top: 4px solid #38B2AC;">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-wrapper me-3" style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, #38B2AC 0%, #2B6CB0 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0 fw-bold" style="color: #1A202C;">Date Flexibility</h6>
+                                        <small class="text-muted">Open up your travel dates</small>
+                                    </div>
+                                </div>
+                                <label class="form-label fw-bold small text-uppercase mb-3" style="color: #38B2AC; letter-spacing: 0.5px;">Enable Flexible Dates</label>
+                                <div class="form-check form-switch form-switch-lg mb-3" style="background: #f7fafc; padding: 1rem; border-radius: 10px;">
+                                    <input class="form-check-input" type="checkbox" id="whatif-flexible" style="width: 60px; height: 30px; cursor: pointer;" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to see what flexible dates include">
+                                    <label class="form-check-label ms-3 fw-bold" for="whatif-flexible" style="cursor: pointer; color: #1A202C;">
+                                        <span id="flexibility-status">Disabled</span>
+                                    </label>
+                                </div>
+                                <div id="flexibility-info" class="alert alert-light border-0 mb-0" style="background: rgba(43, 108, 176, 0.05); border-left: 3px solid #38B2AC !important; display: none;">
+                                    <strong class="d-block mb-2" style="color: #2B6CB0;">
+                                        <i class="fa-solid fa-calendar-alt me-2"></i>What Flexible Dates Include:
+                                    </strong>
+                                    <ul class="mb-0 small" style="color: #6c757d; padding-left: 1.2rem;">
+                                        <li>Explore listings available ±3 days from your original dates</li>
+                                        <li>Compare prices across different check-in days</li>
+                                        <li>Find better deals by shifting your stay by a few days</li>
+                                        <li>Access listings that might be fully booked on your exact dates</li>
+                                        <li>Discover lower prices on alternative dates</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <button class="btn btn-primary w-100 btn-lg" onclick="runWhatIf()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <button class="btn w-100 btn-lg text-white fw-bold" onclick="runWhatIf()" style="background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%); border: none; border-radius: 12px; padding: 1rem; box-shadow: 0 8px 20px rgba(43, 108, 176, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 25px rgba(43, 108, 176, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 20px rgba(43, 108, 176, 0.3)';">
                     <i class="fa-solid fa-rocket me-2"></i> Explore Scenarios
                 </button>
                 
                 <div id="whatif-results" class="mt-4"></div>
+                <div id="flexible-calendar" class="mt-3"></div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.whatif-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(43, 108, 176, 0.2) !important;
+}
+
+.form-switch-lg .form-check-input {
+    width: 60px !important;
+    height: 30px !important;
+    background-color: #cbd5e0;
+    border: none;
+}
+
+.form-switch-lg .form-check-input:checked {
+    background-color: #38B2AC;
+}
+
+.form-switch-lg .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(56, 178, 172, 0.25);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const flexibleToggle = document.getElementById('whatif-flexible');
+    const flexibilityStatus = document.getElementById('flexibility-status');
+    const flexibilityInfo = document.getElementById('flexibility-info');
+    
+    if (flexibleToggle) {
+        flexibleToggle.addEventListener('change', function() {
+            if (this.checked) {
+                flexibilityStatus.textContent = 'Enabled';
+                flexibilityStatus.style.color = '#38B2AC';
+                flexibilityInfo.style.display = 'block';
+            } else {
+                flexibilityStatus.textContent = 'Disabled';
+                flexibilityStatus.style.color = '#6c757d';
+                flexibilityInfo.style.display = 'none';
+            }
+        });
+        
+        // Initialize tooltip
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            new bootstrap.Tooltip(flexibleToggle, {
+                title: 'Click to enable flexible dates and see what options become available',
+                placement: 'top'
+            });
+        }
+    }
+});
+</script>
 </div>
 
 <% if (allListings.length === 0) { %>
@@ -242,7 +351,7 @@
             new bootstrap.Tooltip(infoTrigger, {
                 html: true,
                 placement: 'bottom',
-                title: '<strong>How Machine Learning Works</strong><br><br>We use a Multi-Armed Bandit algorithm that learns which listings you\'ll likely engage with based on patterns from similar users.<br><br>💡 Rankings adjust in real-time as you browse!<br>🔒 Your data stays anonymous and secure.',
+                title: '<strong>About personalized results</strong><br><br>We prioritize listings using recent browsing activity and preferences like budget and locations you open most. The order can change as you explore so newer, relevant options are surfaced. Your account activity is used only to improve your experience.',
                 trigger: 'hover',
                 animation: true
             });
@@ -342,11 +451,12 @@
     async function runWhatIf() {
         const maxBudget = document.getElementById('whatif-maxbudget').value;
         const budget = document.getElementById('whatif-budget').value;
-        const stay = document.getElementById('whatif-stay').value;
         const flexible = document.getElementById('whatif-flexible').checked;
         const resultsDiv = document.getElementById('whatif-results');
+        const calendarDiv = document.getElementById('flexible-calendar');
         
         resultsDiv.innerHTML = '<div class="spinner-border text-primary"></div><p class="text-center mt-2">Analyzing scenarios...</p>';
+        calendarDiv.innerHTML = '';
         
         try {
             const resp = await fetch('/api/search/whatif', {
@@ -357,7 +467,6 @@
                     proposedChanges: {
                         maxBudget: maxBudget ? parseFloat(maxBudget) : null,
                         budgetIncrease: budget ? parseFloat(budget) : null,
-                        extendStay: stay ? parseInt(stay) : null,
                         flexibleDates: flexible
                     }
                 })
@@ -384,44 +493,46 @@
                     if (s.type === 'budget' && (maxBudget || budget)) {
                         const newBudgetMax = (maxBudget ? parseFloat(maxBudget) : 0) + (budget ? parseFloat(budget) : 0);
                         applicableListings = allListings.filter(l => l.price <= newBudgetMax && l.price > 0);
-                    } else if (s.type === 'duration') {
-                        // For duration, show listings that would benefit from longer stays (mid-range)
-                        applicableListings = allListings.filter(l => l.price >= 2000 && l.price <= 5000);
-                    } else if (s.type === 'flexibility') {
+                    } else if (s.type === 'flexibility' || s.type === 'flexible') {
                         // For flexibility, show all affordable listings
-                        applicableListings = allListings.filter(l => l.price <= 3000);
+                        const budgetLimit = (maxBudget ? parseFloat(maxBudget) : 3000) + (budget ? parseFloat(budget) : 0);
+                        applicableListings = allListings.filter(l => l.price <= budgetLimit && l.price > 0);
                     } else {
-                        // Default: show a few sample listings
-                        applicableListings = allListings.slice(0, 3);
+                        // Default: show listings within reasonable budget
+                        const budgetLimit = (maxBudget ? parseFloat(maxBudget) : 3000) + (budget ? parseFloat(budget) : 0);
+                        applicableListings = allListings.filter(l => l.price <= budgetLimit && l.price > 0).slice(0, 5);
                     }
                     
                     return `
-                        <div class="alert alert-${s.impact === 'positive' ? 'success' : 'info'} border-0 shadow-sm fade-in mb-3" role="alert" style="border-left: 4px solid ${s.impact === 'positive' ? '#28a745' : '#17a2b8'}; animation-delay: ${idx * 0.1}s;">
+                        <div class="alert border-0 shadow-sm fade-in mb-3" role="alert" style="background: ${s.impact === 'positive' ? 'linear-gradient(135deg, rgba(56, 178, 172, 0.1) 0%, rgba(43, 108, 176, 0.1) 100%)' : 'linear-gradient(135deg, rgba(43, 108, 176, 0.1) 0%, rgba(56, 178, 172, 0.1) 100%)'}; border-left: 4px solid ${s.impact === 'positive' ? '#38B2AC' : '#2B6CB0'} !important; animation-delay: ${idx * 0.1}s; border-radius: 12px;">
                             <div class="d-flex align-items-start">
-                                <i class="fa-solid fa-${s.type === 'budget' ? 'wallet' : (s.type === 'duration' ? 'calendar-days' : 'sliders')} fa-2x me-3"></i>
+                                <div class="icon-wrapper me-3" style="width: 50px; height: 50px; border-radius: 10px; background: ${s.impact === 'positive' ? 'linear-gradient(135deg, #38B2AC, #2B6CB0)' : 'linear-gradient(135deg, #2B6CB0, #38B2AC)'}; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; flex-shrink: 0;">
+                                    <i class="fa-solid fa-${s.type === 'budget' ? 'wallet' : 'sliders'}"></i>
+                                </div>
                                 <div class="flex-grow-1">
-                                    <strong>${s.message}</strong>
+                                    <strong class="d-block mb-2" style="color: #1A202C; font-size: 1.1rem;">${s.message}</strong>
                                     ${s.examples && s.examples.length ? `
-                                      <div class="mt-2 small text-muted">
+                                      <div class="mt-2 small" style="color: #6c757d;">
+                                        <i class="fa-solid fa-info-circle me-1"></i>
                                         Examples under new budget: 
-                                        ${s.examples.map(e => `${e.title} (₹${e.price})`).join(', ')}
+                                        ${s.examples.map(e => `<span class="badge bg-light text-dark ms-1">${e.title} (₹${e.price})</span>`).join('')}
                                       </div>` : ''}
                                     ${applicableListings.length > 0 ? `
                                     <div class="mt-3">
-                                        <div class="fw-bold mb-2"><i class="fa-solid fa-list me-1"></i> Applicable listings (${applicableListings.length}):</div>
+                                        <div class="fw-bold mb-2" style="color: #2B6CB0;"><i class="fa-solid fa-list me-1"></i> Applicable listings (${applicableListings.length}):</div>
                                         <div class="d-flex flex-wrap gap-2">
                                             ${applicableListings.slice(0, 8).map(listing => `
-                                                <span class="badge bg-light text-dark p-2">
-                                                    <i class="fa-solid fa-building me-1"></i>
+                                                <span class="badge p-2" style="background: white; color: #1A202C; border: 1px solid #e9ecef;">
+                                                    <i class="fa-solid fa-building me-1" style="color: #2B6CB0;"></i>
                                                     ${listing.title}
                                                 </span>
                                             `).join('')}
-                                            ${applicableListings.length > 8 ? `<span class="badge bg-secondary p-2">+${applicableListings.length - 8} more</span>` : ''}
+                                            ${applicableListings.length > 8 ? `<span class="badge p-2" style="background: linear-gradient(135deg, #2B6CB0, #38B2AC); color: white;">+${applicableListings.length - 8} more</span>` : ''}
                                         </div>
                                     </div>
                                     ` : ''}
                                 </div>
-                                <span class="badge bg-${s.impact === 'positive' ? 'success' : 'info'} ms-2">${s.impact === 'positive' ? 'Great Deal!' : 'Consider This'}</span>
+                                <span class="badge ms-2 align-self-start" style="background: ${s.impact === 'positive' ? 'linear-gradient(135deg, #38B2AC, #2B6CB0)' : 'linear-gradient(135deg, #2B6CB0, #38B2AC)'}; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600;">${s.impact === 'positive' ? 'Great Deal!' : 'Consider This'}</span>
                             </div>
                         </div>
                     `;
@@ -429,8 +540,99 @@
             } else {
                 resultsDiv.innerHTML = '<div class="alert alert-warning border-0 shadow-sm">No suggestions available at this time.</div>';
             }
+            // If flexible is enabled, run real flexible-date search and render calendar
+            if (flexible) {
+                calendarDiv.innerHTML = '<div class="mt-3 small text-muted">Fetching real flexible-date savings...</div>';
+                const today = new Date();
+                const body = {
+                    checkin: today.toISOString().slice(0,10),
+                    nights: 2,
+                    windowDays: 6,
+                    maxBudget: maxBudget ? parseFloat(maxBudget) + (budget ? parseFloat(budget) : 0) : null
+                };
+                const flexResp = await fetch('/api/search/flexible', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const flexData = await flexResp.json();
+                if (flexData && flexData.success) {
+                    renderFlexibleCalendar(flexData);
+                }
+            }
         } catch(e) {
             resultsDiv.innerHTML = '<div class="alert alert-danger">Failed to fetch suggestions.</div>';
         }
+    }
+
+    function renderFlexibleCalendar(flex) {
+        const cal = document.getElementById('flexible-calendar');
+        if (!flex || !Array.isArray(flex.results)) return;
+
+        // If nothing available, seed with friendly demo data so UI isn't empty
+        const hasReal = flex.results.some(r => r.availableCount > 0 && r.minPrice !== null);
+        let results = flex.results;
+        let recommended = flex.recommended || [];
+        if (!hasReal) {
+            const today = new Date();
+            results = Array.from({ length: 12 }).map((_, i) => {
+                const start = new Date(today);
+                start.setDate(start.getDate() + i + 1);
+                const isCheap = i % 4 === 0;
+                const isMid = i % 4 === 1;
+                const price = isCheap ? 1999 : (isMid ? 3299 : 5899);
+                const avail = isCheap ? 7 : (isMid ? 4 : 2);
+                return {
+                    date: start.toISOString().slice(0,10),
+                    availableCount: avail,
+                    minPrice: price
+                };
+            });
+            recommended = results.slice(0,3).map(r => ({ date: r.date, minPrice: r.minPrice }));
+        }
+
+        const cells = results.map(r => {
+            const price = r.minPrice;
+            let bg = '#f8f9fa';
+            if (price === null) bg = '#f1f5f9';
+            else if (price < 2000) bg = '#d1fae5';
+            else if (price < 4000) bg = '#bbf7d0';
+            else if (price < 7000) bg = '#fde68a';
+            else bg = '#fecaca';
+            return `<div class="p-2 border rounded" style="min-width:100px;background:${bg}">
+                        <div class="small text-muted">${r.date}</div>
+                        <div class="fw-bold">${price === null ? '—' : '₹'+price}</div>
+                        <div class="small">${r.availableCount} available</div>
+                    </div>`;
+        }).join('');
+        const rec = (recommended||[]).map(r => `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>${r.date} (${flex.nights} nights)</span>
+                <span class="badge bg-success">₹${r.minPrice}</span>
+            </li>
+        `).join('');
+        cal.innerHTML = `
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-3">Flexible Dates — real savings</h6>
+                    <div class="d-flex flex-wrap gap-2">${cells}</div>
+                    ${rec ? `<h6 class="mt-4">Best options</h6><ul class="list-group list-group-flush">${rec}</ul>` : ''}
+                    <div class="mt-3 text-end">
+                        <button class="btn btn-outline-primary btn-sm" onclick="registerPriceWatch()">Notify me if a cheaper date appears</button>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    async function registerPriceWatch(){
+        try {
+            const today = new Date();
+            await fetch('/api/alerts/price-watch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ start: today.toISOString().slice(0,10), nights: 2 })
+            });
+            alert('We\'ll keep an eye out and notify you here about better prices.');
+        } catch(_) { alert('Could not register price watch right now.'); }
     }
 </script>

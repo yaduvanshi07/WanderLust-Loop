@@ -1,8 +1,8 @@
-# 🏠 StaySense - Where Intelligence Finds Home
+# 🏠 Wanderlust Loop - Wander. Stay. Repeat.
 
 <div align="center">
 
-![StaySense Logo](https://img.shields.io/badge/StaySense-Intelligence%20Finds%20Home-blue?style=for-the-badge)
+![Wanderlust Loop Logo](https://img.shields.io/badge/Wanderlust%20Loop-Wander.%20Stay.%20Repeat.-blue?style=for-the-badge)
 ![Node.js](https://img.shields.io/badge/Node.js-20.9+-green?style=for-the-badge&logo=node.js)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-brightgreen?style=for-the-badge&logo=mongodb)
 ![ML](https://img.shields.io/badge/ML-Powered-orange?style=for-the-badge)
@@ -15,16 +15,15 @@
 
 ---
 
-## 🌟 What is StaySense?
+## 🌟 What is Wanderlust Loop?
 
-StaySense is not just another booking platform—it's an **intelligent ecosystem** that combines cutting-edge machine learning with real-time analytics to revolutionize how people find and book vacation rentals. Whether you're a traveler seeking the perfect stay or a host optimizing your property, StaySense uses AI to make smarter decisions.
+Wanderlust Loop is not just another booking platform—it's an **intelligent ecosystem** that combines cutting-edge machine learning with real-time analytics to revolutionize how people find and book vacation rentals. Whether you're a traveler seeking the perfect stay or a host optimizing your property, Wanderlust Loop uses AI to make smarter decisions.
 
-### ✨ Why StaySense?
+### ✨ Why Wanderlust Loop?
 
 - 🤖 **AI-Powered Matching**: Find your perfect travel buddy using ML compatibility algorithms
 - 📊 **Real-Time Analytics**: Track performance metrics and get actionable insights
 - 🎯 **Smart Recommendations**: Personalized listings based on your behavior and preferences
-- 💡 **What-If Scenarios**: Test decisions before making them with predictive analytics
 - 🗺️ **Live Location Tracking**: Connect with nearby travelers in real-time
 - 🎨 **Beautiful UI**: Modern glassmorphism design with smooth animations
 
@@ -60,11 +59,6 @@ StaySense is not just another booking platform—it's an **intelligent ecosystem
 - Profile-based recommendations
 - Similar listing suggestions
 - Price-range and location matching
-
-#### 4. **What-If Explorer**
-- **For Guests**: Test different budgets, dates, and preferences
-- **For Hosts**: Predict impact of price changes, discounts, and policies
-- Visual comparisons with actionable recommendations
 
 ### 📊 Analytics & Performance Tracking
 
@@ -148,8 +142,8 @@ Find your perfect travel companion using advanced ML algorithms:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yaduvanshi07/StaySense-Where-Intelligence-Finds-Home.git
-   cd StaySense-Where-Intelligence-Finds-Home
+   git clone https://github.com/yaduvanshi07/Wanderlust-Loop.git
+   cd Wanderlust-Loop
    ```
 
 2. **Install Node.js dependencies**
@@ -204,7 +198,7 @@ Find your perfect travel companion using advanced ML algorithms:
 ## 📁 Project Structure
 
 ```
-StaySense/
+Wanderlust Loop/
 ├── app.js                          # Main application entry point
 ├── schema.js                       # Joi validation schemas
 ├── cloudConfig.js                  # Cloudinary configuration
@@ -233,7 +227,6 @@ StaySense/
 │   ├── analyticsHelper.js          # Analytics calculations
 │   ├── listingPerformanceTracker.js # Performance scoring
 │   ├── hostNotificationService.js  # Host alerts
-│   ├── hostScenarioPredictor.js   # What-If scenario predictions
 │   └── buddyMatchingEngine.js      # AI travel buddy matching
 │
 ├── views/                          # EJS templates
@@ -290,8 +283,6 @@ StaySense/
 ### 📊 Analytics
 - `GET /analytics/dashboard` - Analytics dashboard
 - `GET /host/performance` - Host performance dashboard
-- `GET /host/performance/:id/whatif` - What-If scenario explorer
-
 ### 👨‍💼 Admin
 - `GET /admin` - Admin dashboard
 - `GET /admin/ml/dashboard` - ML performance dashboard
@@ -301,8 +292,6 @@ StaySense/
 ### 🤖 ML APIs
 - `POST /api/search/rank` - Get personalized ranking
 - `POST /api/search/feedback` - Log user interactions
-- `POST /api/search/whatif` - Guest counterfactual analysis
-- `POST /api/host/whatif` - Host scenario analysis
 
 ---
 
@@ -310,7 +299,7 @@ StaySense/
 
 ### 1. Intelligent Search & Ranking
 
-StaySense uses **Thompson Sampling** (Multi-Armed Bandit) to personalize search results:
+Wanderlust Loop uses **Thompson Sampling** (Multi-Armed Bandit) to personalize search results:
 
 - Learns from user interactions (clicks, bookings)
 - Balances exploration (trying new listings) vs. exploitation (showing popular ones)
@@ -336,20 +325,7 @@ Advanced ML algorithm matches users based on:
 
 Compatibility scores range from 0-100%, with detailed breakdowns.
 
-### 4. What-If Scenarios
-
-**For Hosts:**
-- Test price changes and see predicted impact
-- Analyze discount effectiveness
-- Evaluate cancellation policy changes
-- Get market position insights
-
-**For Guests:**
-- Explore different budgets and dates
-- See alternative recommendations
-- Compare options side-by-side
-
-### 5. Real-Time Location Tracking
+### 4. Real-Time Location Tracking
 
 - Users can share their location (with privacy controls)
 - Find nearby travelers on interactive map
@@ -377,23 +353,6 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 3. View match details and compatibility scores
 4. Send connection requests
 5. Use interactive map to find nearby travelers
-
-### Test What-If Explorer
-
-**For Hosts:**
-1. Navigate to `/host/performance`
-2. Click "What-If Explorer" on any listing
-3. Test scenarios:
-   - **Price**: Change from ₹2000 to ₹1800
-   - **Discount**: Enter 10% discount
-   - **Policy**: Select flexible/moderate/strict
-4. Review predictions and recommendations
-
-**For Guests:**
-1. Visit `/listings`
-2. Click "What If Explorer"
-3. Adjust budget, stay duration, dates
-4. View scenario suggestions
 
 ---
 
@@ -442,11 +401,11 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 
 ## 📊 Project Highlights
 
-### What Makes StaySense Special?
+### What Makes Wanderlust Loop Special?
 
 1. **🤖 AI-Powered Everything**: From search to matching to recommendations
 2. **📈 Real-Time Analytics**: Track everything, optimize continuously
-3. **💡 Decision Support**: What-If scenarios for better choices
+3. **💡 Decision Support**: Data-driven insights for better choices
 4. **👥 Social Features**: Find travel buddies with ML compatibility
 5. **🗺️ Location Intelligence**: Real-time geolocation with privacy controls
 6. **🎨 Beautiful UI**: Modern, responsive, and intuitive design
@@ -473,7 +432,6 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 ### For Travelers 🧳
 - Personalized booking recommendations
 - Sentiment-based review filtering
-- Counterfactual analysis for better decisions
 - Find compatible travel buddies through AI
 - Join interest-based communities
 - Connect with travelers securely
@@ -482,7 +440,7 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 ### For Hosts 🏠
 - Performance insights and tracking
 - Automated recommendations for improvement
-- What-If scenarios for strategic planning
+- Data-backed scenarios for strategic planning
 - Market position analysis
 - Revenue optimization tools
 - Low-performance alerts
@@ -502,7 +460,7 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 
 ## 🔗 Repository
 
-**GitHub**: [StaySense-Where-Intelligence-Finds-Home](https://github.com/yaduvanshi07/StaySense-Where-Intelligence-Finds-Home)
+**GitHub**: [Wanderlust-Loop](https://github.com/yaduvanshi07/Wanderlust-Loop)
 
 ---
 
@@ -510,6 +468,6 @@ Compatibility scores range from 0-100%, with detailed breakdowns.
 
 **Made with ❤️ and 🤖 AI**
 
-*StaySense - Where Intelligence Finds Home*
+*Wanderlust Loop - Wander. Stay. Repeat.*
 
 </div>

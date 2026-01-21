@@ -52,6 +52,11 @@ const User=require("./models/user.js");
 const searchRouter = require("./routes/search");
 const buddyRouter = require("./routes/buddy");
 const dbUrl= process.env.ATLASDB_URL;
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret) {
+    throw new Error("SESSION_SECRET must be set in the environment");
+}
 
 const{isLoggedIn, isOwner, validateListing,isReviewAuthor, isAdmin, canViewAnalytics}=require("./middleware.js");
 const{saveRedirectUrl}=require("./middleware.js");
@@ -62,7 +67,7 @@ app.use(express.static(path.join(__dirname,"/public")));
 const store= MongoStore.create({
     mongoUrl: dbUrl,
     crypto: {
-        secret: "mysecret",
+        secret: sessionSecret,
 },
     touchAfter: 24*3600,
 });
@@ -73,7 +78,7 @@ store.on("error",(err)=>{
 
 const sessionOptions={
     store,
-    secret: "mysecret",
+    secret: sessionSecret,
     resave:false,
     saveUninitialized: true,
     cookie: {
@@ -167,7 +172,7 @@ app.post("/signup", wrapAsync(async(req,res)=>{
         if(err){
             return next(err);
         }
-        req.flash("success", `Welcome to StaySense! Your account has been created successfully.`);
+        req.flash("success", `Welcome to Wanderlust Loop! Your account has been created successfully.`);
         res.redirect("/listings");
     })
     
@@ -200,7 +205,7 @@ async (req, res, next) => {
                 return res.redirect('/login');
             }
         }
-        req.flash("success", `Welcome back to StaySense!`);
+        req.flash("success", `Welcome back to Wanderlust Loop!`);
         let redirectUrl = "/listings";
         if (req.user && req.user.role === 'admin') {
             redirectUrl = "/analytics/dashboard";
@@ -874,115 +879,6 @@ app.post("/api/risk/score", wrapAsync(async (req, res) => {
     }
 }));
 
-const hostScenarioPredictor = require("./utils/hostScenarioPredictor");
-
-// Counterfactual "What If" API (Guest - for search)
-app.post("/api/search/whatif", wrapAsync(async (req, res) => {
-    try {
-        const { baseResults = [], proposedChanges = {} } = req.body || {};
-
-        const responses = [];
-
-        // Budget-based suggestion using real listing data
-        if (proposedChanges.maxBudget || proposedChanges.budgetIncrease) {
-            const baseMax = Number(proposedChanges.maxBudget) || 0;
-            const increasedBy = Number(proposedChanges.budgetIncrease) || 0;
-            const newMax = baseMax > 0 ? baseMax + increasedBy : (increasedBy > 0 ? increasedBy : 0);
-
-            if (newMax > 0) {
-                const [currentCount, newCount] = await Promise.all([
-                    baseMax > 0 ? Listing.countDocuments({ price: { $lte: baseMax } }) : Promise.resolve(0),
-                    Listing.countDocuments({ price: { $lte: newMax } })
-                ]);
-                const delta = Math.max(0, newCount - currentCount);
-
-                // Sample a few titles as examples
-                const sample = await Listing.find({ price: { $lte: newMax } })
-                    .select("title price")
-                    .sort({ price: 1 })
-                    .limit(6);
-
-                responses.push({
-                    type: "budget",
-                    message: baseMax > 0
-                        ? `Increasing your max budget from ₹${baseMax} to ₹${newMax} adds ${delta} more options (total ${newCount}).`
-                        : `With a budget up to ₹${newMax}, you have ${newCount} matching properties.`,
-                    impact: delta > 0 || baseMax === 0 ? "positive" : "neutral",
-                    delta,
-                    total: newCount,
-                    examples: sample.map(s => ({ title: s.title, price: s.price }))
-                });
-            }
-        }
-
-        // Duration-based heuristic suggestion
-        if (proposedChanges.extendStay) {
-            const nights = Number(proposedChanges.extendStay) || 0;
-            if (nights > 0) {
-                const discount = nights >= 7 ? 18 : (nights >= 3 ? 12 : 8);
-                responses.push({
-                    type: "duration",
-                    message: `Extending your stay by ${nights} ${nights === 1 ? 'night' : 'nights'} could unlock up to ${discount}% weekly-stay savings on many listings.`,
-                    impact: "positive",
-                    discount
-                });
-            }
-        }
-
-        // Flexible dates heuristic suggestion
-        if (proposedChanges.flexibleDates) {
-            // Approximate savings by shifting from weekend to weekday
-            const estSavings = 10 + Math.floor(Math.random() * 8); // 10-18%
-            const avgNightly = await Listing.aggregate([
-                { $group: { _id: null, avg: { $avg: "$price" } } }
-            ]);
-            const avg = Math.round((avgNightly?.[0]?.avg || 3000) * (estSavings / 100));
-            responses.push({
-                type: "flexibility",
-                message: `Using flexible dates (midweek) can save ~${estSavings}% (≈ ₹${avg}/night) versus popular weekend dates.`,
-                impact: "positive",
-                savingsPercent: estSavings,
-                savingsPerNight: avg
-            });
-        }
-
-        return res.json({ success: true, suggestions: responses });
-    } catch (e) {
-        return res.status(500).json({ success: false, error: e.message });
-    }
-}));
-
-// Host What-If Scenario Explorer API
-app.post("/api/host/whatif", isLoggedIn, wrapAsync(async (req, res) => {
-    try {
-        const { listingId, scenarios } = req.body || {};
-        
-        if (!listingId) {
-            return res.status(400).json({ success: false, error: "listingId is required" });
-        }
-        
-        // Verify listing ownership
-        const listing = await Listing.findById(listingId);
-        if (!listing) {
-            return res.status(404).json({ success: false, error: "Listing not found" });
-        }
-        
-        if (!listing.owner.equals(req.user._id)) {
-            return res.status(403).json({ success: false, error: "Not authorized" });
-        }
-        
-        // Analyze scenarios
-        const analysis = await hostScenarioPredictor.analyzeScenario(listingId, scenarios);
-        
-        if (!analysis) {
-            return res.status(500).json({ success: false, error: "Could not analyze scenario" });
-        }
-        
-        return res.json({ success: true, data: analysis });
-    } catch (e) {
-        return res.status(500).json({ success: false, error: e.message });
-    }
-}));
 
 
 
@@ -1187,7 +1083,7 @@ app.get('/admin/api/geocode', isAdmin, wrapAsync(async (req, res) => {
         const resp = await axios.get(url, {
             timeout: 5000,
             headers: {
-                'User-Agent': 'StaySense-Admin-Map/1.0 (+contact@staysense.example)'
+                'User-Agent': 'WanderlustLoop-Admin-Map/1.0 (+contact@wanderlustloop.example)'
             }
         });
         const results = Array.isArray(resp.data) ? resp.data : [];

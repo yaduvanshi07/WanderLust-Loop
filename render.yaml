@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: wanderlust-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node app.js
+    envVars:
+      - key: ATLASDB_URL
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: CLOUD_NAME
+        sync: false
+      - key: CLOUD_API_KEY
+        sync: false
+      - key: CLOUD_API_SECRET
+        sync: false
+      - key: NLP_SERVICE_URL
+        value: https://wanderlust-nlp.onrender.com
+      - key: BANDIT_SERVICE_URL
+        value: https://wanderlust-bandit.onrender.com
+
+  - type: web
+    name: wanderlust-nlp
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    rootDir: ml-services/nlp_service
+
+  - type: web
+    name: wanderlust-bandit
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    rootDir: ml-services/bandit_service
+

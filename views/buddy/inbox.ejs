@@ -1,192 +1,201 @@
 <% layout('layouts/boilerplate') %>
 
-<style>
-  body {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    min-height: 100vh;
-  }
-  
-  .inbox-container {
-    animation: fadeInUp 0.6s ease-out;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
+  <style>
+    /* Local Scoped Styles for Inbox */
+    .inbox-container {
+      animation: fadeInUp 0.5s ease-out;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .inbox-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-  }
-  
-  .inbox-header h2 {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700;
-    font-size: 2.5rem;
-  }
-  
-  .conversation-item {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    border: 2px solid #f0f0f0;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    position: relative;
-    overflow: hidden;
-    animation: slideIn 0.6s ease-out backwards;
-  }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  .conversation-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .conversation-item:hover {
-    transform: translateX(10px);
-    box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
-    border-color: #f093fb;
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  .conversation-item:hover::before {
-    opacity: 1;
-  }
-  
-  .unread-badge {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    border-radius: 50%;
-    padding: 0.4rem 0.7rem;
-    font-weight: 600;
-    font-size: 0.85rem;
-    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
-    animation: pulse 2s infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-  }
-  
-  .empty-state {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 4rem 2rem;
-    text-align: center;
-    border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  }
-</style>
 
-<div class="container mt-4 inbox-container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="inbox-header">
-                <h2><i class="fa-solid fa-inbox me-2"></i>Messages</h2>
-                <p class="text-muted mt-2">Chat with your accepted travel buddies</p>
-            </div>
-        </div>
-    </div>
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
 
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Header Section */
+    /* .inbox-header styles removed - using shared content-panel */
+
+    /* Conversation Item */
+    .conversation-item {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.5s ease-out backwards;
+      animation-delay: var(--delay, 0s);
+    }
+
+    .conversation-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+      border-color: rgba(139, 92, 246, 0.3);
+      /* Soft purple border on hover */
+      background: #FAFAFA;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Left accent bar on hover */
+    .conversation-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .conversation-item:hover::before {
+      opacity: 1;
+    }
+
+    .user-avatar-area img,
+    .user-avatar-area .rounded-circle {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .last-msg {
+      color: #6B7280;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .msg-meta {
+      font-size: 0.8rem;
+      color: #9CA3AF;
+    }
+
+    .unread-badge {
+      background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+      color: white;
+      border-radius: 50%;
+      min-width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 576px) {
+      .inbox-header {
+        padding: 1.5rem;
+      }
+
+      .conversation-item {
+        padding: 1rem;
+      }
+    }
+  </style>
+
+  <div class="container mt-4 inbox-container">
     <div class="row">
-        <div class="col-12">
-            <% if (conversations.length === 0) { %>
-                <div class="empty-state">
-                    <i class="fa-solid fa-inbox fa-4x mb-3" style="color: #f093fb;"></i>
-                    <h4>No conversations yet</h4>
-                    <p class="text-muted">You need to accept a request first to start chatting.</p>
-                    <a href="/buddy/requests" class="btn btn-primary mt-3" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none;">
-                        <i class="fa-solid fa-envelope me-2"></i>View Requests
-                    </a>
-                </div>
-            <% } else { %>
-                <div class="list-group">
-                    <% conversations.forEach((conv, index) => { %>
-                        <a href="/buddy/inbox/<%= conv.conversationId %>" class="conversation-item" style="animation-delay: <%= index * 0.1 %>s">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <% if (conv.otherUser.travelBuddyProfile?.profilePicture?.url) { %>
-                                        <img src="<%= conv.otherUser.travelBuddyProfile.profilePicture.url %>" 
-                                             class="rounded-circle me-3" 
-                                             style="width: 50px; height: 50px; object-fit: cover;">
-                                    <% } else { %>
-                                        <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center me-3" 
-                                             style="width: 50px; height: 50px;">
-                                            <i class="fa-solid fa-user text-white"></i>
-                                        </div>
-                                    <% } %>
-                                    <div>
-                                        <h6 class="mb-0"><%= conv.otherUser.username %></h6>
-                                        <% if (conv.lastMessage) { %>
-                                            <small class="text-muted">
-                                                <%= conv.lastMessage.sender.username === currUser.username ? 'You: ' : '' %>
-                                                <%= conv.lastMessage.content.substring(0, 50) %>
-                                                <%= conv.lastMessage.content.length > 50 ? '...' : '' %>
-                                            </small>
-                                        <% } else { %>
-                                            <small class="text-muted">No messages yet</small>
-                                        <% } %>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <% if (conv.lastMessage) { %>
-                                        <small class="text-muted d-block">
-                                            <%= new Date(conv.lastMessage.createdAt).toLocaleDateString() %>
-                                        </small>
-                                    <% } %>
-                                    <% if (conv.unreadCount > 0) { %>
-                                        <span class="unread-badge"><%= conv.unreadCount %></span>
-                                    <% } %>
-                                </div>
-                            </div>
-                        </a>
-                    <% }) %>
-                </div>
-            <% } %>
-        </div>
-    </div>
-</div>
+      <div class="col-lg-10 mx-auto">
 
+        <div class="content-panel">
+
+          <!-- Header Inside Panel -->
+          <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+              <h2 class="text-gradient-purple fw-bold m-0" style="font-size: 2.2rem; letter-spacing: -1px;">
+                <i class="fa-solid fa-inbox me-3 text-secondary"></i>Messages
+              </h2>
+              <p class="text-muted mb-0 mt-2 ms-1">Chat with your accepted travel buddies</p>
+            </div>
+          </div>
+
+          <!-- List Content Inside Panel -->
+          <% if (conversations.length===0) { %>
+            <div class="empty-state">
+              <i class="fa-solid fa-comments fa-4x mb-4" style="color: #E5E7EB;"></i>
+              <h3 class="fw-bold text-dark">No conversations</h3>
+              <p class="text-muted mb-4">Start chatting by accepting requests or getting yours accepted.</p>
+              <a href="/buddy/requests" class="btn btn-primary-custom"
+                style="background:#8B5CF6; color:white; padding:0.8rem 2rem; border-radius:12px; text-decoration:none;">
+                <i class="fa-solid fa-envelope me-2"></i>Requests
+              </a>
+            </div>
+            <% } else { %>
+              <div class="list-group gap-3">
+                <% conversations.forEach((conv, index)=> { %>
+                  <a href="/buddy/inbox/<%= conv.conversationId %>" class="conversation-item"
+                    style="--delay: <%= index * 0.1 %>s">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                      <div class="d-flex align-items-center">
+                        <div class="user-avatar-area me-3">
+                          <% if (conv.otherUser.travelBuddyProfile?.profilePicture?.url) { %>
+                            <img src="<%= conv.otherUser.travelBuddyProfile.profilePicture.url %>"
+                              class="rounded-circle" style="width: 56px; height: 56px; object-fit: cover;">
+                            <% } else { %>
+                              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                                style="width: 56px; height: 56px; color: #9CA3AF;">
+                                <i class="fa-solid fa-user fa-lg"></i>
+                              </div>
+                              <% } %>
+                        </div>
+
+                        <div>
+                          <h6 class="mb-1 fw-bold text-dark">
+                            <%= conv.otherUser.username %>
+                          </h6>
+                          <div class="last-msg">
+                            <% if (conv.lastMessage) { %>
+                              <%= conv.lastMessage.sender.username===currUser.username ? 'You: ' : '' %>
+                                <%= conv.lastMessage.content.substring(0, 50) %>
+                                  <%= conv.lastMessage.content.length> 50 ? '...' : '' %>
+                                    <% } else { %>
+                                      <span class="text-muted fst-italic">No messages yet</span>
+                                      <% } %>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="text-end d-flex flex-column align-items-end">
+                        <% if (conv.lastMessage) { %>
+                          <span class="msg-meta mb-2">
+                            <%= new Date(conv.lastMessage.createdAt).toLocaleDateString(undefined, { month: 'short' ,
+                              day: 'numeric' }) %>
+                          </span>
+                          <% } %>
+                            <% if (conv.unreadCount> 0) { %>
+                              <div class="unread-badge">
+                                <%= conv.unreadCount %>
+                              </div>
+                              <% } %>
+                      </div>
+                    </div>
+                  </a>
+                  <% }) %>
+              </div>
+              <% } %>
+        </div>
+      </div>
+    </div>
+  </div>

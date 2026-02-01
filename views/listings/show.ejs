@@ -1,724 +1,600 @@
 <% layout("/layouts/boilerplate") %>
-<style>
-  form {
-  /* background-color: #fdfdfd; */
-  border-radius: 12px;
-  max-width: 500px;
-  margin: auto;
-}
+  <style>
+    form {
+      /* background-color: #fdfdfd; */
+      border-radius: 12px;
+      max-width: 500px;
+      margin: auto;
+    }
 
-form label {
-  font-weight: 500;
-}
+    form label {
+      font-weight: 500;
+    }
 
-form p {
-  margin-bottom: 0.5rem;
-}
+    form p {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <div class="listing-details content-panel">
+          <h1 class="listing-title">
+            <%= listing.title %>
+          </h1>
 
-</style>
-<div class="container-fluid mt-4">
-  <div class="row">
-    <!-- Main Content -->
-    <div class="col-lg-8">
-      <div class="listing-details">
-        <h1 class="listing-title"><%= listing.title %></h1>
-        
-        <!-- Image Gallery -->
-        <div class="image-gallery mb-4">
-          <img src="<%= listing.image.url %>" class="main-image" alt="<%= listing.title %>">
-        </div>
-        
-        <!-- Listing Info -->
-        <div class="listing-info">
-          <div class="host-info mb-4">
-            <div class="host-avatar">
-              <i class="fa-solid fa-user"></i>
-            </div>
-            <div class="host-details">
-              <div class="host-name">Hosted by <%= listing.owner.username %></div>
-              <div class="host-response-time">Responds within an hour</div>
-            </div>
+          <!-- Image Gallery -->
+          <div class="image-gallery mb-4">
+            <img src="<%= listing.image.url %>" class="main-image" alt="<%= listing.title %>">
           </div>
-          
-          <div class="listing-description mb-4">
-            <h3>About this place</h3>
-            <p><%= listing.description %></p>
-          </div>
-          
-          <div class="listing-amenities mb-4">
-            <h3>What this place offers</h3>
-            <div class="amenities-grid">
-              <div class="amenity-item">
-                <i class="fa-solid fa-wifi"></i>
-                <span>Wifi</span>
+
+          <!-- Listing Info -->
+          <div class="listing-info">
+            <div class="host-info mb-4">
+              <div class="host-avatar">
+                <i class="fa-solid fa-user"></i>
               </div>
-              <div class="amenity-item">
-                <i class="fa-solid fa-car"></i>
-                <span>Free parking</span>
-              </div>
-              <div class="amenity-item">
-                <i class="fa-solid fa-snowflake"></i>
-                <span>Air conditioning</span>
-              </div>
-              <div class="amenity-item">
-                <i class="fa-solid fa-tv"></i>
-                <span>TV</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Booking Widget -->
-    <div class="col-lg-4">
-      <% 
-        // Check if user is owner - handle both populated and non-populated owner
-        let isOwner = false;
-        if (currUser && listing.owner) {
-          const ownerId = listing.owner._id ? listing.owner._id.toString() : listing.owner.toString();
-          const userId = currUser._id ? currUser._id.toString() : currUser.toString();
-          isOwner = ownerId === userId;
-        }
-      %>
-      
-      <% if (!currUser) { %>
-        <!-- Show login prompt for guests -->
-        <div class="login-prompt">
-          <h4>Ready to book?</h4>
-          <p>Sign in to make a reservation</p>
-          <div class="d-grid gap-2">
-            <a href="/login" class="btn btn-primary">Sign in</a>
-            <a href="/signup" class="btn btn-outline-primary">Sign up</a>
-          </div>
-        </div>
-      <% } else if (isOwner && currUser.role !== 'admin') { %>
-        <!-- Owner viewing their own listing - show info message -->
-        <div class="host-actions">
-          <h4>Your listing</h4>
-          <p class="text-muted">Manage your listing from the options at the bottom of this page.</p>
-          <div class="mt-3">
-            <div class="price-display">
-              <span class="price-amount-large">₹<%= listing.price.toLocaleString("en-IN") %></span>
-              <span class="price-period-small">per night</span>
-            </div>
-          </div>
-        </div>
-      <% } else { %>
-        <!-- Show booking widget for logged-in non-owners -->
-        <% try { %>
-          <%- include('../includes/booking-widget', { listing: listing, currUser: currUser }) %>
-        <% } catch(e) { %>
-          <div class="alert alert-warning">
-            <p>Booking widget temporarily unavailable. Please try again later.</p>
-            <p class="small text-muted">Error: <%= e.message %></p>
-          </div>
-        <% } %>
-      <% } %>
-    </div>
-  </div>
-</div>
-
-<!-- Similar Listings -->
-<% if (recommendations && recommendations.length > 0) { %>
-<div class="container-fluid mt-5">
-  <h3 class="mb-3">Similar places you may like</h3>
-  <div class="row g-4">
-    <% recommendations.forEach(sim => { %>
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-        <div class="card h-100 shadow-sm similar-card">
-          <a href="/listings/<%= sim._id %>" class="text-decoration-none text-dark">
-            <div class="ratio ratio-4x3">
-              <img src="<%= (sim.image && sim.image.url) ? sim.image.url : 'https://via.placeholder.com/600x400?text=Listing' %>" class="card-img-top object-fit-cover" alt="<%= sim.title %>">
-            </div>
-            <div class="card-body">
-              <h5 class="card-title text-truncate mb-1"><%= sim.title %></h5>
-              <p class="card-text text-muted mb-2 text-truncate"><i class="fa-solid fa-location-dot me-1"></i><%= sim.location %>, <%= sim.country %></p>
-              <div class="d-flex align-items-center justify-content-between">
-                <span class="fw-semibold">₹<%= sim.price %><span class="text-muted fw-normal">/night</span></span>
-                <span class="badge bg-light text-dark">Similar</span>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    <% }) %>
-  </div>
-</div>
-
-<style>
-.similar-card .card-img-top {
-  object-fit: cover;
-}
-.similar-card .card-body {
-  padding: 12px 14px;
-}
-.similar-card .card-title {
-  font-size: 16px;
-  font-weight: 600;
-}
-@media (max-width: 576px) {
-  .similar-card .card-title { font-size: 15px; }
-}
-</style>
-<% } %>
-
-<style>
-.listing-title {
-  font-size: 26px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #222;
-}
-
-.image-gallery {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.main-image {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-}
-
-.listing-info {
-  padding: 24px 0;
-}
-
-.host-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 0;
-  border-top: 1px solid #ebebeb;
-  border-bottom: 1px solid #ebebeb;
-}
-
-.host-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #f7f7f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #717171;
-  font-size: 20px;
-}
-
-.host-details {
-  flex: 1;
-}
-
-.host-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: #222;
-}
-
-.host-response-time {
-  font-size: 14px;
-  color: #717171;
-}
-
-.listing-description h3,
-.listing-amenities h3 {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #222;
-}
-
-.listing-description p {
-  font-size: 16px;
-  line-height: 1.5;
-  color: #222;
-}
-
-.amenities-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.amenity-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-}
-
-.amenity-item i {
-  font-size: 20px;
-  color: #222;
-  width: 24px;
-}
-
-.amenity-item span {
-  font-size: 16px;
-  color: #222;
-}
-
-.host-actions,
-.login-prompt {
-  border: 1px solid #dddddd;
-  border-radius: 12px;
-  padding: 24px;
-  background: white;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-}
-
-.host-actions h4,
-.login-prompt h4 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #222;
-}
-
-.login-prompt p {
-  color: #717171;
-  margin-bottom: 16px;
-}
-
-.price-display {
-  padding: 16px;
-  background: #f7f7f7;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.price-amount-large {
-  font-size: 24px;
-  font-weight: 600;
-  color: #222;
-}
-
-.price-period-small {
-  font-size: 14px;
-  color: #717171;
-  margin-left: 4px;
-}
-
-@media (max-width: 768px) {
-  .container-fluid {
-    padding: 0 16px;
-  }
-  
-  .listing-title {
-    font-size: 22px;
-  }
-  
-  .main-image {
-    height: 250px;
-  }
-  
-  .amenities-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>
-
-<!-- Reviews Section -->
-<div class="container-fluid mt-5">
-  <div class="row">
-    <div class="col-lg-8">
-      <div class="reviews-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h3 class="mb-0">Reviews</h3>
-          <% 
-            const approvedReviews = listing.reviews ? listing.reviews.filter(r => r.status === "approved") : [];
-            const avgRating = approvedReviews.length > 0 
-              ? (approvedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / approvedReviews.length).toFixed(1)
-              : 0;
-            const totalReviews = approvedReviews.length;
-          %>
-          <div class="rating-summary">
-            <% if (totalReviews > 0) { %>
-              <div class="d-flex align-items-center gap-2">
-                <span class="average-rating"><i class="fa-solid fa-star text-warning"></i> <%= avgRating %></span>
-                <span class="text-muted">(<%= totalReviews %> <%= totalReviews === 1 ? 'review' : 'reviews' %>)</span>
-              </div>
-            <% } else { %>
-              <span class="text-muted">No reviews yet</span>
-            <% } %>
-          </div>
-        </div>
-        
-        <% if (currUser) { %>
-          <div class="review-form-section mb-4">
-            <h4>Leave a review</h4>
-            <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
-              <div class="mb-3">
-                <label for="rating" class="form-label">Rating</label>
-                <fieldset class="starability-slot">
-                  <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-                  <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                  <label for="first-rate1" title="Terrible">1 star</label>
-                  <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                  <label for="first-rate2" title="Not good">2 stars</label>
-                  <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                  <label for="first-rate3" title="Average">3 stars</label>
-                  <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                  <label for="first-rate4" title="Very good">4 stars</label>
-                  <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                  <label for="first-rate5" title="Amazing">5 stars</label>
-                </fieldset>
-              </div>
-
-              <div class="mb-3">
-                <label for="comment" class="form-label">Comments</label>
-                <textarea name="review[comment]" id="comment" cols="20" rows="5" class="form-control" required></textarea>
-                <div class="invalid-feedback">
-                  Please add comment for review...
+              <div class="host-details">
+                <div class="host-name">Hosted by <%= listing.owner.username %>
                 </div>
+                <div class="host-response-time">Responds within an hour</div>
               </div>
-
-              <button class="btn btn-primary">Submit Review</button>
-            </form>
-          </div>
-        <% } %>
-
-        <!-- Reviews List -->
-        <div class="reviews-list">
-          <% if (approvedReviews && approvedReviews.length > 0) { %>
-            <div class="row">
-              <% approvedReviews.forEach(review => { %>
-                <div class="col-md-6 mb-4">
-                  <div class="review-card">
-                    <div class="review-header">
-                      <div class="reviewer-avatar">
-                        <i class="fa-solid fa-user"></i>
-                      </div>
-                      <div class="reviewer-info">
-                        <div class="reviewer-name">
-                          <%= review.author && review.author.username ? review.author.username : 'Anonymous' %>
-                          <% 
-                            // Check if user is verified (has booked this listing)
-                            const reviewerId = review.author && review.author._id ? review.author._id.toString() : null;
-                            const isVerified = reviewerId && verifiedUserIds && verifiedUserIds.has(reviewerId);
-                          %>
-                          <% if (isVerified) { %>
-                            <span class="badge bg-success ms-2 verified-badge">
-                              <i class="fa-solid fa-check-circle me-1"></i>Verified User
-                            </span>
-                          <% } %>
-                        </div>
-                        <div class="review-date">
-                          <%= review.createdAt ? new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '' %>
-                        </div>
-                      </div>
-                      <div class="review-rating">
-                        <div class="stars">
-                          <% for (let i = 1; i <= 5; i++) { %>
-                            <i class="fa-solid fa-star <%= i <= (review.rating || 0) ? 'filled' : 'empty' %>"></i>
-                          <% } %>
-                          <span class="rating-number ms-2"><%= review.rating || 0 %></span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="review-content">
-                      <p><%= review.comment || 'No comment' %></p>
-                      <% if (review.sentiment && review.sentiment.label) { %>
-                        <span class="badge <%= review.sentiment.label === 'positive' ? 'bg-success' : (review.sentiment.label === 'negative' ? 'bg-danger' : 'bg-secondary') %>">
-                          <%= review.sentiment.label.charAt(0).toUpperCase() + review.sentiment.label.slice(1) %>
-                        </span>
-                      <% } %>
-                    </div>
-                    <% if (currUser && review.author && review.author._id && review.author._id.toString() === currUser._id.toString()) { %>
-                      <div class="review-actions">
-                        <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this review?')">
-                            <i class="fa-solid fa-trash me-1"></i>Delete
-                          </button>
-                        </form>
-                      </div>
-                    <% } %>
-                  </div>
-                </div>
-              <% }); %>
             </div>
-          <% } else { %>
-            <div class="no-reviews">
-              <p>No reviews yet. Be the first to review this place!</p>
-            </div>
-          <% } %>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<style>
-.reviews-section {
-  padding: 24px 0;
-}
-
-.reviews-section h3 {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  color: #222;
-}
-
-.review-form-section {
-  background: #f7f7f7;
-  padding: 24px;
-  border-radius: 12px;
-  margin-bottom: 32px;
-}
-
-.review-form-section h4 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #222;
-}
-
-.review-card {
-  background: white;
-  border: 1px solid #ebebeb;
-  border-radius: 12px;
-  padding: 20px;
-  height: 100%;
-}
-
-.review-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.reviewer-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #f7f7f7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #717171;
-}
-
-.reviewer-info {
-  flex: 1;
-}
-
-.reviewer-name {
-  font-size: 16px;
-  font-weight: 500;
-  color: #222;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.verified-badge {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
-.review-date {
-  font-size: 14px;
-  color: #717171;
-}
-
-.review-rating .stars {
-  color: #ff385c;
-  font-size: 14px;
-}
-
-.review-rating .stars .filled {
-  color: #ff385c;
-}
-
-.review-rating .stars .empty {
-  color: #ddd;
-}
-
-.review-rating .rating-number {
-  font-size: 14px;
-  font-weight: 500;
-  color: #222;
-}
-
-.rating-summary {
-  text-align: right;
-}
-
-.average-rating {
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
-}
-
-.review-content p {
-  font-size: 16px;
-  line-height: 1.5;
-  color: #222;
-  margin-bottom: 12px;
-}
-
-.review-actions {
-  margin-top: 12px;
-}
-
-.no-reviews {
-  text-align: center;
-  padding: 40px;
-  color: #717171;
-}
-
-@media (max-width: 768px) {
-  .review-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  .review-rating {
-    align-self: flex-start;
-  }
-}
-</style>
-
-<!-- Owner/Analytics Actions Section (Before Footer) -->
-<% if (currUser && listing.owner && listing.owner._id && (listing.owner._id.toString() === currUser._id.toString() || currUser.role === 'admin')) { %>
-<div class="container-fluid mt-5 mb-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="owner-actions-section">
-        <div class="p-4 border rounded-3 bg-light">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
-            <div>
-              <h5 class="mb-1">
-                <i class="fa-solid fa-toolbox me-2"></i>
-                <% if (listing.owner && listing.owner._id && currUser && currUser._id && (listing.owner._id.toString() === currUser._id.toString())) { %>
-                  Manage Your Listing
-                <% } else { %>
-                  Admin Actions
-                <% } %>
-              </h5>
-              <p class="text-muted mb-0 small">
-                <% if (listing.owner && listing.owner._id && currUser && currUser._id && (listing.owner._id.toString() === currUser._id.toString())) { %>
-                  Quick actions for this listing
-                <% } else { %>
-                  Administrative access to this listing
-                <% } %>
+            <div class="listing-description mb-4">
+              <h3>About this place</h3>
+              <p>
+                <%= listing.description %>
               </p>
             </div>
+
+            <div class="listing-amenities mb-4">
+              <h3>What this place offers</h3>
+              <div class="amenities-grid">
+                <div class="amenity-item">
+                  <i class="fa-solid fa-wifi"></i>
+                  <span>Wifi</span>
+                </div>
+                <div class="amenity-item">
+                  <i class="fa-solid fa-car"></i>
+                  <span>Free parking</span>
+                </div>
+                <div class="amenity-item">
+                  <i class="fa-solid fa-snowflake"></i>
+                  <span>Air conditioning</span>
+                </div>
+                <div class="amenity-item">
+                  <i class="fa-solid fa-tv"></i>
+                  <span>TV</span>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
 
+      <!-- Booking Widget -->
+      <div class="col-lg-4">
+        <% /* Check if user is owner - handle both populated and non-populated owner */ let isOwner=false; if (currUser
+          && listing.owner) { const ownerId=listing.owner._id ? listing.owner._id.toString() : listing.owner.toString();
+          const userId=currUser._id ? currUser._id.toString() : currUser.toString(); isOwner=ownerId===userId; } %>
+
+          <% if (!currUser) { %>
+            <!-- Show login prompt for guests -->
+            <div class="login-prompt">
+              <h4>Ready to book?</h4>
+              <p>Sign in to make a reservation</p>
+              <div class="d-grid gap-2">
+                <a href="/login" class="btn btn-primary">Sign in</a>
+                <a href="/signup" class="btn btn-outline-primary">Sign up</a>
+              </div>
+            </div>
+            <% } else if (isOwner && currUser.role !=='admin' ) { %>
+              <!-- Owner viewing their own listing - show info message -->
+              <div class="host-actions">
+                <h4>Your listing</h4>
+                <p class="text-muted">Manage your listing from the options at the bottom of this page.</p>
+                <div class="mt-3">
+                  <div class="price-display">
+                    <span class="price-amount-large">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                    <span class="price-period-small">per night</span>
+                  </div>
+                </div>
+              </div>
+              <% } else { %>
+                <!-- Show booking widget for logged-in non-owners -->
+                <% try { %>
+                  <%- include('../includes/booking-widget', { listing: listing, currUser: currUser }) %>
+                    <% } catch(e) { %>
+                      <div class="alert alert-warning">
+                        <p>Booking widget temporarily unavailable. Please try again later.</p>
+                        <p class="small text-muted">Error: <%= e.message %>
+                        </p>
+                      </div>
+                      <% } %>
+                        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined Similar Listings and Reviews Section -->
+  <div class="container-fluid mt-5 mb-5">
+    <div class="row">
+      <!-- Similar Listings Column -->
+      <% if (recommendations && recommendations.length> 0) { %>
+        <div class="col-lg-6 mb-4">
+          <h3 class="mb-3" style="color: #222; font-weight: 600;">Similar places you may like</h3>
           <div class="row g-3">
-            <% if ((listing.owner && listing.owner._id && currUser && currUser._id && (listing.owner._id.toString() === currUser._id.toString())) || (currUser && currUser.role === 'admin')) { %>
-            <div class="col-12 col-sm-6 col-lg-4">
-              <a href="/listings/<%= listing._id %>/edit" class="action-tile text-decoration-none d-block h-100">
-                <div class="tile-inner h-100 d-flex align-items-center p-3 border rounded-3 bg-white">
-                  <div class="tile-icon me-3">
-                    <div class="icon-circle bg-primary-subtle text-primary">
-                      <i class="fa-solid fa-edit"></i>
+            <% recommendations.forEach(function(sim) { %>
+              <div class="col-12 col-xl-6">
+                <div class="card h-100 shadow-sm similar-card">
+                  <a href="/listings/<%= sim._id %>" class="text-decoration-none text-dark">
+                    <div class="ratio ratio-4x3">
+                      <img
+                        src="<%= (sim.image && sim.image.url) ? sim.image.url : 'https://via.placeholder.com/600x400?text=Listing' %>"
+                        class="card-img-top object-fit-cover" alt="<%= sim.title %>">
                     </div>
-                  </div>
-                  <div class="tile-content">
-                    <div class="tile-title">Edit Listing</div>
-                    <div class="tile-subtitle">Update photos, price, details</div>
-                  </div>
+                    <div class="card-body">
+                      <h5 class="card-title text-truncate mb-1">
+                        <%= sim.title %>
+                      </h5>
+                      <p class="card-text text-muted mb-2 text-truncate">
+                        <i class="fa-solid fa-location-dot me-1"></i>
+                        <%= sim.location %>, <%= sim.country %>
+                      </p>
+                      <div class="d-flex align-items-center justify-content-between">
+                        <span class="fw-semibold">₹<%= sim.price.toLocaleString("en-IN") %><span
+                              class="text-muted fw-normal">/night</span></span>
+                        <span class="badge bg-light text-dark">Similar</span>
+                      </div>
+                    </div>
+                  </a>
                 </div>
-              </a>
-            </div>
-            <% } %>
+              </div>
+              <% }); %>
+          </div>
+        </div>
+        <% } %>
 
-            <% if ((listing.owner && listing.owner._id && currUser && currUser._id && (listing.owner._id.toString() === currUser._id.toString())) || (currUser && currUser.role === 'admin')) { %>
-            <div class="col-12 col-sm-6 col-lg-4">
-              <a href="/listings/<%= listing._id %>/analytics" class="action-tile text-decoration-none d-block h-100">
-                <div class="tile-inner analytics h-100 d-flex align-items-center p-3 border rounded-3">
-                  <div class="tile-icon me-3">
-                    <div class="icon-circle gradient-analytics text-white">
-                      <i class="fa-solid fa-chart-line"></i>
+          <!-- Reviews Column -->
+          <div class="<%= (recommendations && recommendations.length > 0) ? 'col-lg-6' : 'col-lg-12' %>">
+            <div class="reviews-section content-panel" style="margin-bottom: 0;">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">Reviews</h3>
+                <% const approvedReviews=listing.reviews ? listing.reviews.filter(r=> r.status === "approved") : [];
+                  const avgRating = approvedReviews.length > 0
+                  ? (approvedReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / approvedReviews.length).toFixed(1)
+                  : 0;
+                  const totalReviews = approvedReviews.length;
+                  %>
+                  <div class="rating-summary">
+                    <% if (totalReviews> 0) { %>
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="average-rating"><i class="fa-solid fa-star text-warning"></i>
+                          <%= avgRating %>
+                        </span>
+                        <span class="text-muted">(<%= totalReviews %>
+                            <%= totalReviews===1 ? 'review' : 'reviews' %>)</span>
+                      </div>
+                      <% } else { %>
+                        <span class="text-muted">No reviews yet</span>
+                        <% } %>
+                  </div>
+              </div>
+
+              <% if (currUser) { %>
+                <div class="review-form-section mb-4">
+                  <h4>Leave a review</h4>
+                  <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+                    <div class="mb-3">
+                      <label for="rating" class="form-label">Rating</label>
+                      <fieldset class="starability-slot">
+                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked
+                          aria-label="No rating." />
+                        <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                        <label for="first-rate1" title="Terrible">1 star</label>
+                        <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                        <label for="first-rate2" title="Not good">2 stars</label>
+                        <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                        <label for="first-rate3" title="Average">3 stars</label>
+                        <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                        <label for="first-rate4" title="Very good">4 stars</label>
+                        <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                        <label for="first-rate5" title="Amazing">5 stars</label>
+                      </fieldset>
                     </div>
-                  </div>
-                  <div class="tile-content text-white">
-                    <div class="tile-title">View Analytics</div>
-                    <div class="tile-subtitle opacity-75">Traffic, revenue, reviews</div>
-                  </div>
+
+                    <div class="mb-3">
+                      <label for="comment" class="form-label">Comments</label>
+                      <textarea name="review[comment]" id="comment" cols="20" rows="5" class="form-control"
+                        required></textarea>
+                      <div class="invalid-feedback">Please add comment for review...</div>
+                    </div>
+
+                    <button class="btn btn-primary">Submit Review</button>
+                  </form>
                 </div>
-              </a>
+                <% } %>
+
+                  <!-- Reviews List -->
+                  <div class="reviews-list">
+                    <% if (approvedReviews && approvedReviews.length> 0) { %>
+                      <div class="row">
+                        <% approvedReviews.forEach(function(review) { %>
+                          <div
+                            class="<%= (recommendations && recommendations.length > 0) ? 'col-12' : 'col-md-6' %> mb-4">
+                            <div class="review-card">
+                              <div class="review-header">
+                                <div class="reviewer-avatar">
+                                  <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="reviewer-info">
+                                  <div class="reviewer-name">
+                                    <%= review.author && review.author.username ? review.author.username : 'Anonymous'
+                                      %>
+                                      <% const reviewerId=review.author && review.author._id ?
+                                        review.author._id.toString() : null; const isVerified=reviewerId &&
+                                        verifiedUserIds && verifiedUserIds.has(reviewerId); %>
+                                        <% if (isVerified) { %>
+                                          <span class="badge bg-success ms-2 verified-badge">
+                                            <i class="fa-solid fa-check-circle me-1"></i>Verified User
+                                          </span>
+                                          <% } %>
+                                  </div>
+                                  <div class="review-date">
+                                    <%= review.createdAt ? new Date(review.createdAt).toLocaleDateString('en-US', {
+                                      year: 'numeric' , month: 'short' , day: 'numeric' }) : '' %>
+                                  </div>
+                                </div>
+                                <div class="review-rating">
+                                  <div class="stars">
+                                    <% for (let i=1; i <=5; i++) { %>
+                                      <i
+                                        class="fa-solid fa-star <%= i <= (review.rating || 0) ? 'filled' : 'empty' %>"></i>
+                                      <% } %>
+                                        <span class="rating-number ms-2">
+                                          <%= review.rating || 0 %>
+                                        </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="review-content">
+                                <p>
+                                  <%= review.comment || 'No comment' %>
+                                </p>
+                                <% if (review.sentiment && review.sentiment.label) { %>
+                                  <span
+                                    class="badge <%= review.sentiment.label === 'positive' ? 'bg-success' : (review.sentiment.label === 'negative' ? 'bg-danger' : 'bg-secondary') %>">
+                                    <%= review.sentiment.label.charAt(0).toUpperCase() + review.sentiment.label.slice(1)
+                                      %>
+                                  </span>
+                                  <% } %>
+                              </div>
+                              <% if (currUser && review.author && review.author._id &&
+                                review.author._id.toString()===currUser._id.toString()) { %>
+                                <div class="review-actions">
+                                  <form method="POST"
+                                    action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                      onclick="return confirm('Are you sure you want to delete this review?')">
+                                      <i class="fa-solid fa-trash me-1"></i>Delete
+                                    </button>
+                                  </form>
+                                </div>
+                                <% } %>
+                            </div>
+                          </div>
+                          <% }); %>
+                      </div>
+                      <% } else { %>
+                        <div class="no-reviews">
+                          <p>No reviews yet. Be the first to review this place!</p>
+                        </div>
+                        <% } %>
+                  </div>
             </div>
-            <% } %>
+          </div>
+    </div>
+  </div>
+
+  <style>
+    .similar-card .card-img-top {
+      object-fit: cover;
+    }
+
+    .similar-card .card-body {
+      padding: 12px 14px;
+    }
+
+    .similar-card .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 576px) {
+      .similar-card .card-title {
+        font-size: 15px;
+      }
+    }
+  </style>
+
+  <style>
+    .reviews-section {
+      padding: 24px 0;
+    }
+
+    .reviews-section h3 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #222;
+    }
+
+    .review-form-section {
+      background: #f7f7f7;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+    }
+
+    .review-form-section h4 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #222;
+    }
+
+    .review-card {
+      background: white;
+      border: 1px solid #ebebeb;
+      border-radius: 12px;
+      padding: 20px;
+      height: 100%;
+    }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .reviewer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #717171;
+    }
+
+    .reviewer-info {
+      flex: 1;
+    }
+
+    .reviewer-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #222;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .verified-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .review-date {
+      font-size: 14px;
+      color: #717171;
+    }
+
+    .review-rating .stars {
+      color: #ff385c;
+      font-size: 14px;
+    }
+
+    .review-rating .stars .filled {
+      color: #ff385c;
+    }
+
+    .review-rating .stars .empty {
+      color: #ddd;
+    }
+
+    .review-rating .rating-number {
+      font-size: 14px;
+      font-weight: 500;
+      color: #222;
+    }
+
+    .rating-summary {
+      text-align: right;
+    }
+
+    .average-rating {
+      font-size: 18px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .review-content p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #222;
+      margin-bottom: 12px;
+    }
+
+    .review-actions {
+      margin-top: 12px;
+    }
+
+    .no-reviews {
+      text-align: center;
+      padding: 40px;
+      color: #717171;
+    }
+
+    @media (max-width: 768px) {
+      .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .review-rating {
+        align-self: flex-start;
+      }
+    }
+  </style>
+
+  <!-- Owner/Analytics Actions Section (Before Footer) -->
+  <% if (currUser && listing.owner && listing.owner._id && (listing.owner._id.toString()===currUser._id.toString() ||
+    currUser.role==='admin' )) { %>
+    <div class="container-fluid mt-5 mb-4">
+      <div class="row">
+        <div class="col-12">
+          <div class="owner-actions-section">
+            <div class="p-4 border rounded-3 bg-light">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <div>
+                  <h5 class="mb-1">
+                    <i class="fa-solid fa-toolbox me-2"></i>
+                    <% if (listing.owner && listing.owner._id && currUser && currUser._id &&
+                      (listing.owner._id.toString()===currUser._id.toString())) { %>
+                      Manage Your Listing
+                      <% } else { %>
+                        Admin Actions
+                        <% } %>
+                  </h5>
+                  <p class="text-muted mb-0 small">
+                    <% if (listing.owner && listing.owner._id && currUser && currUser._id &&
+                      (listing.owner._id.toString()===currUser._id.toString())) { %>
+                      Quick actions for this listing
+                      <% } else { %>
+                        Administrative access to this listing
+                        <% } %>
+                  </p>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <% if ((listing.owner && listing.owner._id && currUser && currUser._id &&
+                  (listing.owner._id.toString()===currUser._id.toString())) || (currUser && currUser.role==='admin' )) {
+                  %>
+                  <div class="col-12 col-sm-6 col-lg-4">
+                    <a href="/listings/<%= listing._id %>/edit" class="action-tile text-decoration-none d-block h-100">
+                      <div class="tile-inner h-100 d-flex align-items-center p-3 border rounded-3 bg-white">
+                        <div class="tile-icon me-3">
+                          <div class="icon-circle bg-primary-subtle text-primary">
+                            <i class="fa-solid fa-edit"></i>
+                          </div>
+                        </div>
+                        <div class="tile-content">
+                          <div class="tile-title">Edit Listing</div>
+                          <div class="tile-subtitle">Update photos, price, details</div>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  <% } %>
+
+                    <% if ((listing.owner && listing.owner._id && currUser && currUser._id &&
+                      (listing.owner._id.toString()===currUser._id.toString())) || (currUser && currUser.role==='admin'
+                      )) { %>
+                      <div class="col-12 col-sm-6 col-lg-4">
+                        <a href="/listings/<%= listing._id %>/analytics"
+                          class="action-tile text-decoration-none d-block h-100">
+                          <div class="tile-inner analytics h-100 d-flex align-items-center p-3 border rounded-3">
+                            <div class="tile-icon me-3">
+                              <div class="icon-circle gradient-analytics text-white">
+                                <i class="fa-solid fa-chart-line"></i>
+                              </div>
+                            </div>
+                            <div class="tile-content text-white">
+                              <div class="tile-title">View Analytics</div>
+                              <div class="tile-subtitle opacity-75">Traffic, revenue, reviews</div>
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                      <% } %>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<style>
-.owner-actions-section {
-  margin-top: 2rem;
-}
+    <style>
+      .owner-actions-section {
+        margin-top: 2rem;
+      }
 
-.owner-actions-section .btn {
-  white-space: nowrap;
-}
+      .owner-actions-section .btn {
+        white-space: nowrap;
+      }
 
-.action-tile .tile-inner {
-  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-}
+      .action-tile .tile-inner {
+        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      }
 
-.action-tile .tile-inner:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-}
+      .action-tile .tile-inner:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      }
 
-.icon-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
+      .icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
 
-.gradient-analytics {
-  background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
-}
+      .gradient-analytics {
+        background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
+      }
 
-.tile-title {
-  font-weight: 600;
-  font-size: 1rem;
-}
+      .tile-title {
+        font-weight: 600;
+        font-size: 1rem;
+      }
 
-.tile-subtitle {
-  font-size: .85rem;
-}
+      .tile-subtitle {
+        font-size: .85rem;
+      }
 
-.tile-inner.analytics {
-  background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
-  border: none !important;
-}
+      .tile-inner.analytics {
+        background: linear-gradient(135deg, #2B6CB0 0%, #38B2AC 100%);
+        border: none !important;
+      }
 
-@media (max-width: 576px) {
-  .owner-actions-section .d-flex {
-    flex-direction: column;
-    align-items: flex-start !important;
-  }
-  
-  .owner-actions-section .d-flex.gap-2 {
-    width: 100%;
-    margin-top: 1rem;
-  }
-  
-  .owner-actions-section .btn {
-    width: 100%;
-  }
-}
-</style>
-<% } %>
+      @media (max-width: 576px) {
+        .owner-actions-section .d-flex {
+          flex-direction: column;
+          align-items: flex-start !important;
+        }
 
+        .owner-actions-section .d-flex.gap-2 {
+          width: 100%;
+          margin-top: 1rem;
+        }
+
+        .owner-actions-section .btn {
+          width: 100%;
+        }
+      }
+    </style>
+    <% } %>

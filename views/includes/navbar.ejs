@@ -1,173 +1,112 @@
+<% /* Refined Navbar: Larger Brand, Left-aligned Controls, Button Home */ %>
 
-<style>
-  .btn-search{
-    background-color:#fe242d ;
-    color:#fff;
-    padding:0 1rem 0 1rem;
-    border-radius: 25rem;
-  }
-  .btn-search:hover{
-    background-color:#fe242d ;
-    color:#fff;
-  }
-  .btn-search i{
-    display:inline;
-    margin-right: 0.5rem;
-  }
-
-  .search-input{
-    border-radius: 25px;
-    width:300px;
-    /* padding:0.5rem, 3rem, 0.5rem, 3rem; */
-  }
-
-  .navbar-saffron {
-    background-color: antiquewhite !important;
-    color: black;
-  }
-
-  .navbar-saffron .navbar-brand,
-  .navbar-saffron .navbar-brand:hover,
-  .navbar-saffron .navbar-brand:focus {
-    color: black !important;
-  }
-
-  .navbar-saffron .nav-link {
-    color: black !important;
-  }
-
-  .navbar-saffron .nav-link:hover,
-  .navbar-saffron .nav-link:focus {
-    color: red !important;
-  }
-
-  .navbar-saffron .navbar-toggler {
-    border-color: rgba(0, 0, 0, 0.3);
-  }
-
-  .navbar-saffron .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-  }
-
-  .navbar-saffron .dropdown-menu {
-    background-color: #fff !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-  }
-
-  .navbar-saffron .dropdown-item {
-    color: #212529 !important;
-  }
-
-  .navbar-saffron .dropdown-item:hover,
-  .navbar-saffron .dropdown-item:focus {
-    color: #1e2125 !important;
-    background-color: #e9ecef !important;
-  }
-
-  .navbar-saffron .dropdown-item.active,
-  .navbar-saffron .dropdown-item:active {
-    color: #fff !important;
-    background-color: #2B6CB0 !important;
-  }
-
-  .navbar-saffron .dropdown-divider {
-    border-top: 1px solid rgba(0, 0, 0, 0.15) !important;
-  }
-
-  .navbar-saffron .dropdown-header {
-    color: #6c757d !important;
-  }
-
-  .navbar-saffron .form-control {
-    background-color: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .navbar-saffron .form-control:focus {
-    background-color: #fff;
-    border-color: rgba(255, 255, 255, 0.5);
-  }
-</style>
-
-<!-- Add to your header or navigation part -->
-
-
-
-<nav class="navbar navbar-expand-md border-bottom sticky-top <%= currUser && currUser.role === 'admin' ? 'navbar-saffron' : 'bg-light' %>">
-    <div class="container-fluid">
+  <nav class="navbar navbar-expand-md sticky-top">
+    <div class="container-fluid d-flex align-items-center">
+      <!-- Brand (Larger) -->
       <a class="navbar-brand" href="/listings">
-        <i class="fa-regular fa-compass"></i>
-        <span class="ms-2">Wanderlust Loop</span>
+        <i class="fa-solid fa-compass me-3"></i>
+        <span>Wanderlust</span><span class="brand-text-teal">Loop</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-        
-          <a class="nav-link" href="/listings">Explore</a>
+
+        <!-- Left Side Controls (Home Button, Add Listing, Search) -->
+        <div class="navbar-nav me-auto align-items-center d-flex flex-row flex-wrap gap-2">
+
+          <!-- Home Button -->
+          <a class="btn-nav-pill" href="/listings">
+            Home
+          </a>
+
+          <!-- Add Listing Button -->
+          <a class="btn-nav-pill" href="/listings/new">
+            Add Listing
+          </a>
+
+          <!-- Search Form -->
+          <form action="/listings" method="GET" class="d-flex search-form position-relative ms-2" role="search">
+            <input class="form-control search-input" type="search" placeholder="Search..." aria-label="Search" name="q"
+              value="<%= searchQuery %>">
+            <button class="btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+          </form>
+
           <% if (currUser) { %>
-            <div class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                <i class="fa-solid fa-users me-1"></i>Travel Buddy Finder
+            <!-- If logged in, maybe show Find Buddy near controls or keep grouped? 
+                 User didn't specify, but Find Buddy is a major feature. 
+                 Keeping it clean or moving it? 
+                 Usually best to keep primary nav items together. 
+                 I'll keep specific "Find Buddy" dropdown in the nav flow to avoid cluttering controls excessively,
+                 or maybe just next to Home? 
+                 Let's stick to the request: "keep [search, add listing, home] in left side".
+            -->
+            <div class="nav-item dropdown ms-2">
+              <a class="nav-link dropdown-toggle btn-find-buddy" href="#" role="button" data-bs-toggle="dropdown">
+                Find Buddy
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/buddy/matches"><i class="fa-solid fa-heart me-2"></i>Find Matches</a></li>
-                <li><a class="dropdown-item" href="/buddy/listings"><i class="fa-solid fa-map-marked-alt me-2"></i>Listings</a></li>
-                <li><a class="dropdown-item" href="/buddy/map"><i class="fa-solid fa-map me-2"></i>Interactive Map</a></li>
-                <li><a class="dropdown-item" href="/buddy/requests"><i class="fa-solid fa-envelope me-2"></i>Requests</a></li>
+                <li><a class="dropdown-item" href="/buddy/matches"><i class="fa-solid fa-heart me-2"></i>Find
+                    Matches</a></li>
+                <li><a class="dropdown-item" href="/buddy/listings"><i
+                      class="fa-solid fa-map-marked-alt me-2"></i>Listings</a></li>
+                <li><a class="dropdown-item" href="/buddy/map"><i class="fa-solid fa-map me-2"></i>Interactive Map</a>
+                </li>
+                <li><a class="dropdown-item" href="/buddy/requests"><i
+                      class="fa-solid fa-envelope me-2"></i>Requests</a></li>
                 <li><a class="dropdown-item" href="/buddy/inbox"><i class="fa-solid fa-inbox me-2"></i>Inbox</a></li>
               </ul>
             </div>
-          <% } %>
-          
+            <% } %>
         </div>
 
-        <div class="navbar-nav ms-auto">
-
-        <form action="/listings" method="GET" class="d-flex" role="search">
-          <input class="form-control me-2 search-input" type="search" placeholder="Search" aria-label="Search"  name="q" value="<%= searchQuery %>">
-          <button class="btn btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
-        </form>
-      </div>
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Airbnb your home</a>
-
-        <% if (typeof currUser === "undefined" || !currUser) { %>
-          <a class="nav-link" href="/signup"><b>Sign up</b></a>
-          <a class="nav-link" href="/login"><b>Log in</b></a>
-        <% } else { %>
-          <div class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              <i class="fa-solid fa-user"></i> <%= currUser.username %>
-              <% if (currUser.role === 'admin') { %>
-                <span class="badge bg-warning text-dark ms-1">Admin</span>
+        <!-- Right Side (Auth Buttons) -->
+        <div class="navbar-nav ms-auto align-items-center">
+          <% if (!currUser) { %>
+            <a class="btn btn-login-custom" href="/login">Login</a>
+            <a class="btn btn-signup-custom" href="/signup">Sign Up</a>
+            <% } else { %>
+              <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle user-profile-box" href="#" role="button" data-bs-toggle="dropdown">
+                  <i class="fa-solid fa-user-circle me-1"></i>
+                  <%= currUser.username %>
+                    <% if (currUser.role==='admin' ) { %>
+                      <span class="badge bg-warning text-dark ms-1" style="font-size: 0.7rem;">Admin</span>
+                      <% } %>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <% if (currUser.role==='admin' ) { %>
+                    <li>
+                      <h6 class="dropdown-header">Admin Panel</h6>
+                    </li>
+                    <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-gauge me-2"></i>Dashboard</a></li>
+                    <li><a class="dropdown-item" href="/coupons"><i class="fa-solid fa-ticket-alt me-2"></i>Coupons</a>
+                    </li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="/analytics/dashboard"><i
+                          class="fa-solid fa-chart-bar me-2"></i>Analytics</a></li>
+                    <% } else { %>
+                      <li><a class="dropdown-item" href="/analytics/dashboard"><i
+                            class="fa-solid fa-chart-bar me-2"></i>Analytics</a></li>
+                      <% } %>
+                        <li>
+                          <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/bookings"><i class="fa-solid fa-calendar-check me-2"></i>My
+                            Bookings</a></li>
+                        <li>
+                          <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/logout"><i
+                              class="fa-solid fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+              </div>
               <% } %>
-            </a>
-            <ul class="dropdown-menu">
-              <% if (currUser.role === 'admin') { %>
-                <li><h6 class="dropdown-header"><i class="fa-solid fa-shield-halved me-2"></i>Admin Panel</h6></li>
-                <li><a class="dropdown-item" href="/admin"><i class="fa-solid fa-gauge me-2"></i>Admin Dashboard</a></li>
-                <li><a class="dropdown-item" href="/coupons"><i class="fa-solid fa-ticket-alt me-2"></i>Manage Coupons</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/analytics/dashboard"><i class="fa-solid fa-chart-bar me-2"></i>Analytics Dashboard</a></li>
-                <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line me-2"></i>Host Performance</a></li>
-              <% } else { %>
-                <li><a class="dropdown-item" href="/analytics/dashboard"><i class="fa-solid fa-chart-bar me-2"></i>Analytics Dashboard</a></li>
-                <li><a class="dropdown-item" href="/host/performance"><i class="fa-solid fa-chart-line me-2"></i>Host Performance</a></li>
-              <% } %>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/bookings"><i class="fa-solid fa-calendar-check me-2"></i> My Bookings</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/logout"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a></li>
-            </ul>
-          </div>
-        <% } %>
-      </div>
-
-
-        
+        </div>
       </div>
     </div>
   </nav>

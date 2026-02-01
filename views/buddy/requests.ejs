@@ -1,346 +1,363 @@
 <% layout('layouts/boilerplate') %>
 
-<style>
-  body {
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-    min-height: 100vh;
-  }
-  
-  .requests-container {
-    animation: fadeInUp 0.6s ease-out;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .requests-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-  }
-  
-  .requests-header h2 {
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700;
-    font-size: 2.5rem;
-  }
-  
-  .request-section {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    overflow: hidden;
-    margin-bottom: 2rem;
-    animation: slideIn 0.6s ease-out backwards;
-  }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  .request-section .card-header {
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-    color: white;
-    padding: 1.5rem 2rem;
-    border: none;
-    font-weight: 600;
-  }
-  
-  .request-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    border: 2px solid #f0f0f0;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .request-card::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .request-card:hover {
-    transform: translateX(10px);
-    box-shadow: 0 10px 30px rgba(238, 9, 121, 0.2);
-    border-color: #ee0979;
-  }
-  
-  .request-card:hover::before {
-    opacity: 1;
-  }
-  
-  .status-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-  
-  .btn-accept {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    border: none;
-    color: white;
-    border-radius: 12px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-accept:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
-    color: white;
-  }
-  
-  .btn-reject {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    border: none;
-    color: white;
-    border-radius: 12px;
-    padding: 0.5rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-reject:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
-    color: white;
-  }
-  
-  .form-control {
-    border-radius: 12px;
-    border: 2px solid #e0e0e0;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
-  }
-  
-  .form-control:focus {
-    border-color: #ee0979;
-    box-shadow: 0 0 0 0.2rem rgba(238, 9, 121, 0.25);
-  }
-</style>
+    <style>
+        /* Local Scoped Styles for Requests */
+        .requests-container {
+            animation: fadeInUp 0.5s ease-out;
+        }
 
-<div class="container mt-4 requests-container">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="requests-header">
-                <h2><i class="fa-solid fa-envelope me-2"></i>Travel Buddy Requests</h2>
-                <% if (isAdmin) { %>
-                    <p class="text-muted mt-2">Admin view - All requests</p>
-                <% } %>
-            </div>
-        </div>
-    </div>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
 
-    <!-- Received Requests -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="request-section">
-                <div class="card-header" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                    <h5 class="mb-0"><i class="fa-solid fa-inbox me-2"></i>Received Requests</h5>
-                </div>
-                <div class="card-body">
-                    <% if (receivedRequests.length === 0) { %>
-                        <div class="text-center p-4">
-                            <i class="fa-solid fa-inbox fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">No received requests</p>
-                        </div>
-                    <% } else { %>
-                        <% receivedRequests.forEach(request => { %>
-                            <div class="request-card">
-                                <div class="card-body p-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6>
-                                                Request from <strong><%= request.from.username %></strong>
-                                                <% if (request.listing) { %>
-                                                    for "<%= request.listing.title %>"
-                                                <% } %>
-                                            </h6>
-                                            <% if (request.message) { %>
-                                                <p class="mb-2"><%= request.message %></p>
-                                            <% } %>
-                                            <small class="text-muted">
-                                                <i class="fa-solid fa-map-marker-alt me-1"></i>
-                                                <% if (request.listing) { %>
-                                                    <%= request.listing.destination %>
-                                                <% } %>
-                                                | 
-                                                <i class="fa-solid fa-clock me-1"></i>
-                                                <%= new Date(request.createdAt).toLocaleString() %>
-                                            </small>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-<%= request.status === 'pending' ? 'warning' : request.status === 'accepted' ? 'success' : 'danger' %>">
-                                                <%= request.status %>
-                                            </span>
-                                        </div>
-                                    </div>
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-                                    <% if (request.status === 'pending') { %>
-                                        <div class="mt-3">
-                                            <form method="POST" action="/buddy/requests/<%= request._id %>/accept" class="d-inline me-2">
-                                                <div class="mb-2">
-                                                    <textarea class="form-control" name="responseMessage" 
-                                                              rows="2" placeholder="Optional response message"></textarea>
-                                                </div>
-                                                <button type="submit" class="btn btn-accept">
-                                                    <i class="fa-solid fa-check me-1"></i>Accept
-                                                </button>
-                                            </form>
-                                            <form method="POST" action="/buddy/requests/<%= request._id %>/reject" class="d-inline">
-                                                <button type="submit" class="btn btn-reject">
-                                                    <i class="fa-solid fa-times me-1"></i>Reject
-                                                </button>
-                                            </form>
-                                        </div>
-                                    <% } %>
-                                </div>
-                            </div>
-                        <% }) %>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
+        /* Header Section */
+        /* .requests-header styles removed - using shared content-panel */
 
-    <!-- Sent Requests -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="request-section">
-                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <h5 class="mb-0"><i class="fa-solid fa-paper-plane me-2"></i>Sent Requests</h5>
-                </div>
-                <div class="card-body">
-                    <% if (sentRequests.length === 0) { %>
-                        <div class="text-center p-4">
-                            <i class="fa-solid fa-paper-plane fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">No sent requests</p>
-                        </div>
-                    <% } else { %>
-                        <% sentRequests.forEach(request => { %>
-                            <div class="request-card">
-                                <div class="card-body p-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6>
-                                                Request to <strong><%= request.to.username %></strong>
-                                                <% if (request.listing) { %>
-                                                    for "<%= request.listing.title %>"
-                                                <% } %>
-                                            </h6>
-                                            <% if (request.message) { %>
-                                                <p class="mb-2"><%= request.message %></p>
-                                            <% } %>
-                                            <small class="text-muted">
-                                                <i class="fa-solid fa-clock me-1"></i>
-                                                <%= new Date(request.createdAt).toLocaleString() %>
-                                            </small>
-                                            <% if (request.responseMessage) { %>
-                                                <div class="mt-2">
-                                                    <strong>Response:</strong> <%= request.responseMessage %>
-                                                </div>
-                                            <% } %>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-<%= request.status === 'pending' ? 'warning' : request.status === 'accepted' ? 'success' : 'danger' %>">
-                                                <%= request.status %>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <% }) %>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </div>
+        /* Section Containers */
+        .request-section-container {
+            background: transparent;
+            margin-bottom: 2rem;
+        }
 
-    <!-- Admin: All Requests -->
-    <% if (isAdmin && allRequests) { %>
-        <div class="row">
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #4B5563;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Request Cards */
+        .request-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            border-left: 4px solid #E5E7EB;
+            /* Default border */
+        }
+
+        .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .request-card.received {
+            border-left-color: #10B981;
+            /* Green for received */
+        }
+
+        .request-card.sent {
+            border-left-color: #3B82F6;
+            /* Blue for sent */
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.35rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-pending {
+            background: #FFF7ED;
+            color: #EA580C;
+        }
+
+        .badge-accepted {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        .badge-rejected {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-accept {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-accept:hover {
+            background: #059669;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-reject {
+            background: #F3F4F6;
+            color: #4B5563;
+        }
+
+        .btn-reject:hover {
+            background: #EF4444;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .form-control-sm-custom {
+            border-radius: 10px;
+            border: 1px solid #E5E7EB;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state-mini {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            border: 2px dashed #E5E7EB;
+            color: #9CA3AF;
+        }
+
+        /* Admin Table */
+        .admin-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table thead th {
+            background: #F9FAFB;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #6B7280;
+            padding: 1rem;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+    </style>
+
+    <div class="container mt-4 requests-container">
+        <div class="row mb-5">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="fa-solid fa-shield-alt me-2"></i>All Requests (Admin View)</h5>
+                <div class="content-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <div>
+                            <h2 class="text-gradient-purple fw-bold m-0"
+                                style="font-size: 2.2rem; letter-spacing: -1px;">
+                                <i class="fa-solid fa-envelope me-3 text-warning"></i>Travel Requests
+                            </h2>
+                            <p class="text-muted mb-0 mt-2 ms-1">Manage your pending and sent travel buddy connections.
+                            </p>
+                        </div>
                     </div>
-                    <div class="card-body">
+
+                    <!-- Received Requests -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="request-section-container">
+                                <h5 class="section-title"><i class="fa-solid fa-inbox text-success"></i> Received
+                                    Requests</h5>
+
+                                <% if (receivedRequests.length===0) { %>
+                                    <div class="empty-state-mini">
+                                        <i class="fa-solid fa-mug-hot fa-2x mb-2"></i>
+                                        <p class="mb-0">No new requests pending.</p>
+                                    </div>
+                                    <% } else { %>
+                                        <% receivedRequests.forEach(request=> { %>
+                                            <div class="request-card received">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-8 mb-3 mb-md-0">
+                                                        <div class="d-flex align-items-start gap-2 mb-2">
+                                                            <span class="badge badge-pending">Pending Approval</span>
+                                                            <small class="text-muted">
+                                                                <%= new Date(request.createdAt).toLocaleDateString() %>
+                                                            </small>
+                                                        </div>
+                                                        <h5 class="mb-1"
+                                                            style="font-weight: 700; color:var(--text-main);">
+                                                            <%= request.from.username %>
+                                                        </h5>
+                                                        <% if (request.listing) { %>
+                                                            <p class="mb-2 text-muted small">
+                                                                Requesting to join: <strong>
+                                                                    <%= request.listing.title %>
+                                                                </strong>
+                                                            </p>
+                                                            <% } %>
+
+                                                                <div class="bg-light p-2 rounded mb-0 text-dark small"
+                                                                    style="border-left: 3px solid #D1D5DB;">
+                                                                    "<%= request.message || 'No message included' %>"
+                                                                </div>
+                                                    </div>
+                                                    <div class="col-md-4 text-md-end">
+                                                        <% if (request.status==='pending' ) { %>
+                                                            <form method="POST"
+                                                                action="/buddy/requests/<%= request._id %>/accept"
+                                                                class="d-block mb-2">
+                                                                <textarea class="form-control form-control-sm-custom"
+                                                                    name="responseMessage" rows="1"
+                                                                    placeholder="Reply (optional)"></textarea>
+                                                                <div class="d-flex justify-content-md-end gap-2">
+                                                                    <button type="submit" class="btn-action btn-accept">
+                                                                        <i class="fa-solid fa-check"></i> Accept
+                                                                    </button>
+                                                                    <button type="submit"
+                                                                        formaction="/buddy/requests/<%= request._id %>/reject"
+                                                                        class="btn-action btn-reject">
+                                                                        <i class="fa-solid fa-xmark"></i> Reject
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                            <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sent Requests -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="request-section-container">
+                                <h5 class="section-title"><i class="fa-solid fa-paper-plane text-primary"></i> Sent
+                                    Requests</h5>
+
+                                <% if (sentRequests.length===0) { %>
+                                    <div class="empty-state-mini">
+                                        <p class="mb-0">You haven't sent any requests yet.</p>
+                                    </div>
+                                    <% } else { %>
+                                        <% sentRequests.forEach(request=> { %>
+                                            <div class="request-card sent">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">To: <strong>
+                                                                <%= request.to.username %>
+                                                            </strong></h6>
+                                                        <% if (request.listing) { %>
+                                                            <small class="text-muted d-block mb-2">For: <%=
+                                                                    request.listing.title %>
+                                                            </small>
+                                                            <% } %>
+                                                                <div class="text-muted small">
+                                                                    You: "<%= request.message %>"
+                                                                </div>
+                                                                <% if (request.responseMessage) { %>
+                                                                    <div
+                                                                        class="mt-2 text-dark small p-2 bg-light rounded">
+                                                                        <strong>Reply:</strong> "<%=
+                                                                            request.responseMessage %>"
+                                                                    </div>
+                                                                    <% } %>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="status-badge badge-<%= request.status %>">
+                                                            <%= request.status %>
+                                                        </span>
+                                                        <div class="text-muted small mt-1">
+                                                            <%= new Date(request.createdAt).toLocaleDateString() %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- End content-panel -->
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <% if (isAdmin && allRequests) { %>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card admin-card">
+                        <div class="card-header bg-white border-bottom">
+                            <h6 class="mb-0 fw-bold text-uppercase"><i class="fa-solid fa-shield-halved me-2"></i>Admin
+                                Monitor</h6>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table mb-0">
                                 <thead>
                                     <tr>
                                         <th>From</th>
                                         <th>To</th>
-                                        <th>Listing</th>
                                         <th>Status</th>
                                         <th>Date</th>
-                                        <th>Actions</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% allRequests.forEach(request => { %>
+                                    <% allRequests.forEach(request=> { %>
                                         <tr>
-                                            <td><%= request.from.username %></td>
-                                            <td><%= request.to.username %></td>
-                                            <td><%= request.listing ? request.listing.title : 'N/A' %></td>
                                             <td>
-                                                <span class="badge bg-<%= request.status === 'pending' ? 'warning' : request.status === 'accepted' ? 'success' : 'danger' %>">
+                                                <%= request.from.username %>
+                                            </td>
+                                            <td>
+                                                <%= request.to.username %>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge badge-<%= request.status %>">
                                                     <%= request.status %>
                                                 </span>
                                             </td>
-                                            <td><%= new Date(request.createdAt).toLocaleDateString() %></td>
                                             <td>
-                                                <form method="POST" action="/buddy/requests/<%= request._id %>?_method=DELETE" class="d-inline">
-                                                    <button type="submit" class="btn btn-danger btn-sm" 
-                                                            onclick="return confirm('Delete this request?')">
-                                                        <i class="fa-solid fa-trash"></i>
+                                                <%= new Date(request.createdAt).toLocaleDateString() %>
+                                            </td>
+                                            <td>
+                                                <form method="POST"
+                                                    action="/buddy/requests/<%= request._id %>?_method=DELETE"
+                                                    class="d-inline">
+                                                    <button type="submit" class="btn btn-link text-danger p-0"
+                                                        onclick="return confirm('Delete this request?')">
+                                                        <i class="fa-solid fa-trash-can"></i>
                                                     </button>
                                                 </form>
                                             </td>
                                         </tr>
-                                    <% }) %>
+                                        <% }) %>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    <% } %>
-</div>
-
+            <% } %>
+    </div>

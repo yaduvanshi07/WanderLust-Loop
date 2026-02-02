@@ -34,15 +34,9 @@
             <button class="btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
           </form>
 
+          <!-- Find Buddy Button - Always Visible -->
           <% if (currUser) { %>
-            <!-- If logged in, maybe show Find Buddy near controls or keep grouped? 
-                 User didn't specify, but Find Buddy is a major feature. 
-                 Keeping it clean or moving it? 
-                 Usually best to keep primary nav items together. 
-                 I'll keep specific "Find Buddy" dropdown in the nav flow to avoid cluttering controls excessively,
-                 or maybe just next to Home? 
-                 Let's stick to the request: "keep [search, add listing, home] in left side".
-            -->
+            <!-- Logged-in: Full functionality with dropdown -->
             <div class="nav-item dropdown ms-2">
               <a class="nav-link dropdown-toggle btn-find-buddy" href="#" role="button" data-bs-toggle="dropdown">
                 Find Buddy
@@ -59,7 +53,15 @@
                 <li><a class="dropdown-item" href="/buddy/inbox"><i class="fa-solid fa-inbox me-2"></i>Inbox</a></li>
               </ul>
             </div>
-            <% } %>
+            <% } else { %>
+              <!-- Logged-out: Disabled button with tooltip -->
+              <div class="nav-item ms-2 position-relative">
+                <button class="btn-find-buddy disabled-feature" data-auth-required="true" type="button">
+                  Find Buddy
+                </button>
+                <div class="auth-tooltip">You need to be logged in to use this feature</div>
+              </div>
+              <% } %>
         </div>
 
         <!-- Right Side (Auth Buttons) -->

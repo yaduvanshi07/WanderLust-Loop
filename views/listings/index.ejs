@@ -1,108 +1,133 @@
 <% layout("/layouts/boilerplate")%>
 
-<style>
-    #filters {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-    }
+    <style>
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
 
-    .filter {
-        text-align: center;
-        margin-top: 1.5rem;
-        margin-left: 2rem;
-        opacity: 0.6;
-    }
+        .filter {
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-left: 2rem;
+            opacity: 0.6;
+        }
 
-    .filter:hover {
-        opacity: 1;
-        cursor: pointer;
-    }
+        .filter:hover {
+            opacity: 1;
+            cursor: pointer;
+        }
 
-    .tax-info {
-        display: none;
-        margin-top: 0.5rem;
-    }
+        .tax-info {
+            display: none;
+            margin-top: 0.5rem;
+        }
 
-    .tax-toggle {
-        border: 1px solid black;
-        border-radius: 1rem;
-        height: 3rem;
-        padding: 1rem;
-        margin-left: 9rem;
-        display: flex;
-        align-items: center;
-    }
+        .tax-toggle {
+            border: 1px solid black;
+            border-radius: 1rem;
+            height: 3rem;
+            padding: 1rem;
+            margin-left: 9rem;
+            display: flex;
+            align-items: center;
+        }
 
-    .card {
-        margin-bottom: 2rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        position: relative;
-        z-index: 1;
-        opacity: 0.6;
-    }
+        .card {
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            z-index: 1;
+            opacity: 0.6;
+        }
 
-    .card:hover {
-        transform: scale(1.03);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        z-index: 10;
-        opacity: 1;
-        cursor: pointer;
-    }
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            opacity: 1;
+            cursor: pointer;
+        }
 
-    .listing-container {
-        margin-bottom: 5rem; /* space below for footer */
-    }
+        .listing-container {
+            margin-bottom: 5rem;
+            /* space below for footer */
+        }
 
-    .old-price {
-        color: red;
-    }
+        .old-price {
+            color: red;
+        }
 
-    .new-price {
-        font-weight: bold;
-        color: green;
-    }
+        .new-price {
+            font-weight: bold;
+            color: green;
+        }
 
-    .cut-price {
-        text-decoration: line-through;
-    }
+        .cut-price {
+            text-decoration: line-through;
+        }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
 
-    .fade-in {
-        animation: fadeIn 0.5s ease-in-out forwards;
-    }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .personalized-alert {
-        animation: fadeIn 0.5s ease-in-out;
-    }
-    /* Personalization banner styling */
-    .personalization-banner {
-        background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%) !important; /* indigo-50 to slate-50 */
-        border: 1px solid #e5e7eb !important; /* gray-200 */
-        border-left: 4px solid #4f46e5 !important; /* indigo-600 */
-        color: #111827; /* gray-900 */
-        border-radius: 12px;
-        transition: box-shadow 0.2s ease, transform 0.2s ease;
-    }
-    .personalization-banner:hover { box-shadow: 0 10px 25px rgba(79,70,229,0.12); transform: translateY(-1px); }
-    .how-it-works { color: #4f46e5; text-decoration: underline; text-underline-offset: 2px; }
-    .how-it-works:hover { color: #1d4ed8; }
-</style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .personalized-alert {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Personalization banner styling */
+        .personalization-banner {
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%) !important;
+            /* indigo-50 to slate-50 */
+            border: 1px solid #e5e7eb !important;
+            /* gray-200 */
+            border-left: 4px solid #4f46e5 !important;
+            /* indigo-600 */
+            color: #111827;
+            /* gray-900 */
+            border-radius: 12px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .personalization-banner:hover {
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .how-it-works {
+            color: #4f46e5;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .how-it-works:hover {
+            color: #1d4ed8;
+        }
+    </style>
 
 
 
-<div id="filters" class="position-relative">
-    <div class="alert d-flex align-items-center gap-3 mt-3 personalized-alert personalization-banner" role="alert">
-        <div class="flex-grow-1">
-            <strong>We personalize your search results.</strong>
-            <span id="info-trigger" class="ms-2 how-it-works" style="cursor: help;">How it works</span>
+    <div id="filters" class="position-relative">
+        <div class="alert d-flex align-items-center gap-3 mt-3 personalized-alert personalization-banner" role="alert">
+            <div class="flex-grow-1">
+                <strong>We personalize your search results.</strong>
+                <span id="info-trigger" class="ms-2 how-it-works" style="cursor: help;">How it works</span>
+            </div>
         </div>
-    </div>
-    <!-- <div class="filter"><div><i class="fa-solid fa-fire"></i></div><p>Trending</p></div>
+        <!-- <div class="filter"><div><i class="fa-solid fa-fire"></i></div><p>Trending</p></div>
     <div class="filter"><div><i class="fa-solid fa-bed"></i></div><p>Rooms</p></div>
     <div class="filter"><div><i class="fa-solid fa-mountain-city"></i></div><p>Iconic Cities</p></div>
     <div class="filter"><div><i class="fa-solid fa-mountain-sun"></i></div><p>Mountains</p></div>
@@ -112,163 +137,176 @@
     <div class="filter"><div><i class="fa-solid fa-cow"></i></div><p>Farms</p></div>
     <div class="filter"><div><i class="fa-solid fa-snowflake"></i></div><p>Arctic</p></div> -->
 
-    <div class="tax-toggle mb-3 mt-4 d-flex align-items-center gap-3">
-        <div class="form-check-reverse form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-            <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+        <div class="tax-toggle mb-3 mt-4 d-flex align-items-center gap-3 justify-content-end">
+            <div class="form-check-reverse form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+            </div>
         </div>
     </div>
-</div>
 
-<% if (allListings.length === 0) { %>
-    <h4>No listings found for "<%= searchQuery %>"</h4>
-<% } else { %>
-    <div class="container mt-4 listing-container">
-        <div id="listing-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <% allListings.forEach(listing => { 
-                let priceWithGST = listing.price * 1.18;
-            %>
-                <div class="col">
-                    <div class="card h-100 border-0 shadow-sm rounded-4" data-listing-id="<%= listing._id %>">
-                        <a href="/listings/<%= listing._id %>" data-listing-id="<%= listing._id %>">
-                            <div class="position-relative">
-                                <img src="<%= listing.image?.url || '/images/default.jpg' %>" class="card-img-top rounded-top-4" style="height: 250px; object-fit: cover;" alt="<%= listing.title %>">
-                                <% if (listing.performanceBadge) { %>
-                                    <span class="position-absolute top-0 start-0 m-2 badge <%= listing.performanceBadge.class %>">
-                                        <%= listing.performanceBadge.text %>
-                                    </span>
-                                <% } %>
-                                <% if (listing.rankingScore) { %>
-                                    <div class="position-absolute top-0 end-0 m-2">
-                                        <span class="badge bg-dark" title="Performance Score: <%= listing.rankingScore %>/100">
-                                            <i class="fa-solid fa-chart-line"></i> <%= listing.rankingScore %>
-                                        </span>
+    <% if (allListings.length===0) { %>
+        <h4>No listings found for "<%= searchQuery %>"</h4>
+        <% } else { %>
+            <div class="container mt-4 listing-container">
+                <div id="listing-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    <% allListings.forEach(listing=> {
+                        let priceWithGST = listing.price * 1.18;
+                        %>
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm rounded-4" data-listing-id="<%= listing._id %>">
+                                <a href="/listings/<%= listing._id %>" data-listing-id="<%= listing._id %>">
+                                    <div class="position-relative">
+                                        <img src="<%= listing.image?.url || '/images/default.jpg' %>"
+                                            class="card-img-top rounded-top-4" style="height: 250px; object-fit: cover;"
+                                            alt="<%= listing.title %>">
+                                        <% if (listing.performanceBadge) { %>
+                                            <span
+                                                class="position-absolute top-0 start-0 m-2 badge <%= listing.performanceBadge.class %>">
+                                                <%= listing.performanceBadge.text %>
+                                            </span>
+                                            <% } %>
+                                                <% if (listing.rankingScore) { %>
+                                                    <div class="position-absolute top-0 end-0 m-2">
+                                                        <span class="badge bg-dark"
+                                                            title="Performance Score: <%= listing.rankingScore %>/100">
+                                                            <i class="fa-solid fa-chart-line"></i>
+                                                            <%= listing.rankingScore %>
+                                                        </span>
+                                                    </div>
+                                                    <% } %>
                                     </div>
-                                <% } %>
-                            </div>
-                        </a>
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold mb-1"><%= listing.title %></h5>
-                            <p class="mb-1 text-muted"><strong>Location:</strong> <%= listing.location %>, <%= listing.country %></p>
-                            <p class="mb-2 text-muted">
-                                <strong>Price:</strong> 
-                                <span class="old-price" id="old-price-<%= listing._id %>">₹<%= listing.price %>/night</span>
-                                <span class="tax-info new-price" id="new-price-<%= listing._id %>">₹<%= priceWithGST.toFixed(2) %>/night</span>
-                            </p>
-                            <% if (listing.performanceStatus && listing.performanceStatus !== 'average') { %>
-                                <div class="performance-indicator mt-2">
-                                    <small class="text-muted">
-                                        <i class="fa-solid fa-<%= listing.performanceStatus === 'excellent' ? 'star' : (listing.performanceStatus === 'good' ? 'thumbs-up' : 'exclamation-triangle') %>"></i>
-                                        Performance: <%= listing.performanceStatus.charAt(0).toUpperCase() + listing.performanceStatus.slice(1) %>
-                                    </small>
+                                </a>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title fw-bold mb-1">
+                                        <%= listing.title %>
+                                    </h5>
+                                    <p class="mb-1 text-muted"><strong>Location:</strong>
+                                        <%= listing.location %>, <%= listing.country %>
+                                    </p>
+                                    <p class="mb-2 text-muted">
+                                        <strong>Price:</strong>
+                                        <span class="old-price" id="old-price-<%= listing._id %>">₹<%= listing.price %>
+                                                /night</span>
+                                        <span class="tax-info new-price" id="new-price-<%= listing._id %>">₹<%=
+                                                priceWithGST.toFixed(2) %>/night</span>
+                                    </p>
+                                    <% if (listing.performanceStatus && listing.performanceStatus !=='average' ) { %>
+                                        <div class="performance-indicator mt-2">
+                                            <small class="text-muted">
+                                                <i
+                                                    class="fa-solid fa-<%= listing.performanceStatus === 'excellent' ? 'star' : (listing.performanceStatus === 'good' ? 'thumbs-up' : 'exclamation-triangle') %>"></i>
+                                                Performance: <%= listing.performanceStatus.charAt(0).toUpperCase() +
+                                                    listing.performanceStatus.slice(1) %>
+                                            </small>
+                                        </div>
+                                        <% } %>
                                 </div>
-                            <% } %>
+                            </div>
                         </div>
-                    </div>
+                        <% }); %>
                 </div>
-            <% }); %>
-        </div>
-    </div>
-<% } %>
+            </div>
+            <% } %>
 
-<script>
-    // Initialize tooltip and cleanup on page load
-    window.addEventListener('DOMContentLoaded', function() {
-        // Remove duplicate alerts
-        const alerts = document.querySelectorAll('.personalized-alert');
-        for (let i = 1; i < alerts.length; i++) {
-            alerts[i].remove();
-        }
-        
-        // Initialize Bootstrap tooltip
-        const infoTrigger = document.getElementById('info-trigger');
-        if (infoTrigger && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-            new bootstrap.Tooltip(infoTrigger, {
-                html: true,
-                placement: 'bottom',
-                title: '<strong>About personalized results</strong><br><br>We prioritize listings using recent browsing activity and preferences like budget and locations you open most. The order can change as you explore so newer, relevant options are surfaced. Your account activity is used only to improve your experience.',
-                trigger: 'hover',
-                animation: true
-            });
-        }
-    });
+                <script>
+                    // Initialize tooltip and cleanup on page load
+                    window.addEventListener('DOMContentLoaded', function () {
+                        // Remove duplicate alerts
+                        const alerts = document.querySelectorAll('.personalized-alert');
+                        for (let i = 1; i < alerts.length; i++) {
+                            alerts[i].remove();
+                        }
 
-    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+                        // Initialize Bootstrap tooltip
+                        const infoTrigger = document.getElementById('info-trigger');
+                        if (infoTrigger && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                            new bootstrap.Tooltip(infoTrigger, {
+                                html: true,
+                                placement: 'bottom',
+                                title: '<strong>About personalized results</strong><br><br>We prioritize listings using recent browsing activity and preferences like budget and locations you open most. The order can change as you explore so newer, relevant options are surfaced. Your account activity is used only to improve your experience.',
+                                trigger: 'hover',
+                                animation: true
+                            });
+                        }
+                    });
 
-    taxSwitch.addEventListener("click", () => {
-        let allOldPrices = document.getElementsByClassName("old-price");
-        let allNewPrices = document.getElementsByClassName("tax-info");
+                    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
 
-        for (let i = 0; i < allOldPrices.length; i++) {
-            let oldPrice = allOldPrices[i];
-            let newPrice = allNewPrices[i];
+                    taxSwitch.addEventListener("click", () => {
+                        let allOldPrices = document.getElementsByClassName("old-price");
+                        let allNewPrices = document.getElementsByClassName("tax-info");
 
-            // Toggle the line-through for old price and show the new price with GST
-            if (taxSwitch.checked) {
-                oldPrice.classList.add("cut-price");
-                newPrice.style.display = "inline";
-            } else {
-                oldPrice.classList.remove("cut-price");
-                newPrice.style.display = "none";
-            }
-        }
-    });
-</script>
-<script>
-    // Client-side re-ranking using bandit API with explanations
-    (async function applyPersonalizedRanking(){
-        try {
-            const grid = document.getElementById('listing-grid');
-            if (!grid) return;
-            const cards = Array.from(grid.querySelectorAll('.card[data-listing-id]'));
-            const listingIds = cards.map(c => c.getAttribute('data-listing-id'));
-            if (listingIds.length === 0) return;
+                        for (let i = 0; i < allOldPrices.length; i++) {
+                            let oldPrice = allOldPrices[i];
+                            let newPrice = allNewPrices[i];
 
-            const query = '<%= searchQuery %>';
-            const resp = await fetch('/api/search/rank', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ listingIds, searchFilters: {}, query })
-            });
-            if (!resp.ok) return;
-            const data = await resp.json();
-            if (!data || !Array.isArray(data.ranked)) return;
+                            // Toggle the line-through for old price and show the new price with GST
+                            if (taxSwitch.checked) {
+                                oldPrice.classList.add("cut-price");
+                                newPrice.style.display = "inline";
+                            } else {
+                                oldPrice.classList.remove("cut-price");
+                                newPrice.style.display = "none";
+                            }
+                        }
+                    });
+                </script>
+                <script>
+                    // Client-side re-ranking using bandit API with explanations
+                    (async function applyPersonalizedRanking() {
+                        try {
+                            const grid = document.getElementById('listing-grid');
+                            if (!grid) return;
+                            const cards = Array.from(grid.querySelectorAll('.card[data-listing-id]'));
+                            const listingIds = cards.map(c => c.getAttribute('data-listing-id'));
+                            if (listingIds.length === 0) return;
 
-            // Build map from id to column node for stable re-insertion
-            const colById = new Map();
-            cards.forEach(card => {
-                const id = card.getAttribute('data-listing-id');
-                colById.set(id, card.closest('.col'));
-            });
+                            const query = '<%= searchQuery %>';
+                            const resp = await fetch('/api/search/rank', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ listingIds, searchFilters: {}, query })
+                            });
+                            if (!resp.ok) return;
+                            const data = await resp.json();
+                            if (!data || !Array.isArray(data.ranked)) return;
 
-            // Reorder DOM and add explanation badges
-            const fragment = document.createDocumentFragment();
-            data.ranked.forEach((item, idx) => {
-                const id = (item && item._id) ? item._id : String(item);
-                const col = colById.get(String(id));
-                if (col) {
-                    const explanation = data.explanations && data.explanations[String(id)];
-                    if (explanation && idx < 3) {
-                        const card = col.querySelector('.card');
-                        if (card) {
-                            const explEl = document.createElement('div');
-                            explEl.className = 'position-absolute top-0 end-0 m-2';
-                            explEl.innerHTML = `
+                            // Build map from id to column node for stable re-insertion
+                            const colById = new Map();
+                            cards.forEach(card => {
+                                const id = card.getAttribute('data-listing-id');
+                                colById.set(id, card.closest('.col'));
+                            });
+
+                            // Reorder DOM and add explanation badges
+                            const fragment = document.createDocumentFragment();
+                            data.ranked.forEach((item, idx) => {
+                                const id = (item && item._id) ? item._id : String(item);
+                                const col = colById.get(String(id));
+                                if (col) {
+                                    const explanation = data.explanations && data.explanations[String(id)];
+                                    if (explanation && idx < 3) {
+                                        const card = col.querySelector('.card');
+                                        if (card) {
+                                            const explEl = document.createElement('div');
+                                            explEl.className = 'position-absolute top-0 end-0 m-2';
+                                            explEl.innerHTML = `
                                 <button class="btn btn-sm btn-info" data-bs-toggle="tooltip" data-bs-html="true" 
                                     title="<strong>Why recommended:</strong><br>
                                     ${(explanation.factors || []).map(f => '• ' + f.message).join('<br>')}<br>
                                     <em>Confidence: ${explanation.confidence}</em>">
                                     <i class="fa-solid fa-sparkles"></i> Recommended
                                 </button>`;
-                            card.appendChild(explEl);
-                            if (window.bootstrap) new bootstrap.Tooltip(explEl);
-                        }
-                    }
-                    fragment.appendChild(col);
-                }
-            });
-            grid.appendChild(fragment);
-        } catch (_) {}
-    })();
+                                            card.appendChild(explEl);
+                                            if (window.bootstrap) new bootstrap.Tooltip(explEl);
+                                        }
+                                    }
+                                    fragment.appendChild(col);
+                                }
+                            });
+                            grid.appendChild(fragment);
+                        } catch (_) { }
+                    })();
 
-</script>
+                </script>

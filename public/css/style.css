@@ -46,7 +46,7 @@ body {
 .navbar-brand {
     font-family: serif;
     font-weight: 800;
-    font-size: 2.8rem;
+    font-size: 32px !important;
     /* Significantly Larger */
     letter-spacing: 0.05em;
     display: flex;
@@ -137,27 +137,43 @@ body {
     font-weight: 600;
     margin-right: 1rem;
     text-decoration: none;
-    padding: 0.6rem 1rem;
+    padding: 0.7rem 1.5rem;
+    background: transparent;
+    border: 2px solid #1F2937;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-login-custom:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: #111827;
+    color: #111827;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .btn-signup-custom {
-    background: linear-gradient(135deg, #4B5563 0%, #1F2937 100%);
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
     border: none;
     color: white !important;
-    border-radius: 25rem;
+    border-radius: 25px;
     padding: 0.7rem 1.8rem;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
     text-decoration: none;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .btn-signup-custom:hover {
-    background: linear-gradient(135deg, #374151 0%, #111827 100%);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    transform: translateY(-2px);
     color: white !important;
 }
+
 
 /* Dropdown Styles */
 .dropdown-menu {
@@ -312,20 +328,21 @@ body.auth-page {
 
 .card-body {
     padding: 1rem 0 0 0 !important;
+    margin-left: 10px;
 }
 
 /* Footer */
 footer {
     background-color: var(--footer-bg);
     color: var(--text-light);
-    padding: 4rem 0 2rem 0;
+    padding: 1.5rem 0 1rem 0;
     margin-top: auto;
 }
 
 .f-section-title {
     color: var(--primary-gold);
     font-weight: 700;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     font-size: 1.1rem;
 }
 
@@ -333,7 +350,7 @@ footer {
     display: block;
     color: #9CA3AF;
     text-decoration: none;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
     transition: color 0.2s;
 }
 
@@ -355,8 +372,8 @@ footer {
 
 .f-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin-top: 3rem;
-    padding-top: 2rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
     display: flex;
     justify-content: space-between;
     color: #6B7280;
@@ -441,18 +458,21 @@ footer {
 .text-gradient-primary {
     background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-purple {
     background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-teal {
     background: linear-gradient(135deg, #059669 0%, #2DD4BF 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -470,4 +490,104 @@ footer {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
     color: white;
+}
+
+/* =========================================
+   Disabled Feature Styles (Auth Required)
+   ========================================= */
+
+/* Disabled Find Buddy Button */
+.btn-find-buddy.disabled-feature {
+    cursor: not-allowed !important;
+    opacity: 0.6;
+    position: relative;
+    pointer-events: auto;
+    /* Allow hover events */
+}
+
+/* Tooltip for disabled features */
+.auth-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(31, 41, 55, 0.95);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tooltip arrow */
+.auth-tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: rgba(31, 41, 55, 0.95);
+}
+
+/* Show tooltip on hover */
+.disabled-feature:hover+.auth-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Subtle blur effect on disabled button */
+.btn-find-buddy.disabled-feature:hover {
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%) !important;
+    opacity: 0.5;
+    transform: none !important;
+    /* Prevent lift effect */
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2) !important;
+    /* Dimmer shadow */
+}
+
+/* Prevent dropdown toggle icon on disabled button */
+.btn-find-buddy.disabled-feature::after {
+    display: none;
+}
+
+/* Mobile responsive tooltip */
+@media (max-width: 768px) {
+    .auth-tooltip {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+        max-width: 200px;
+        white-space: normal;
+        text-align: center;
+    }
+}
+
+/* =========================================
+   Flash Message Styles
+   ========================================= */
+
+/* Error flash message with prominent red background */
+.alert-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.alert-danger .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+/* Fade out animation for auto-dismiss */
+.alert.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
 }

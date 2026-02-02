@@ -27,9 +27,13 @@ body {
     color: var(--text-main);
 }
 
+/* Main Containers - Explicit Stacking Context */
 .container {
     flex: 1;
     padding-top: 2rem;
+    position: relative;
+    z-index: 10;
+    /* Ensure content sits above background canvas */
 }
 
 /* Navbar */
@@ -38,9 +42,23 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     min-height: 6rem;
-    /* Increased height specific for larger brand */
     padding: 1rem 3rem;
-    /* More padding */
+    position: relative;
+    z-index: 1000;
+    /* High priority */
+}
+
+/* ... rest of navbar code ... */
+
+/* Footer */
+footer {
+    background-color: var(--footer-bg);
+    color: var(--text-light);
+    padding: 1.5rem 0 1rem 0;
+    margin-top: auto;
+    position: relative;
+    z-index: 10;
+    /* Ensure footer sits above background canvas */
 }
 
 .navbar-brand {

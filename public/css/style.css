@@ -609,3 +609,122 @@ footer {
     opacity: 0;
     transition: opacity 0.5s ease-out;
 }
+
+/* Mobile Navbar Enhancements */
+@media (max-width: 767px) {
+    .navbar {
+        padding: 0.75rem 1rem;
+    }
+
+    .navbar-collapse {
+        background: rgba(255, 255, 255, 0.98);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-top: 0.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    /* Row 1: Auth Buttons (Login/Signup or Profile) */
+    .navbar-collapse>.navbar-nav:last-of-type {
+        order: 1;
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        gap: 0.75rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Row 2 & 3 Container: Nav Buttons + Search */
+    .navbar-collapse>.navbar-nav:first-of-type {
+        order: 2;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Row 2 ordering: Home(1), Add(2), Buddy(3) */
+    .navbar-collapse>.navbar-nav:first-of-type>.btn-nav-pill:nth-of-type(1) {
+        order: 1;
+    }
+
+    .navbar-collapse>.navbar-nav:first-of-type>.btn-nav-pill:nth-of-type(2) {
+        order: 2;
+    }
+
+    .navbar-collapse>.navbar-nav:first-of-type>.nav-item.dropdown,
+    .navbar-collapse>.navbar-nav:first-of-type>.nav-item:not(.dropdown) {
+        order: 3;
+    }
+
+    /* Row 3 ordering: Search Form */
+    .navbar-collapse>.navbar-nav:first-of-type>.search-form {
+        order: 4;
+        width: 100%;
+        margin-top: 0.25rem;
+    }
+
+    /* Unified Button Styling for Mobile Compactness */
+    .btn-nav-pill,
+    .btn-find-buddy,
+    .btn-login-custom,
+    .btn-signup-custom {
+        width: auto !important;
+        flex: 1 1 auto;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    /* Ensure icons don't break layout */
+    .btn-nav-pill i,
+    .btn-find-buddy i {
+        margin-right: 0.25rem;
+    }
+
+    /* Search Input & Button */
+    .search-input {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .btn-search {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0 !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    /* User Profile Box */
+    .user-profile-box {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Dropdown alignment */
+    .dropdown-menu {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+}

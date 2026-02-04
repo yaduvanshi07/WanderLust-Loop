@@ -15,7 +15,7 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 
         <!-- Left Side Controls (Home Button, Add Listing, Search) -->
-        <div class="navbar-nav me-auto align-items-center d-flex flex-row flex-wrap gap-2">
+        <div class="navbar-nav me-auto align-items-center d-flex flex-column flex-md-row gap-3 gap-md-2 mt-3 mt-md-0">
 
           <!-- Home Button -->
           <a class="btn-nav-pill" href="/listings">
@@ -28,7 +28,7 @@
           </a>
 
           <!-- Search Form -->
-          <form action="/listings" method="GET" class="d-flex search-form position-relative ms-2" role="search">
+          <form action="/listings" method="GET" class="d-flex search-form position-relative ms-0 ms-md-2" role="search">
             <input class="form-control search-input" type="search" placeholder="Search..." aria-label="Search" name="q"
               value="<%= searchQuery %>">
             <button class="btn-search" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
@@ -37,8 +37,9 @@
           <!-- Find Buddy Button - Always Visible -->
           <% if (currUser) { %>
             <!-- Logged-in: Full functionality with dropdown -->
-            <div class="nav-item dropdown ms-2">
-              <a class="nav-link dropdown-toggle btn-find-buddy" href="#" role="button" data-bs-toggle="dropdown">
+            <div class="nav-item dropdown ms-0 ms-md-2 text-center text-md-start">
+              <a class="nav-link dropdown-toggle btn-find-buddy d-block d-md-inline-block" href="#" role="button"
+                data-bs-toggle="dropdown">
                 Find Buddy
               </a>
               <ul class="dropdown-menu">
@@ -55,8 +56,9 @@
             </div>
             <% } else { %>
               <!-- Logged-out: Disabled button with tooltip -->
-              <div class="nav-item ms-2 position-relative">
-                <button class="btn-find-buddy disabled-feature" data-auth-required="true" type="button">
+              <div class="nav-item ms-0 ms-md-2 position-relative text-center text-md-start">
+                <button class="btn-find-buddy disabled-feature d-block d-md-inline-block" data-auth-required="true"
+                  type="button">
                   Find Buddy
                 </button>
                 <div class="auth-tooltip">You need to be logged in to use this feature</div>
@@ -65,13 +67,14 @@
         </div>
 
         <!-- Right Side (Auth Buttons) -->
-        <div class="navbar-nav ms-auto align-items-center">
+        <div class="navbar-nav ms-auto align-items-center d-flex flex-column flex-md-row gap-3 gap-md-0 mt-3 mt-md-0">
           <% if (!currUser) { %>
-            <a class="btn btn-login-custom" href="/login">Login</a>
-            <a class="btn btn-signup-custom" href="/signup">Sign Up</a>
+            <a class="btn btn-login-custom mb-2 mb-md-0 text-center" href="/login">Login</a>
+            <a class="btn btn-signup-custom text-center" href="/signup">Sign Up</a>
             <% } else { %>
-              <div class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle user-profile-box" href="#" role="button" data-bs-toggle="dropdown">
+              <div class="nav-item dropdown text-center text-md-start">
+                <a class="nav-link dropdown-toggle user-profile-box justify-content-center justify-content-md-start"
+                  href="#" role="button" data-bs-toggle="dropdown">
                   <i class="fa-solid fa-user-circle me-1"></i>
                   <%= currUser.username %>
                     <% if (currUser.role==='admin' ) { %>
